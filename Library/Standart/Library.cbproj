@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{06f6792d-b673-4ba5-901a-ed97182dd832}</ProjectGuid>
+    <ProjectType>CppStaticLibrary</ProjectType>
+    <Config Condition="'$(Config)'==''">Debug Build</Config>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Debug Build' or '$(Cfg_1)'!=''">
+    <Base>true</Base>
+    <Cfg_1>true</Cfg_1>
+    <CfgParent>Base</CfgParent>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Release Build' or '$(Cfg_2)'!=''">
+    <Base>true</Base>
+    <Cfg_2>true</Cfg_2>
+    <CfgParent>Base</CfgParent>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Base)'!=''">
+    <DCC_Optimize>false</DCC_Optimize>
+    <OutputExt>lib</OutputExt>
+    <DCC_CBuilderOutput>JPHN</DCC_CBuilderOutput>
+    <DynamicRTL>true</DynamicRTL>
+    <BCC_InstructionSet>6</BCC_InstructionSet>
+    <BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+    <BCC_UseRegisterVariables>None</BCC_UseRegisterVariables>
+    <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+    <BCC_ZeroLengthEmptyMemberFuncs>true</BCC_ZeroLengthEmptyMemberFuncs>
+    <DCC_MakeModifiedUnits>true</DCC_MakeModifiedUnits>
+    <FinalOutputDir>.</FinalOutputDir>
+    <TASM_AdditionalSwitches> /w2</TASM_AdditionalSwitches>
+    <DCC_UnitSearchPath>.\;$(BDS)\lib;$(BDS)\lib\obj</DCC_UnitSearchPath>
+    <BCC_GenerateMultithreaded>true</BCC_GenerateMultithreaded>
+    <BCC_StackFrames>true</BCC_StackFrames>
+    <BRCC_UserSuppliedOptions> -I$(BDS)\Lib;$(BDS)\Bin;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\Projects;..\august2002;$(BDS)\include\dinkumware</BRCC_UserSuppliedOptions>
+    <BCC_PCHCache>true</BCC_PCHCache>
+    <BCC_IntegerSizedEnums>false</BCC_IntegerSizedEnums>
+    <BCC_IncludePath>$(BDS)\Lib;$(BDS)\Bin;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\Projects;..\august2002;$(BDS)\include\dinkumware</BCC_IncludePath>
+    <TASM_IncludePath>$(BDS)\Lib;$(BDS)\Bin;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\Projects;..\august2002;$(BDS)\include\dinkumware</TASM_IncludePath>
+    <BRCC_IncludePath>$(BDS)\Lib;$(BDS)\Bin;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\Projects;..\august2002;$(BDS)\include\dinkumware</BRCC_IncludePath>
+    <DCC_IncludePath>.\;$(BDS)\lib;$(BDS)\lib\obj</DCC_IncludePath>
+    <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+    <BCC_ZeroLengthEmptyBaseClass>true</BCC_ZeroLengthEmptyBaseClass>
+    <ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk</ILINK_LibraryPath>
+    <BCC_Defines>NO_STRICT</BCC_Defines>
+    <BRCC_Defines>_DEBUG</BRCC_Defines>
+    <TASM_Defines>_DEBUG</TASM_Defines>
+    <Multithreaded>true</Multithreaded>
+    <TASM_Debugging>Full</TASM_Debugging>
+    <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+    <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_1)'!=''">
+    <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+    <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+    <ILINK_DisableIncrementalLinking>true</ILINK_DisableIncrementalLinking>
+    <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+    <IntermediateOutputDir>Debug_Build</IntermediateOutputDir>
+    <TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
+    <ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    <BCC_Defines>_DEBUG;$(BCC_Defines)</BCC_Defines>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_2)'!=''">
+    <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+    <DCC_Optimize>true</DCC_Optimize>
+    <BCC_InlineFunctionExpansion>true</BCC_InlineFunctionExpansion>
+    <BCC_UseRegisterVariables>Always</BCC_UseRegisterVariables>
+    <DCC_DebugInformation>false</DCC_DebugInformation>
+    <IntermediateOutputDir>Release_Build</IntermediateOutputDir>
+    <BCC_StackFrames>false</BCC_StackFrames>
+    <ILINK_LibraryPath>$(BDS)\lib\release;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    <BCC_Defines>NDEBUG;$(BCC_Defines)</BCC_Defines>
+    <TASM_Debugging>None</TASM_Debugging>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>CPlusPlusBuilder.Personality</Borland.Personality>
+    <Borland.ProjectType>CppStaticLibrary</Borland.ProjectType>
+    <BorlandProject>
+<BorlandProject> <CPlusPlusBuilder.Personality>   <VersionInfo>
+      <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+      <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+      <VersionInfo Name="MajorVer">1</VersionInfo>
+      <VersionInfo Name="MinorVer">0</VersionInfo>
+      <VersionInfo Name="Release">0</VersionInfo>
+      <VersionInfo Name="Build">0</VersionInfo>
+      <VersionInfo Name="Debug">False</VersionInfo>
+      <VersionInfo Name="PreRelease">False</VersionInfo>
+      <VersionInfo Name="Special">False</VersionInfo>
+      <VersionInfo Name="Private">False</VersionInfo>
+      <VersionInfo Name="DLL">False</VersionInfo>
+      <VersionInfo Name="Locale">1033</VersionInfo>
+      <VersionInfo Name="CodePage">1252</VersionInfo>
+    </VersionInfo>
+    <VersionInfoKeys>
+      <VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
+      <VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
+      <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+      <VersionInfoKeys Name="InternalName"></VersionInfoKeys>
+      <VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
+      <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
+      <VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
+      <VersionInfoKeys Name="ProductName"></VersionInfoKeys>
+      <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+      <VersionInfoKeys Name="Comments"></VersionInfoKeys>
+    </VersionInfoKeys>
+    <HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Count">14</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item0">$(BCB)\Lib\;$(BCB)\Bin;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Lib;$(BCB)\Projects\;..\..\Library\standart;..\..\Library\august2002</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item1">..\;..\OldLibrary;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary;..\dll</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item2">..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary;..\dll</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item3">..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item4">..\;d:\Program Files\Borland\CBuilder5\Projects\;..;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item5">d:\Program Files\Borland\CBuilder5\Projects;..\;..;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item6">..\;..;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item7">..\;D:\Program Files\Borland\CBuilder5\Lib;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary;..</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item8">..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;D:\Program\Library\BuilberLibrary;D:\Program\Library\OldLibrary;D:\Program\Library</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item9">..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item10">..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;F:\PROGRAM FILES\BORLAND\CBuilder4\Lib</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item11">F:\Cpp Programs for Builder\Sergey Library;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item12">..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;..\;$(BCB)\include;$(BCB)\include\vcl;F:\Cpp Programs for Builder\Sergey Library</HistoryLists_hlIncludePath>
+      <HistoryLists_hlIncludePath Name="Item13">..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;F:\Cpp Programs for Builder\Sergey Library;$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+    </HistoryLists_hlIncludePath>
+    <HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Count">8</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item0">..\;..\OldLibrary;..;..\DLL;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item1">..\DLL;..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item2">..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item3">..\;d:\Program Files\Borland\CBuilder5\Projects\;..;D:\Program Files\Borland\CBuilder5\Lib\</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item4">d:\Program Files\Borland\CBuilder5\Projects;..\;..;D:\Program Files\Borland\CBuilder5\Lib\</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item5">..\;..;D:\Program Files\Borland\CBuilder5\Lib\</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item6">..\;D:\Program Files\Borland\CBuilder5\Lib</HistoryLists_hlLibraryPath>
+      <HistoryLists_hlLibraryPath Name="Item7">F:\PROGRAM FILES\BORLAND\CBuilder4\Lib</HistoryLists_hlLibraryPath>
+    </HistoryLists_hlLibraryPath>
+    <HistoryLists_hlDebugSourcePath>
+      <HistoryLists_hlDebugSourcePath Name="Count">1</HistoryLists_hlDebugSourcePath>
+      <HistoryLists_hlDebugSourcePath Name="Item0">$(BCB)\source\vcl</HistoryLists_hlDebugSourcePath>
+    </HistoryLists_hlDebugSourcePath>
+    <HistoryLists_hlConditionals>
+      <HistoryLists_hlConditionals Name="Count">1</HistoryLists_hlConditionals>
+      <HistoryLists_hlConditionals Name="Item0">_DEBUG</HistoryLists_hlConditionals>
+    </HistoryLists_hlConditionals>
+    <Debugging>
+      <Debugging Name="DebugSourceDirs">$(BCB)\source\vcl</Debugging>
+    </Debugging>
+    <Parameters>
+      <Parameters Name="RunParams"></Parameters>
+      <Parameters Name="Launcher"></Parameters>
+      <Parameters Name="UseLauncher">False</Parameters>
+      <Parameters Name="DebugCWD"></Parameters>
+      <Parameters Name="HostApplication"></Parameters>
+      <Parameters Name="RemoteHost"></Parameters>
+      <Parameters Name="RemotePath"></Parameters>
+      <Parameters Name="RemoteLauncher"></Parameters>
+      <Parameters Name="RemoteCWD"></Parameters>
+      <Parameters Name="RemoteDebug">False</Parameters>
+      <Parameters Name="RemoteParams"></Parameters>
+      <Parameters Name="UseRemoteLauncher">False</Parameters>
+      <Parameters Name="Debug Symbols Search Path"></Parameters>
+      <Parameters Name="LoadAllSymbols">True</Parameters>
+      <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+    </Parameters>
+    <Compiler>
+      <Compiler Name="ShowInfoMsgs">0</Compiler>
+      <Compiler Name="LinkDebugVcl">1</Compiler>
+      <Compiler Name="LinkCGLIB">0</Compiler>
+    </Compiler>
+    <CORBA>
+      <CORBA Name="AddServerUnit">1</CORBA>
+      <CORBA Name="AddClientUnit">1</CORBA>
+      <CORBA Name="PrecompiledHeaders">1</CORBA>
+    </CORBA>
+    <Language>
+      <Language Name="ActiveLang"></Language>
+      <Language Name="ProjectLang"></Language>
+      <Language Name="RootDir"></Language>
+    </Language>
+    <Linker>
+      <Linker Name="LibPrefix"></Linker>
+      <Linker Name="LibSuffix"></Linker>
+      <Linker Name="LibVersion"></Linker>
+    </Linker>
+    <ProjectProperties>
+      <ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
+      <ProjectProperties Name="ManagePaths">True</ProjectProperties>
+      <ProjectProperties Name="VerifyPackages">True</ProjectProperties>
+    </ProjectProperties>
+  </CPlusPlusBuilder.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Borland.Cpp.Targets" />
+  <ItemGroup>
+    <CppCompile Include="Ansilib.cpp">
+      <BuildOrder>1</BuildOrder>
+    </CppCompile>
+    <CppCompile Include="Ansi_Stream.cpp">
+      <BuildOrder>3</BuildOrder>
+    </CppCompile>
+    <CppCompile Include="Functions.cpp">
+      <BuildOrder>2</BuildOrder>
+    </CppCompile>
+    <CppCompile Include="Library.cpp">
+      <BuildOrder>0</BuildOrder>
+    </CppCompile>
+    <BuildConfiguration Include="Debug Build">
+      <Key>Cfg_1</Key>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Release Build">
+      <Key>Cfg_2</Key>
+    </BuildConfiguration>
+  </ItemGroup>
+</Project>
