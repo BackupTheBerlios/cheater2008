@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 192
   Top = 172
-  Width = 948
-  Height = 778
   Caption = 'HCheater'
+  ClientHeight = 732
+  ClientWidth = 940
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -34,7 +34,6 @@ object Form1: TForm1
       item
         Width = 100
       end>
-    SimplePanel = False
   end
   object PageControl1: TPageControl
     Left = 0
@@ -43,7 +42,6 @@ object Form1: TForm1
     Height = 705
     ActivePage = TabSheet1
     Align = alClient
-    TabIndex = 0
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'Stream Edit'
@@ -60,6 +58,10 @@ object Form1: TForm1
     object TabSheet2: TTabSheet
       Caption = 'Process chose'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Button1: TButton
         Left = 456
         Top = 8
@@ -83,28 +85,39 @@ object Form1: TForm1
     object TabSheet3: TTabSheet
       Caption = 'Prcess list'
       ImageIndex = 2
+      ExplicitHeight = 696
       inline ProcessChoice11: TProcessChoice1
         Left = 0
         Top = 0
         Width = 932
-        Height = 677
+        Height = 696
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 932
+        ExplicitHeight = 696
         inherited Splitter1: TSplitter
-          Height = 677
+          Height = 696
+          ExplicitHeight = 677
         end
         inherited ProcessTree: TTreeView
-          Height = 677
+          Height = 696
+          ExplicitHeight = 677
         end
         inherited AdditionalInfo: TTreeView
           Width = 609
           Height = 677
+          ExplicitWidth = 609
+          ExplicitHeight = 677
         end
       end
     end
     object TabSheet4: TTabSheet
       Caption = 'Memory Info'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Button2: TButton
         Left = 696
         Top = 24
@@ -265,6 +278,10 @@ object Form1: TForm1
     object TabSheet5: TTabSheet
       Caption = 'Searcher List'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ChitProperties: TChitThreadProperties
         Left = 0
         Top = 0
@@ -326,14 +343,6 @@ object Form1: TForm1
         OnClick = AddSearcherMenuItemClick
       end
     end
-  end
-  object ServerSocket1: TServerSocket
-    Active = True
-    Port = 50000
-    ServerType = stNonBlocking
-    OnClientRead = ServerSocket1ClientRead
-    Left = 464
-    Top = 64
   end
   object TcpServer1: TTcpServer
     Active = True
