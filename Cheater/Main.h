@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 
 #ifndef MainH
 #define MainH
@@ -75,7 +75,6 @@ __published:	// IDE-managed Components
         TButton *Set;
         TButton *Reload;
         TMemo *Memo1;
-        TServerSocket *ServerSocket1;
         TTcpServer *TcpServer1;
         void __fastcall OpenFileMenuItemClick(TObject *Sender);
 

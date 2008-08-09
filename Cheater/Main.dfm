@@ -85,22 +85,21 @@ object Form1: TForm1
     object TabSheet3: TTabSheet
       Caption = 'Prcess list'
       ImageIndex = 2
-      ExplicitHeight = 696
       inline ProcessChoice11: TProcessChoice1
         Left = 0
         Top = 0
         Width = 932
-        Height = 696
+        Height = 677
         Align = alClient
         TabOrder = 0
         ExplicitWidth = 932
-        ExplicitHeight = 696
+        ExplicitHeight = 677
         inherited Splitter1: TSplitter
-          Height = 696
+          Height = 677
           ExplicitHeight = 677
         end
         inherited ProcessTree: TTreeView
-          Height = 696
+          Height = 677
           ExplicitHeight = 677
         end
         inherited AdditionalInfo: TTreeView
