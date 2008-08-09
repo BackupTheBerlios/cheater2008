@@ -1,14 +1,14 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
+
 
 #include "ChitThread.h"
 #include "Searcher.h"
 #pragma package(smart_init)
+
 TChitThread* GlobalChit=NULL;
 //---------------------------------------------------------------------------
-
 //   Important: Methods and properties of objects in VCL can only be
 //   used in a method called using Synchronize, for example:
 //
@@ -22,6 +22,7 @@ TChitThread* GlobalChit=NULL;
 //      }
 //---------------------------------------------------------------------------
 
+
 __fastcall TChitThread::TChitThread(bool CreateSuspended)
         : TThread(CreateSuspended)
 {
@@ -30,16 +31,17 @@ GlobalChit=this;
 sleep=10000;
 FSearchers=new TList();
 }
+
 //---------------------------------------------------------------------------
 void __fastcall TChitThread::Execute()
 {
 while(!Terminated)
  {
    Synchronize(Work);
-  Sleep(sleep);
+   Sleep(sleep);
  }
-
 }
+
 //---------------------------------------------------------------------------
 void __fastcall TChitThread::Work(void)
 {
@@ -54,11 +56,13 @@ __fastcall TChitThread::~TChitThread()
       for(int i=0;i<Searchers->Count;i++)
        delete (TSearcher*) Searchers->Items[i];
       delete Searchers;
-      GlobalChit=NULL;      
+      GlobalChit=NULL;
 }
+
 //--------------------------------------------------
 TChitThread* TChitThread::GetGlobal(void)
  {
   if(GlobalChit==NULL) GlobalChit=new TChitThread(true);
   return GlobalChit;
  }
+

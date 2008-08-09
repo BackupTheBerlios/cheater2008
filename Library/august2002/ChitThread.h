@@ -1,5 +1,4 @@
-//---------------------------------------------------------------------------
-
+﻿//---------------------------------------------------------------------------
 #ifndef ChitThreadH
 #define ChitThreadH
 //---------------------------------------------------------------------------
@@ -11,7 +10,6 @@ private:
         TList* FSearchers;
 protected:
         void __fastcall Execute();
-
 public:
         int sleep;
  static  TChitThread* GetGlobal(void);
@@ -19,7 +17,6 @@ public:
         void __fastcall Work(void);
         __fastcall ~TChitThread();
         __property TList* Searchers  = { read=FSearchers };
-
 };
 extern TChitThread* GlobalChit;
 //---------------------------------------------------------------------------

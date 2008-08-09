@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 #include "ChitThreadProperties.h"
 #pragma package(smart_init)
+
 //---------------------------------------------------------------------------
 // ValidCtrCheck is used to assure that the components created do not have
 // any pure virtual functions.
@@ -11,8 +11,9 @@
 
 static inline void ValidCtrCheck(TChitThreadProperties *)
 {
-        new TChitThreadProperties(NULL);
+    new TChitThreadProperties(NULL);
 }
+
 //---------------------------------------------------------------------------
 __fastcall TChitThreadProperties::TChitThreadProperties(TComponent* Owner)
         : TGroupBox(Owner)
@@ -37,6 +38,7 @@ menu=new TMenuItem(this);
 menu->Caption="Reload";
 menu->OnClick=ReloadMenuItemClick;
 PopupMenu->Items->Add(menu);
+
 }
 //---------------------------------------------------------------------------
 namespace Chitthreadproperties
@@ -47,6 +49,7 @@ namespace Chitthreadproperties
                  RegisterComponents("Samples", classes, 0);
         }
 }
+
 //---------------------------------------------------------------------------
 void __fastcall TChitThreadProperties::SetSearchers(TList* value)
 {
@@ -55,8 +58,6 @@ void __fastcall TChitThreadProperties::SetSearchers(TList* value)
    Scroll->Max=0;
    if(FSearchers!=NULL)
     if(value->Count>0) {Scroll->Max=value->Count-1;Reload(0);}
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -65,17 +66,16 @@ void __fastcall TChitThreadProperties::ScrollEvent(System::TObject* Sender, TScr
 Reload(ScrollPos);
 }
 
-
 void __fastcall TChitThreadProperties::DeleteUnitMenuItemClick(TObject*)
 {
 if(Searchers!=NULL)
  if(Scroll->Position<Searchers->Count)
    {
     delete      (TSearcher*)Searchers->Items[Scroll->Position];
-    Searchers->Delete(Scroll->Position);
-    if(Scroll->Max>0)
-     Scroll->Max--;
-   }
+     Searchers->Delete(Scroll->Position);
+     if(Scroll->Max>0)
+      Scroll->Max--;
+    }
 }
 
 void __fastcall TChitThreadProperties::Reload(int ScrollPos)
@@ -107,3 +107,4 @@ void __fastcall TChitThreadProperties::ReloadMenuItemClick(TObject*)
 {
  Reload(Scroll->Position);
 }
+
