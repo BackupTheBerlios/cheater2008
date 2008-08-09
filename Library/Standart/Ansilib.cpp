@@ -1,12 +1,10 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
-            
 #include <sstream>
 #include <iomanip>
-
 #include "Ansilib.h"
- char* StringType[]={"hex num","dec num","string","hex string","float num","double num"};
+char* StringType[]={"hex num","dec num","string","hex string","float num","double num"};
 
 /* char* HEX_NUM="hex num" ;
  char* DEC_NUM="dec num" ;
@@ -25,7 +23,7 @@
 std::string IntToHex(int i_num)
 {
 	std::stringstream ret;
-	ret << std::setfill('0') << std::setw(2) << i_num;
+	ret << std::setfill('0') << std::setw(2) << std::hex<< i_num;
 	return ret.str();
 }
 
