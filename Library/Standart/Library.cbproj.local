@@ -1,2 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject/>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2008.08.09 19:14:22.419.cbproj,C:\Users\gein\Documents\RAD Studio\Projects\Project1.cbproj=D:\tmp\Library\Standart\Library.cbproj</Transaction>
+    <Transaction>2008.08.09 19:15:51.456.cpp,D:\tmp\Library\Standart\Ansilib.cpp=</Transaction>
+    <Transaction>2008.08.09 19:15:53.367.h,D:\tmp\Library\Standart\Ansilib.h=</Transaction>
+  </Transactions>
+</BorlandProject>
