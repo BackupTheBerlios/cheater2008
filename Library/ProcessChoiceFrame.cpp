@@ -72,7 +72,7 @@ if( EnumProcesses(
             FileName,  // path buffer
             90         // maximum characters to retrieve
             );
-       TTreeNode* Child =ProcessTree->Items->AddChild(ProcessId,AnsiString(":")+ulongToHexAnsi((unsigned long)lphModule[j])+AnsiString(" ")+AnsiString(FileName,realRead));
+       TTreeNode* Child =ProcessTree->Items->AddChild(ProcessId,AnsiString(":")+ulongToHexAnsi((unsigned long)lphModule[j]).c_str()+AnsiString(" ")+AnsiString(FileName,realRead));
           realRead=GetModuleBaseName(
                 handle,    // handle to process
                  lphModule[j],    // handle to module
@@ -87,10 +87,10 @@ if( EnumProcesses(
                      sizeof(modinfo)                 // size of buffer
                                 )==TRUE)
                   {
-                   ProcessTree->Items->AddChild(Child,AnsiString("BaseOfDll       :")+ulongToHexAnsi((unsigned long)modinfo.lpBaseOfDll,8));
-                   ProcessTree->Items->AddChild(Child,AnsiString("Size of Image    ")+ulongToHexAnsi(modinfo.SizeOfImage,8));
-                   ProcessTree->Items->AddChild(Child,AnsiString("Entry Point     :")+ulongToHexAnsi((unsigned long)modinfo.EntryPoint,8));
-                  }
+				   ProcessTree->Items->AddChild(Child,AnsiString("BaseOfDll       :")+ulongToHexAnsi((unsigned long)modinfo.lpBaseOfDll,8).c_str());
+				   ProcessTree->Items->AddChild(Child,AnsiString("Size of Image    ")+ulongToHexAnsi(modinfo.SizeOfImage,8).c_str());
+                   ProcessTree->Items->AddChild(Child,AnsiString("Entry Point     :")+ulongToHexAnsi((unsigned long)modinfo.EntryPoint,8).c_str());
+				  }
 
       }
 

@@ -218,7 +218,7 @@ Suspend->Checked=!Suspend->Checked;
 void __fastcall TForm1::IntervalClick(TObject *Sender)
 {
 TInputForm* dlg= new TInputForm(NULL);
-dlg->InputBox->InitBox(TChitThread::GetGlobal()->sleep,DEC_NUM);
+dlg->InputBox->InitBox(IntToString(TChitThread::GetGlobal()->sleep),DEC_NUM);
 dlg->ShowModal();
 if(dlg->ModalResult==mrOk)
  TChitThread::GetGlobal()->sleep=dlg->InputBox->GetPointer();

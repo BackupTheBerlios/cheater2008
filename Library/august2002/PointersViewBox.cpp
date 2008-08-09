@@ -164,7 +164,7 @@ AnsiString caption;
     AddPointerToListMenuItem->Enabled=(PointersBox->Count>0);
 for(i=0;i<PoitersDB->Count;i++)
  {
-   caption=ulongToAnsi(i);
+   caption=ulongToAnsi(i).c_str();
    menu= new TMenuItem(DeleteMenuItem);
    menu->Caption=caption;
    menu->OnClick=DeleteSubMenuClick;
@@ -328,7 +328,7 @@ if(List!=NULL)
     for(int i=0;i<PointersBox->Count;i++)
      {
         if(PointersBox->Selected[i])
-        destList->Add((void*)(HexAnsiToulong(PointersBox->Items->Strings[i])));
+        destList->Add((void*)(HexAnsiToulong(PointersBox->Items->Strings[i].c_str())));
      }
  }
 }
@@ -349,7 +349,7 @@ if(Showing)
      if (itemCount>List->Count-pos) itemCount=List->Count-pos;
      for(int i=0;i<itemCount;i++)
       {
-       PointersBox->Items->Add(ulongToHexAnsi((unsigned long)List->Items[pos+i],8));
+       PointersBox->Items->Add(ulongToHexAnsi((unsigned long)List->Items[pos+i],8).c_str());
       }
     }
     PointersBox->Items->EndUpdate();
@@ -365,7 +365,7 @@ if(List!=NULL)
     for(int i=0;i<PointersBox->Count;i++)
      {
         if(PointersBox->Selected[i])
-        List->Remove((void*)(HexAnsiToulong(PointersBox->Items->Strings[i])));
+        List->Remove((void*)(HexAnsiToulong(PointersBox->Items->Strings[i].c_str())));
      }
             List=FList;
 }

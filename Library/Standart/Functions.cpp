@@ -8,29 +8,29 @@
 //---------------------------------------------------------------------------
 
 #pragma package(smart_init)
-int ReadPointers(TStream* stream,TList* list)
+int ReadPointers(TStream& i_stream,TList& o_list)
 {
 int num;
 int i=0;
 int Pointer;
- stream->Read(&num,sizeof(int));
+ i_stream.Read(&num,sizeof(int));
   for(;i<num;i++)
    {
-    stream->Read(&Pointer,sizeof(int));
-    list->Add((void*)Pointer);
+	i_stream.Read(&Pointer,sizeof(int));
+	o_list.Add((void*)Pointer);
    }
   return i;
 }
-int WritePointers(TStream* stream,TList* list)
+int WritePointers(TStream& io_stream,TList& i_list)
 {
-int num=list->Count;
+int num=i_list.Count;
 int i=0;
 int Pointer;
- stream->Write(&num,sizeof(int));
+ io_stream.Write(&num,sizeof(int));
   for(;i<num;i++)
    {
-    Pointer=(int)list->Items[i];   
-    stream->Write(&Pointer,sizeof(int));
+    Pointer=(int)i_list.Items[i];   
+	io_stream.Write(&Pointer,sizeof(int));
 
    }
   return i;

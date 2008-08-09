@@ -2,31 +2,32 @@
 
 #include <vcl.h>
 #pragma hdrstop
-
 #include "Ansi_Stream.h"
 
 //---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
 //------------------------------------------------------
-AnsiString  __fastcall  ConvertStreamToHexAnsi(TStream* stream)
+std::string  __fastcall  ConvertStreamToHexAnsi(TStream* stream)
  {
-  AnsiString res=EMPTY_STRING;
+
+  std::string ret;
   stream->Position=0;
    WORK_ANSILIB_UNION_FOR_CONVERT work;
       work._ulong=0;
    while(stream->Position<stream->Size)
-    {
+	{
+
       stream->Read(&work._ulong,1);
-      res+=AnsiString::IntToHex(work._int,2);
+	  ret += IntToHex(work._int);
     }
-  return res;
+  return ret;
  }
 
 //-----------------------------------------------------------------------------
-AnsiString  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream)
+std::string  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream)
  {
-  AnsiString res=EMPTY_STRING;
+  std::string res=EMPTY_STRING;
    WORK_ANSILIB_UNION_FOR_CONVERT work;
       work._ulong=0;
   stream->Position=0;
@@ -35,24 +36,24 @@ AnsiString  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream)
      while(stream->Position<stream->Size-1)
       {
         stream->Read(&work._ulong,1);
-        res+=AnsiString::IntToHex(work._int,2);
-       res+=AnsiString(SPACE_STRING);
+		res+=IntToHex(work._int);
+       res+=std::string(SPACE_STRING);
       }
       stream->Read(&work._ulong,1);
-      res+=AnsiString::IntToHex(work._int,2);
+      res+=IntToHex(work._int);
    }
   return res;
  }
 //-----------------------------------------------------------------------------
-int      __fastcall   WriteHexAnsiToStream(const AnsiString& Str,TStream* stream)
+int      __fastcall   WriteHexAnsiToStream(const std::string& Str,TStream* stream)
  {
   WORK_ANSILIB_UNION_FOR_CONVERT work;
 unsigned long i=0;
-  if(Str.Length()!=0)
+  if(Str.size()!=0)
    {
-    for(i;i<Str.Length()/2;i++)
+	for(i;i<Str.size()/2;i++)
      {
-      work._ulong=HexAnsiToulong(Str.SubString(2*i+1,2));
+	  work._ulong=HexAnsiToulong(Str.substr(2*i+1,2));
       stream->Write(&work.byte_,1);
      }
    }     
@@ -68,7 +69,7 @@ unsigned long i=0;
   "hex string"
                                        Text           Type                      len
    */
-int __fastcall WriteTypedAnsiToStream(const AnsiString& Text, int Type, TStream* stream)
+int __fastcall WriteTypedAnsiToStream(const std::string& Text, int Type, TStream* stream)
  {
 
   int len=0;
@@ -76,7 +77,7 @@ int __fastcall WriteTypedAnsiToStream(const AnsiString& Text, int Type, TStream*
   switch(Type)
    {
     case DEC_NUM:
-       work._int=Text.ToInt();
+	   work._int=ToInt(Text);
        len=WriteulongToStream(work._ulong,stream);
     break;
     case HEX_NUM:
@@ -87,16 +88,16 @@ int __fastcall WriteTypedAnsiToStream(const AnsiString& Text, int Type, TStream*
     break;
     case DOUBLE_NUM:
       len=sizeof(double);
-      work.double_=Text.ToDouble();
+	  work.double_=ToDouble(Text);
       stream->Write(&work.double_,len);
     break;
     case FLOAT_NUM:
       len=sizeof(float);
-      work.float_=(float)Text.ToDouble();
+      work.float_=(float)ToDouble(Text);
       stream->Write(&work.float_,len);
     break;
     default:
-            len=Text.Length();
+            len=Text.size();
             stream->Write(Text.c_str(),len);
    }
 
@@ -107,17 +108,17 @@ int __fastcall WriteTypedAnsiToStream(const AnsiString& Text, int Type, TStream*
 //-----------------------------------------------------------------------------
 //unsigned long __fastcall FindInBuf(byte *,unsigned long,byte *,unsigned long );
 //-----------------------------------------------------------------------------
-AnsiString __fastcall ConvertStreamToPrintString(TStream* stream)
+std::string __fastcall ConvertStreamToPrintString(TStream* stream)
  {
   stream->Position=0;
-  AnsiString res=EMPTY_STRING;
+  std::string res=EMPTY_STRING;
   WORK_ANSILIB_UNION_FOR_CONVERT work;
   work.ch[1]=0;
  while(stream->Position<stream->Size)
       {
        stream->Read(&work.char_,1);
        ConvertToPrintSign(work.byte_);
-       res+=AnsiString(work.ch);
+       res+=std::string(work.ch);
       }
 
   return res;

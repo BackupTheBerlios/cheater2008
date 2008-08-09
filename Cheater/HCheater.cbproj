@@ -129,7 +129,8 @@
       <HistoryLists_hlILINK_StackReserveSize Name="Count">1</HistoryLists_hlILINK_StackReserveSize>
       <HistoryLists_hlILINK_StackReserveSize Name="Item0">0x00100000</HistoryLists_hlILINK_StackReserveSize>
     </HistoryLists_hlILINK_StackReserveSize>
-  </CPlusPlusBuilder.Personality></BorlandProject></BorlandProject>
+  </CPlusPlusBuilder.Personality>  <ModelSupport>False</ModelSupport>
+</BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Cpp.Targets" />
   <ItemGroup>

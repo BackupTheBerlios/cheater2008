@@ -62,9 +62,9 @@ public:
     unsigned long __fastcall GetPointer(void);
     bool __fastcall IsEmpty(void);
     void __fastcall Clear(void);                 
-    void __fastcall Add(const AnsiString&);
+    void __fastcall Add(const std::string&);
     void __fastcall TInputGroupBoxClearPointersMenuItemOnClick(TObject*);
-    void __fastcall InitBox(AnsiString,int);
+    void __fastcall InitBox(const std::string&,int);
 //        void __fastcall LoadPointers(SMemoryPointers* list);
         void __fastcall LoadPointers(TList* list);
     __property AnsiString Text  = { read = GetText };

@@ -101,7 +101,7 @@ if((Searcher!=NULL)&&(Showing))
  { Find->InitBox(ConvertStreamToHexAnsi(Searcher->Find),HEX_STRING);
    Replace->InitBox(ConvertStreamToHexAnsi(Searcher->Replace),HEX_STRING);
    Pointers->List=Searcher->Pointers;
-   PageSize->InitBox(Searcher->PageSize,DEC_NUM);
+   PageSize->InitBox(IntToString(Searcher->PageSize),DEC_NUM);
  }
 }
 

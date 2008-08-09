@@ -37,29 +37,27 @@ namespace Memoryinfoedit
 void __fastcall TMemoryInfoEdit::SetMemoryInfo(MEMORY_BASIC_INFORMATION MemInfo)
 {
 
-Memo->Lines->Values["BaseeAddress"]=ulongToHexAnsi((unsigned long)MemInfo.BaseAddress);
-Memo->Lines->Values["AllocationBase"]=ulongToHexAnsi((unsigned long)MemInfo.AllocationBase);
-Memo->Lines->Values["AllocationProtect"]=ulongToHexAnsi(MemInfo.AllocationProtect);
-Memo->Lines->Values["RegionSize"]=ulongToHexAnsi(MemInfo.RegionSize);
-Memo->Lines->Values["State"]=ulongToHexAnsi(MemInfo.State);
-Memo->Lines->Values["Protect"]=ulongToHexAnsi(MemInfo.Protect);
-Memo->Lines->Values["Type"]=ulongToHexAnsi(MemInfo.Type);
+Memo->Lines->Values["BaseeAddress"]=AnsiString(ulongToHexAnsi((unsigned long)MemInfo.BaseAddress).c_str());
+Memo->Lines->Values["AllocationBase"]=AnsiString(ulongToHexAnsi((unsigned long)MemInfo.AllocationBase).c_str());
+Memo->Lines->Values["AllocationProtect"]=AnsiString(ulongToHexAnsi(MemInfo.AllocationProtect).c_str());
+Memo->Lines->Values["RegionSize"]=AnsiString(ulongToHexAnsi(MemInfo.RegionSize).c_str());
+Memo->Lines->Values["State"]=AnsiString(ulongToHexAnsi(MemInfo.State).c_str());
+Memo->Lines->Values["Protect"]=AnsiString(ulongToHexAnsi(MemInfo.Protect).c_str());
+Memo->Lines->Values["Type"]=AnsiString(ulongToHexAnsi(MemInfo.Type).c_str());
 }
 
 
 MEMORY_BASIC_INFORMATION __fastcall TMemoryInfoEdit::GetMemoryInfo(void)
 {
  MEMORY_BASIC_INFORMATION MemInfo;
- MemInfo.BaseAddress=(void*)HexAnsiToulong(Memo->Lines->Values["BaseeAddress"]);
- MemInfo.AllocationBase=(void*)HexAnsiToulong(Memo->Lines->Values["AllocationBase"]);
- MemInfo.AllocationProtect=HexAnsiToulong(Memo->Lines->Values["AllocationProtect"]);
- MemInfo.RegionSize=HexAnsiToulong(Memo->Lines->Values["RegionSize"]);
- MemInfo.State=HexAnsiToulong(Memo->Lines->Values["State"]);
- MemInfo.Protect=HexAnsiToulong(Memo->Lines->Values["Protect"]);
- MemInfo.Type=HexAnsiToulong(Memo->Lines->Values["Type"]);
+ MemInfo.BaseAddress=(void*)HexAnsiToulong(Memo->Lines->Values["BaseeAddress"].c_str());
+ MemInfo.AllocationBase=(void*)HexAnsiToulong(Memo->Lines->Values["AllocationBase"].c_str());
+ MemInfo.AllocationProtect=HexAnsiToulong(Memo->Lines->Values["AllocationProtect"].c_str());
+ MemInfo.RegionSize=HexAnsiToulong(Memo->Lines->Values["RegionSize"].c_str());
+ MemInfo.State=HexAnsiToulong(Memo->Lines->Values["State"].c_str());
+ MemInfo.Protect=HexAnsiToulong(Memo->Lines->Values["Protect"].c_str());
+ MemInfo.Type=HexAnsiToulong(Memo->Lines->Values["Type"].c_str());
 
-
-return MemInfo;
-
+ return MemInfo;
 }
 

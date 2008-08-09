@@ -71,7 +71,7 @@ Max=100;
 void __fastcall TCountEdit::UpDownFieldChangingEventEx(System::TObject* Sender, bool &AllowChange, short NewValue, TUpDownDirection Direction)
 {
 if(Direction==updNone) throw "TCountEdit::UpDownFieldChangingEventEx Error";
-DWORD value=AnsiToulong(EditField->Text);
+DWORD value=AnsiToulong(std::string(EditField->Text.c_str()));
 if(Direction==updUp)
 {
 value++;
@@ -85,7 +85,7 @@ value--;
 }
 if((value>=Min)&&(value<=Max))
 {
-  EditField->Text=ulongToAnsi(value);
+  EditField->Text=AnsiString(ulongToAnsi(value).c_str());
   if(OnChangeEvent) OnChangeEvent(dynamic_cast<TObject *>(this),value);
 
 }  

@@ -83,13 +83,13 @@ void TInputGroupBox::CreateLabels(void)
 
 
 
-void __fastcall TInputGroupBox::InitBox(AnsiString Text,int Type)
+void __fastcall TInputGroupBox::InitBox(const std::string& i_str,int Type)
 {
     //TODO: Add your source code here
 if(Type<=FLOAT_NUM)
  {
   TypeBox->ItemIndex=Type;
-  TextBox->Text=Text;
+  TextBox->Text=i_str.c_str();
  }
 
 }
@@ -150,14 +150,14 @@ if(TypeBox->Items->Count==0)
 void __fastcall TInputGroupBox::WriteDataToStream(TStream* stream)
 {
     //TODO: Add your source code here
-WriteTypedAnsiToStream(TextBox->Text,TypeBox->ItemIndex,stream);
+WriteTypedAnsiToStream(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,stream);
 }
 
 
 unsigned long __fastcall TInputGroupBox::GetPointer(void)
 {
     //TODO: Add your source code here
-    return PointerAnsiToulong(TextBox->Text,TypeBox->ItemIndex);
+    return PointerAnsiToulong(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex);
 }
 
 
@@ -182,7 +182,7 @@ void __fastcall TInputGroupBox::BoxesChange(void)
     //TODO: Add your source code here
 if (!TypeBox->Text.IsEmpty()&&!TextBox->Text.IsEmpty())
  {
-  int Work=WhatAnsiType(TextBox->Text);
+  int Work=WhatAnsiType(std::string(TextBox->Text.c_str()));
   if((TypeBox->ItemIndex!=DOUBLE_NUM)&&(TypeBox->ItemIndex!=FLOAT_NUM))
    {
     if((Work!=DEC_NUM)&&(TypeBox->ItemIndex==DEC_NUM))
@@ -203,11 +203,11 @@ void __fastcall TInputGroupBox::Clear(void)
 }
 
 
-void __fastcall TInputGroupBox::Add(const AnsiString& str)
+void __fastcall TInputGroupBox::Add(const std::string& str)
 {
     //TODO: Add your source code here
-if(TextBox->Items->IndexOf(str)==-1)
- TextBox->Items->Add(str);
+if(TextBox->Items->IndexOf(str.c_str())==-1)
+ TextBox->Items->Add(str.c_str());
 }
 
 
@@ -301,7 +301,7 @@ TPopupMenu* __fastcall TInputGroupBox::CreatePopupMenu(void)
 void __fastcall TInputGroupBox::TInputGroupBoxSavePointerMenuItemOnClick(TObject*)
 {
     //TODO: Add your source code here
-Add(TextBox->Text);
+Add(TextBox->Text.c_str());
 }
 
 
@@ -328,7 +328,7 @@ unsigned long num;
 num=0;
 num=GetPointer();
 TypeBox->ItemIndex=HEX_NUM;
-TextBox->Text=ulongToHexAnsi(num);
+TextBox->Text=AnsiString(ulongToHexAnsi(num).c_str());
 }
 
 
@@ -337,9 +337,9 @@ void __fastcall TInputGroupBox::TInputGroupBoxConvertToHexStringMenuItemOnClick(
     //TODO: Add your source code here
 unsigned long len;
 byte* x;
-x=TypedAnsiTobyteptr(TextBox->Text,TypeBox->ItemIndex,&len);
+x=TypedAnsiTobyteptr(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,&len);
 TypeBox->ItemIndex=HEX_STRING;
-TextBox->Text=byteptrToHexAnsi(x,len);
+TextBox->Text=AnsiString(byteptrToHexAnsi(x,len).c_str());
 delete x;
 }
 
@@ -352,7 +352,7 @@ byte* x;
 AnsiString res("");
 char ch[2];
 ch[1]=0;
-x=TypedAnsiTobyteptr(TextBox->Text,TypeBox->ItemIndex,&len);
+x=TypedAnsiTobyteptr(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,&len);
 TypeBox->ItemIndex=STRING;
 for(unsigned long i=0;i<len;i++)
   {
@@ -371,7 +371,7 @@ unsigned long num;
 num=0;
 num=GetPointer();
 TypeBox->ItemIndex=DEC_NUM;
-TextBox->Text=ulongToAnsi(num);
+TextBox->Text=AnsiString(ulongToAnsi(num).c_str());
 }
 void __fastcall TInputGroupBox::TInputGroupBoxConvertToDoubleNumMenuItemOnClick(TObject*)
 {
@@ -380,7 +380,7 @@ WORK_ANSILIB_UNION_FOR_CONVERT work;
 work.double_=0;
 unsigned long len;
 byte* x;
- x=TypedAnsiTobyteptr(TextBox->Text,TypeBox->ItemIndex,&len);
+ x=TypedAnsiTobyteptr(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,&len);
 memcpy(&work,x,sizeof(double));
 TypeBox->ItemIndex=DOUBLE_NUM;
 TextBox->Text=AnsiString(work.double_);
@@ -394,7 +394,7 @@ WORK_ANSILIB_UNION_FOR_CONVERT work;
 work.double_=0;
 unsigned long len;
 byte* x;
- x=TypedAnsiTobyteptr(TextBox->Text,TypeBox->ItemIndex,&len);
+ x=TypedAnsiTobyteptr(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,&len);
 memcpy(&work,x,sizeof(float));
 TypeBox->ItemIndex=FLOAT_NUM;
 TextBox->Text=AnsiString(work.float_);

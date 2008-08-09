@@ -342,9 +342,9 @@ try
       {
        if((RealRead=stream->Read(ch,StringLen))>0)
         {
-           PointerMemo->Lines->Add(ulongTo8digitHexString(stream->Position-RealRead));
-           HexMemo->Lines->Add(byteptrToHexAnsiWithSpace(ch,RealRead));
-           StringMemo->Lines->Add(ConvertToPrintString(ch,RealRead));
+           PointerMemo->Lines->Add(ulongTo8digitHexString(stream->Position-RealRead).c_str());
+		   HexMemo->Lines->Add(byteptrToHexAnsiWithSpace(ch,RealRead).c_str());
+		   StringMemo->Lines->Add(ConvertToPrintString(ch,RealRead).c_str());
            ViewedLen+=RealRead;
         }
          else
@@ -361,8 +361,8 @@ catch(Exception& e)
   HexMemo->Lines->EndUpdate();
   StringMemo->Lines->EndUpdate();
   PointerMemo->Lines->EndUpdate();
-  StringNumberEdit->Text=ulongToAnsi(NumberOfString);
-  StringLengthEdit->Text=ulongToAnsi(StringLen);
+  StringNumberEdit->Text=ulongToAnsi(NumberOfString).c_str();
+  StringLengthEdit->Text=ulongToAnsi(StringLen).c_str();
 
   HexMemo->SelStart=HexMemoSelStart;
   StringMemo->SelStart=StringMemoSelStart;
@@ -508,7 +508,7 @@ if(Shift.Contains(ssDouble))
 _shift+=AnsiString("+MouseDobleClick");
 
 
-KeyPressed=AnsiString("Key: ")+AnsiString(ulongToHexAnsi(Key))+AnsiString(" ")+_shift;
+KeyPressed=AnsiString("Key: ")+AnsiString(ulongToHexAnsi(Key).c_str())+AnsiString(" ")+_shift;
  Key=0;
 
 }
@@ -526,7 +526,7 @@ void __fastcall TStreamEdit::HexRichEditKeyPres(unsigned char value)
 int pos=ConvertHexPosToGlobal(HexMemo->SelStart);
 int rem;
 int hexPos=ConvertGlobalToHexPos(pos);
-char* ch;
+const char* ch;
 char print[2];
 print[1]=0;
 int StringPos=ConvertGlobalToStringPos(pos);
@@ -536,13 +536,11 @@ StringMemo->SelLength=1;
 stream->Position=CurrentPos+pos;
 HexMemo->SelLength=1;
 
-
-
 HexMemo->SelText=AnsiString::IntToHex(value,1);
 rem=HexMemo->SelStart;
 HexMemo->SelStart=hexPos;
 HexMemo->SelLength=2;
-ch=HexAnsiTobyteptr(HexMemo->SelText);
+ch=HexAnsiTobyteptr(HexMemo->SelText.c_str());
 print[0]=ConvertToPrintSign(*ch);
 StringMemo->SelText=AnsiString(print);
 HexMemo->SelLength=0;
@@ -550,8 +548,8 @@ stream->Write(ch,1);
 HexMemo->SelStart=rem;
 ShiftIfWrongHexSelStart();
 
-
 delete ch;
+
 //char
 }
 
@@ -693,7 +691,7 @@ AnsiString caption;
     CopyMenuItem->Enabled=(HexMemo->SelLength!=0);
 for(i=0;i<ClipBoard->Count;i++)
  {
-   caption=ulongToAnsi(i);
+   caption=ulongToAnsi(i).c_str();
    menu= new TMenuItem(DeleteMenuItem);
    menu->Caption=caption;
    menu->OnClick=DeleteSubMenuClick;
@@ -884,8 +882,8 @@ void __fastcall TStreamEdit::StringsOptionChangedEvent(TObject *Sender,DWORD val
 {
 try
 {
- NumberOfString=AnsiToulong(StringNumberEdit->Text);
- StringLen=AnsiToulong(StringLengthEdit->Text);
+ NumberOfString=AnsiToulong(StringNumberEdit->Text.c_str());
+ StringLen=AnsiToulong(StringLengthEdit->Text.c_str());
 }
 catch(...)
  {
@@ -1018,7 +1016,7 @@ int hexpos=ConvertGlobalToHexPos(pos);
 HexMemo->SelStart=hexpos;
 HexMemo->SelLength=2;
 char ch[2];
-HexMemo->SelText=byteptrToHexAnsi(&value,1);
+HexMemo->SelText=byteptrToHexAnsi(&value,1).c_str();
 ch[0]=ConvertToPrintSign(value);
 ch[1]=0;
 stream->Position=CurrentPos+pos;
@@ -1176,8 +1174,8 @@ WORK_ANSILIB_UNION_FOR_CONVERT buf;
 stream->Position=pos;
 stream->Read(&buf,sizeof(buf));
 AnsiString newInfo=AnsiString("char ")+AnsiString((int)buf.char_)+AnsiString(",");
-newInfo+=AnsiString("byte ")+ulongToAnsi(buf.byte_)+AnsiString(",");
-newInfo+=AnsiString("ulong ")+ulongToAnsi(buf._ulong)+AnsiString(",");
+newInfo+=AnsiString("byte ")+ulongToAnsi(buf.byte_).c_str()+AnsiString(",");
+newInfo+=AnsiString("ulong ")+ulongToAnsi(buf._ulong).c_str()+AnsiString(",");
 newInfo+=AnsiString("int ")+AnsiString(buf._int)+AnsiString(",");
 try
 {

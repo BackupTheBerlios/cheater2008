@@ -6,9 +6,9 @@
 #include "searcher.h"
 //---------------------------------------------------------------------------
 //------------------------------------------------------
-AnsiString  __fastcall  ConvertStreamToHexAnsi(TStream* stream);
-AnsiString  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream);
-int      __fastcall   WriteHexAnsiToStream(const AnsiString& Str,TStream* stream);
+std::string  __fastcall  ConvertStreamToHexAnsi(TStream* stream);
+std::string  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream);
+int      __fastcall   WriteHexAnsiToStream(const std::string& Str,TStream* stream);
 //-----------------------------------------------------------------------------
 /*
   porible types:
@@ -18,8 +18,8 @@ int      __fastcall   WriteHexAnsiToStream(const AnsiString& Str,TStream* stream
   "hex string"
                                        Text           Type                      len
    */
-int __fastcall WriteTypedAnsiToStream(const AnsiString& Text, int Type, TStream*);
-AnsiString __fastcall ConvertStreamToPrintString(TStream* stream);
+int __fastcall WriteTypedAnsiToStream(const std::string& Text, int Type, TStream*);
+std::string __fastcall ConvertStreamToPrintString(TStream* stream);
 int __fastcall WriteulongToStream(unsigned long num ,TStream* stream);
 unsigned long __fastcall ConvertStreamToulong(TStream* stream);
 int InsertDilimeters(TStream* src,TStream* dest,TStream* dilim, int step,int flag);
