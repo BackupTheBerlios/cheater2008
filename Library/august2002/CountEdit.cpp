@@ -5,14 +5,17 @@
 #include "CountEdit.h"
 #include <Ansi_stream.h>
 #pragma package(smart_init)
+
 //---------------------------------------------------------------------------
 // ValidCtrCheck is used to assure that the components created do not have
 // any pure virtual functions.
 //
+
 static inline void ValidCtrCheck(TCountEdit *)
 {
         new TCountEdit(NULL);
 }
+
 //---------------------------------------------------------------------------
 unsigned long TCountEdit::Instance=0;
 
@@ -32,12 +35,9 @@ namespace Countedit
         }
 }
 //---------------------------------------------------------------------------
-
 __fastcall TCountEdit::~TCountEdit(void)
 {
     //TODO: Add your source code here
-
-
 }
 
 void TCountEdit::CreateInstance(void)
@@ -45,11 +45,9 @@ void TCountEdit::CreateInstance(void)
     //TODO: Add your source code here
  EditField=new TEdit((TComponent*)this);
  EditField->Width=30;
-
  EditField->Top=15;
  EditField->Left=2;
  EditField->Parent=this;
-
  UpDownField=new TUpDown((TComponent*)this);
  UpDownField->Min=1;
  UpDownField->Max=255;
@@ -60,13 +58,14 @@ void TCountEdit::CreateInstance(void)
  UpDownField->Height=EditField->Height;
  UpDownField->Width=10;
 
- UpDownField->Parent=this; 
+ UpDownField->Parent=this;
  OnChangeEvent=NULL;
  OnResize=OnResizeEvent;
 
 Min=1;
 Max=100;
 }
+
 
 void __fastcall TCountEdit::UpDownFieldChangingEventEx(System::TObject* Sender, bool &AllowChange, short NewValue, TUpDownDirection Direction)
 {

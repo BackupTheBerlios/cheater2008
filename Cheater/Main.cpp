@@ -1,8 +1,6 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
-
 #include "Main.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -33,12 +31,8 @@ __fastcall TForm1::~TForm1()
   if(file!=NULL) {delete file;file=NULL;}
   if(Process!=NULL) {delete Process;Process=NULL;}
   if(GlobalChit!=NULL) delete GlobalChit;
-
-
 }
 //---------------------------------------------------------------------------
-
-
 void __fastcall TForm1::OpenFileMenuItemClick(TObject *Sender)
 {
 if(OpenDialog1->Execute())
@@ -51,23 +45,18 @@ if(OpenDialog1->Execute())
 //---------------------------------------------------------------------------
 void __fastcall TForm1::FormCreate(TObject *Sender)
 {
-
 //this->ProcessChoice1->Align=alClient;
 }
 //---------------------------------------------------------------------------
-
-
 void __fastcall TForm1::CreateProcessMenuItemClick(TObject *Sender)
 {
 if(OpenDialog1->Execute())
  {
    Process->CreateProcess(OpenDialog1->FileName);
    EditMemoryFrame->stream=Process;
-
  }
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::SetStartMenuItemClick(TObject *Sender)
 {
 InputForm->InputBox->InitBox(ulongToHexAnsi(Process->Start),HEX_NUM);
@@ -89,11 +78,9 @@ if(InputForm->ShowModal()==mrOk)
  }
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::Button1Click(TObject *Sender)
 {
 ListBox->Items->Clear();
-
 processNum=0;
   DWORD *lpidProcess=new DWORD[1024];
   HMODULE *lphModule=new HMODULE[1024];
@@ -104,12 +91,10 @@ lpidProcess,  // array of process identifiers
   cb,            // size of array
   &cbNeeded      // number of bytes returned
 );
-
 for(DWORD i=0;i<cbNeeded/sizeof(DWORD);i++)
  {
  DWORD cbNeededModule;
 HANDLE handle=OpenProcess(
-
     PROCESS_ALL_ACCESS	,	// access flag
     FALSE,	// handle inheritance flag
     lpidProcess[i] 	// process identifier
@@ -134,15 +119,13 @@ int realRead=GetModuleFileNameEx(
 idProcess[processNum]=lpidProcess[i];
 processNum++;
   }
-
 //  }
  }
+
 delete lphModule;
 delete lpidProcess;
-
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::ListBoxClick(TObject *Sender)
 {
 Process->OpenProcess(    idProcess[ListBox->ItemIndex]);
@@ -158,7 +141,6 @@ void __fastcall TForm1::Button2Click(TObject *Sender)
  delete ch;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::Button4Click(TObject *Sender)
 {
  byte* ch;
@@ -168,7 +150,6 @@ void __fastcall TForm1::Button4Click(TObject *Sender)
  delete ch;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::Button5Click(TObject *Sender)
 {
  byte* ch;
@@ -178,7 +159,6 @@ void __fastcall TForm1::Button5Click(TObject *Sender)
  delete ch;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::Button6Click(TObject *Sender)
 {
  byte* ch;
@@ -198,16 +178,11 @@ void __fastcall TForm1::Button3Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
-
-
-
 void __fastcall TForm1::FormShow(TObject *Sender)
 {
 ChitProperties->Searchers=TChitThread::GetGlobal()->Searchers;
 }
 //---------------------------------------------------------------------------
-
 
 void __fastcall TForm1::SuspendClick(TObject *Sender)
 {
@@ -229,7 +204,6 @@ void __fastcall TForm1::AddSearcherMenuItemClick(TObject *Sender)
 {
 if(EditMemoryFrame->stream!=NULL)
  {
-
   TSearcher* work=new TSearcher((TStream*)NULL);
   TSearcher* work2=EditMemoryFrame->GetSearcher();
  work->Assign(work2);
@@ -237,39 +211,27 @@ if(EditMemoryFrame->stream!=NULL)
  }
 }
 //---------------------------------------------------------------------------
-
-
 void __fastcall TForm1::ChitOptionsClick(TObject *Sender)
 {
 //
 Suspend->Checked=TChitThread::GetGlobal()->Suspended;
 }
 //---------------------------------------------------------------------------
-
-
 void __fastcall TForm1::SetClick(TObject *Sender)
 {
   Process->SetMemoryInfo(MemoryInfo->GetMemoryInfo());
-
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::ReloadClick(TObject *Sender)
 {
 MemoryInfo->SetMemoryInfo(Process->GetMemoryInfo(MemPtr->GetPointer()));
 }
 //---------------------------------------------------------------------------
-
-
-
-
-
 void __fastcall TForm1::ServerSocket1ClientRead(TObject *Sender,
       TCustomWinSocket *Socket)
 {
 {int Length=Socket->ReceiveLength();
 char *buf=new char[Length+1];
-
       this->ListBox->Items->Add(AnsiString("Begin. Lenght= ")+AnsiString(Length));
       TStringList* ServerStrings=new TStringList();
       Socket->ReceiveBuf(buf,Length);
@@ -284,7 +246,6 @@ char *buf=new char[Length+1];
  }
   int Length=Socket->ReceiveLength();
 char *buf=new char[Length+1];
-
       this->ListBox->Items->Add(AnsiString("Begin2. Lenght= ")+AnsiString(Length));
       TStringList* ServerStrings=new TStringList();
       Socket->ReceiveBuf(buf,Length);
@@ -296,13 +257,8 @@ char *buf=new char[Length+1];
   this->ListBox->Items->Add(AnsiString("End2"));
   if(ServerStrings!=NULL) delete ServerStrings;
   if(buf)   delete[] buf;
-
-
-
-
 }
 //---------------------------------------------------------------------------
-
 
 void __fastcall TForm1::TcpServer1OnRecieveEvent(TObject* Sender, char* buf, int & DataLen)
 {
@@ -311,4 +267,6 @@ void __fastcall TForm1::TcpServer1OnRecieveEvent(TObject* Sender, char* buf, int
   this->ListBox->Items->Add(text);
   this->ListBox->Items->Add(AnsiString("End3"));
 }
+
+
 

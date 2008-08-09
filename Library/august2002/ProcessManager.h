@@ -1,22 +1,16 @@
-//---------------------------------------------------------------------------
-
+﻿//---------------------------------------------------------------------------
 #ifndef ProcessManagerH
 #define ProcessManagerH
 //---------------------------------------------------------------------------
 class TProcessManager:public TStream
 {
 private:
-
     PROCESS_INFORMATION ProcessInformation;
-
     SYSTEM_INFO SystemInfo;
         DWORD FStart;
         DWORD FPosition;
         DWORD FSize;
         void __fastcall SetStart(DWORD value); 	// pointer to PROCESS_INFORMATION
-
-
-
 public:
         __fastcall TProcessManager(void);
         virtual int __fastcall Seek(int Offset, Word Origin);
@@ -33,6 +27,3 @@ protected:
         virtual void __fastcall SetSize(DWORD NewSize);
         };
 #endif
-
-
-

@@ -158,18 +158,16 @@ StartupInfo.dwFlags=STARTF_USESHOWWINDOW;
 StartupInfo.wShowWindow=SW_SHOW;
 StartupInfo.cbReserved2=0;
 StartupInfo.lpReserved2=NULL;
+
 ThreadAttributes.nLength=sizeof(SECURITY_ATTRIBUTES);
 ThreadAttributes.bInheritHandle=TRUE;
 ThreadAttributes.lpSecurityDescriptor=NULL;
-
-
 ApplicationName=AnsiString(FileName);
 CurrentDirectory=ApplicationName.SubString(1,ApplicationName.LastDelimiter("\\"));
    FPosition=0;
    FStart=0x01000000;
    FSize=0x7fff0000;
   return ::CreateProcess(
-
     ApplicationName.c_str(),	// pointer to name of executable module
     CommandLine.c_str(),	// pointer to command line string
     &ProcessAttributes,	// pointer to process security attributes
@@ -181,6 +179,7 @@ CurrentDirectory=ApplicationName.SubString(1,ApplicationName.LastDelimiter("\\")
     &StartupInfo,	// pointer to STARTUPINFO
     &ProcessInformation 	// pointer to PROCESS_INFORMATION
    )==TRUE;
+
 }
 
 
