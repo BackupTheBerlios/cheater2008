@@ -15,12 +15,11 @@ extern char* FOR_POINTERS ;
 class PACKAGE TInputGroupBox : public TGroupBox
 {
 private:
-
     TComboBox* CreateTextBox(void);
     TTypeComboBox* CreateTypeBox(void);
     void CreateLabels(void);
     void __fastcall SetTypeOfBox(AnsiString value);
-   AnsiString __fastcall GetTypeOfBox();
+    AnsiString __fastcall GetTypeOfBox();
     AnsiString FTypeOfBox;
     AnsiString __fastcall GetText();
     void __fastcall BoxesChange(void);
@@ -35,7 +34,6 @@ static unsigned long Instance;
     TMenuItem* ConvertToFloatNumMenuItem;
     TMenuItem* ConvertToDoubleNumMenuItem;
 
-
     TStrings* __fastcall GetStrings();
     TPopupMenu* __fastcall CreatePopupMenu(void);
     void __fastcall TInputGroupBoxSavePointerMenuItemOnClick(TObject*);
@@ -46,8 +44,8 @@ static unsigned long Instance;
     void __fastcall TInputGroupBoxConvertToDecNumMenuItemOnClick(TObject*);
     void __fastcall TInputGroupBoxConvertToDoubleNumMenuItemOnClick(TObject*);
     void __fastcall TInputGroupBoxConvertToFloatNumMenuItemOnClick(TObject*);
-    void __fastcall OnResizeBox(TObject*);    
-        void __fastcall SetList(TList* value);
+    void __fastcall OnResizeBox(TObject*);
+    void __fastcall SetList(TList* value);
 protected:
     TComboBox* TextBox;
     TComboBox* TypeBox;
@@ -61,18 +59,18 @@ public:
     void __fastcall WriteDataToStream(TStream*);
     unsigned long __fastcall GetPointer(void);
     bool __fastcall IsEmpty(void);
-    void __fastcall Clear(void);                 
+    void __fastcall Clear(void);
     void __fastcall Add(const std::string&);
     void __fastcall TInputGroupBoxClearPointersMenuItemOnClick(TObject*);
     void __fastcall InitBox(const std::string&,int);
 //        void __fastcall LoadPointers(SMemoryPointers* list);
-        void __fastcall LoadPointers(TList* list);
+    void __fastcall LoadPointers(TList* list);
     __property AnsiString Text  = { read = GetText };
-
 __published:
     __property AnsiString TypeOfBox  = { read = GetTypeOfBox, write = SetTypeOfBox };
 
 };
+
 //---------------------------------------------------------------------------
 #endif
 

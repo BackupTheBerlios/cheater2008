@@ -192,9 +192,7 @@ if (!TypeBox->Text.IsEmpty()&&!TextBox->Text.IsEmpty())
       TextBox->Text="";
    }
  }
-
 }
-
 
 void __fastcall TInputGroupBox::Clear(void)
 {

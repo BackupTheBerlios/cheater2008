@@ -8,12 +8,10 @@
 #define dlNone      0x0
 
 #include <string>
-
 extern char* EMPTY_STRING;
-
 extern char* SPACE_STRING;
 extern char* StringType[];
- enum  StringIndex{HEX_NUM,DEC_NUM,STRING,HEX_STRING,FLOAT_NUM,DOUBLE_NUM};
+enum  StringIndex{HEX_NUM,DEC_NUM,STRING,HEX_STRING,FLOAT_NUM,DOUBLE_NUM};
 extern unsigned char* PRINT_TABLE;
 /*extern char* HEX_NUM;
 extern char* DEC_NUM;
@@ -25,8 +23,7 @@ extern unsigned long HEX_MASK_4;
 extern unsigned long HEX_MASK_3;
 extern unsigned long HEX_MASK_2;
 extern unsigned long HEX_MASK_1;
-
-    union WORK_ANSILIB_UNION_FOR_CONVERT
+union WORK_ANSILIB_UNION_FOR_CONVERT
      {
       char char_;
       byte byte_;
@@ -36,25 +33,24 @@ extern unsigned long HEX_MASK_1;
       int _int;
       double double_;
 	  float float_;
-      void* pvoid; 
+      void* pvoid;
      };
-    std::string  __fastcall  byteptrToHexAnsi(byte *, unsigned long);
-    std::string  __fastcall  byteptrToHexAnsiWithSpace(byte *, unsigned long);    
-	byte*      __fastcall   HexAnsiTobyteptr(const std::string&);
-
-	std::string  __fastcall  ulongToAnsi(unsigned long);
-    unsigned long __fastcall AnsiToulong(const std::string&);
-
-    std::string  __fastcall  ulongToHexAnsi(unsigned long);
-    std::string  __fastcall  ulongToHexAnsi(unsigned long,unsigned long);
-    unsigned long __fastcall HexAnsiToulong(const std::string&);
-    bool IsDouble(std::string&);
+std::string  __fastcall  byteptrToHexAnsi(byte *, unsigned long);
+std::string  __fastcall  byteptrToHexAnsiWithSpace(byte *, unsigned long);
+byte*      __fastcall   HexAnsiTobyteptr(const std::string&);
+std::string  __fastcall  ulongToAnsi(unsigned long);
+unsigned long __fastcall AnsiToulong(const std::string&);
+std::string  __fastcall  ulongToHexAnsi(unsigned long);
+std::string  __fastcall  ulongToHexAnsi(unsigned long,unsigned long);
+unsigned long __fastcall HexAnsiToulong(const std::string&);
+bool IsDouble(std::string&);
 /*
   porible types:
   "dec num"
   "hex num"
   "string"
   "hex string"
+
                                        Text           Type                      len
    */
 byte* __fastcall TypedAnsiTobyteptr( const std::string& , int , unsigned long*  );
@@ -77,6 +73,5 @@ std::string IntToHex(int i_num);
 int ToInt(const std::string& i_str);
 double ToDouble(const std::string& i_str);
 std::string IntToString(int i_num);
-
 #endif
 
