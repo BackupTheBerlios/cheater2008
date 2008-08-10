@@ -1,11 +1,9 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 
 #include "StreamEdit.h"
 #include "EditForm.h"
-
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 // ValidCtrCheck is used to assure that the components created do not have
@@ -14,11 +12,11 @@
 int NumberOfCopies=0;
 char* WhatFind="Что искать";
  TList* ClipBoard;     // clipboard for selections
-
 static inline void ValidCtrCheck(TStreamEdit *)
 {
         new TStreamEdit(NULL);
 }
+
 //---------------------------------------------------------------------------
 namespace Streamedit
 {
@@ -43,10 +41,7 @@ ViewedLen=0;
 NumberOfString=20;
 StringLen=16;
 IsProcessKeyDown=false;
-
-
 // throw Exception("Sergey12");
-
 // throw Exception("Sergey13");
 SearcherProperties->OnSelectPointer=PointersNotifyEvent;
 // throw Exception("Sergey11");
@@ -222,7 +217,6 @@ GroupBox2->InsertControl(GotoInputGroupBox);
  StringLengthEdit->Caption=AnsiString("Line's length");
  GroupBox2->InsertControl(StringLengthEdit);
 
-
  SearcherProperties=new TSearcherProperties(GroupBox2);
  SearcherProperties->Align=alBottom;
  GroupBox2->InsertControl(SearcherProperties);
@@ -254,7 +248,6 @@ GroupBox2->Width=280;
    Splitter3->Align=alRight;
    GroupBox1->InsertControl(Splitter3);
 
-
    PointerMemo=new TMemo(GroupBox1);
    PointerMemo->Align=alLeft;
    PointerMemo->Width=80;
@@ -275,8 +268,6 @@ GroupBox2->Width=280;
    HexMemo->Font->Name="Fixedsys";
    GroupBox1->InsertControl(HexMemo);
 
-
-
 PointerMemo->WordWrap=false;
 HexMemo->WordWrap=false;
 StringMemo->WordWrap=false;
@@ -286,22 +277,17 @@ HexMemo->HideSelection=false;
 InsertControl(GroupBox1);
 }
 
-
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::SearchMenuItemClick(TObject *Sender)
 {
 Search(true);
-
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::SlowSearchMenuItemClick(TObject *Sender)
 {
 SlowSearch();
 }
 //---------------------------------------------------------------------------
-
-
 __fastcall TStreamEdit::~TStreamEdit(void)
 {
 //delete MemoryStream;
@@ -347,9 +333,9 @@ try
 		   StringMemo->Lines->Add(ConvertToPrintString(ch,RealRead).c_str());
            ViewedLen+=RealRead;
         }
-         else
-           if(i==0)
-              if(stream->Position>CurrentPos) CurrentPos=stream->Position;
+       else
+        if(i==0)
+         if(stream->Position>CurrentPos) CurrentPos=stream->Position;
       }
    }
  }
@@ -368,6 +354,7 @@ catch(Exception& e)
   StringMemo->SelStart=StringMemoSelStart;
  }//enf if (Showing)
 }
+
 void __fastcall TStreamEdit::LoadFromStreamMenuitemClick(
       TObject *Sender)
 {
@@ -375,15 +362,14 @@ LoadFromStream();
 }
 //---------------------------------------------------------------------------
 
-
 int __fastcall TStreamEdit::ConvertHexPosToGlobal(int value)
 {
 //value=HexRichEdit->SelStart;
 int res=0;
 res+=StringLen*(value/(3*StringLen+1))+(value%(3*StringLen+1))/3;
-
 return res;
 }
+
 void __fastcall TStreamEdit::HexRichEditKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
 {
@@ -410,14 +396,13 @@ else
      {
       if(Key==0x27)//right
        {
-
          ShiftHexSelStart(1);
        }
       else
        {
         if(Key==0x25) //left
          {
-         ShiftHexSelStart(-1);
+           ShiftHexSelStart(-1);
          }
         else
          {
@@ -435,12 +420,13 @@ else
              {
               if(Key==0x23)//end
                {
+
                }
               else
                {
                 if(Key==0x22)//PgDown
                  {
-               ShiftHexSelStart(StringLen*NumberOfString*2);
+                   ShiftHexSelStart(StringLen*NumberOfString*2);
                  }
                 else
                  {
@@ -452,23 +438,25 @@ else
                    {
                     if(Key==0x24)//Home
                      {
+
                      }
                     else
                      {
                       if(Key==0x9) //tab
                        {
                          int pos=ConvertHexPosToGlobal(HexMemo->SelStart);
-                          StringMemo->SelStart=ConvertGlobalToStringPos(pos);
+                         StringMemo->SelStart=ConvertGlobalToStringPos(pos);
                          StringMemo->SetFocus();
-
                        }
                       else
                        {
                         if(Key==0x1)   //??
                          {
+
                          }
                         else
                          {
+
                          }
                        }
                      }
@@ -483,44 +471,37 @@ else
  }
 
  AnsiString _shift="";
-
-
 if(Shift.Contains(ssShift))
-_shift+=AnsiString("+Shift");
+  _shift+=AnsiString("+Shift");
 
 if(Shift.Contains(ssAlt))
-_shift+=AnsiString("+Alt");
-
+  _shift+=AnsiString("+Alt");
 
 if(Shift.Contains(ssCtrl))
-_shift+=AnsiString("+Ctrl");
+  _shift+=AnsiString("+Ctrl");
 
 if(Shift.Contains(ssLeft))
-_shift+=AnsiString("+MouseLeft");
+  _shift+=AnsiString("+MouseLeft");
 
 if(Shift.Contains(ssRight))
-_shift+=AnsiString("+MouseRight");
+  _shift+=AnsiString("+MouseRight");
+
 
 if(Shift.Contains(ssMiddle))
-_shift+=AnsiString("+MouseMiddle");
+  _shift+=AnsiString("+MouseMiddle");
 
 if(Shift.Contains(ssDouble))
-_shift+=AnsiString("+MouseDobleClick");
-
+  _shift+=AnsiString("+MouseDobleClick");
 
 KeyPressed=AnsiString("Key: ")+AnsiString(ulongToHexAnsi(Key).c_str())+AnsiString(" ")+_shift;
- Key=0;
-
+Key=0;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::GotoMenuItemClick(TObject *Sender)
 {
-CurrentPos=GotoInputGroupBox->GetPointer();
+  CurrentPos=GotoInputGroupBox->GetPointer();
 }
 //---------------------------------------------------------------------------
-
-
 void __fastcall TStreamEdit::HexRichEditKeyPres(unsigned char value)
 {
 int pos=ConvertHexPosToGlobal(HexMemo->SelStart);
@@ -557,35 +538,35 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
 {
 int pos=ConvertHexPosToGlobal(HexMemo->SelStart);
 if(pos==ViewedLen-1)
-   {
+  {
     HexMemo->SelStart--;
     ShiftHexSelStart(1);
-   }
+  }
 else
-{
-  if(HexMemo->SelStart%(3*StringLen+1)==3*StringLen-1)
-   {
-     HexMemo->SelStart+=2;
-   }
-}
+  {
+    if(HexMemo->SelStart%(3*StringLen+1)==3*StringLen-1)
+     {
+       HexMemo->SelStart+=2;
+
+     }
+  }
+
 if((HexMemo->SelStart%(3*StringLen+1))%3==2)
 HexMemo->SelStart++;
 }
 
 int __fastcall TStreamEdit::ConvertGlobalToHexPos(int value)
 {
-//Edit2->Text=AnsiString((3*StringLen+1)*(value/StringLen)+(value%StringLen)*3);
-
- return (3*StringLen+1)*(value/StringLen)+(value%StringLen)*3;
+  //Edit2->Text=AnsiString((3*StringLen+1)*(value/StringLen)+(value%StringLen)*3);
+  return (3*StringLen+1)*(value/StringLen)+(value%StringLen)*3;
 }
+
 void __fastcall TStreamEdit::HexRichEditKeyPress(TObject *Sender,
       char &Key)
 {
-Key=0;
+  Key=0;
 }
 //---------------------------------------------------------------------------
-
-
 int TStreamEdit::FindInStream(char* buf, int len)
 {
 //Stream->Search(buf,len);
@@ -615,7 +596,6 @@ if((value<stream->Size)&&(value>=0))
  }
 }
 
-
 void __fastcall TStreamEdit::ShiftHexSelStart(int Shift)
 {
 int value=HexMemo->SelStart;
@@ -628,17 +608,18 @@ if(Shift%2!=0)
   switch(Shift%2+InBytePos)
    {
     case -1:
-         Offset--;
+      Offset--;
       InBytePos=1;
       break;
     case 2:
-         Offset++;
+      Offset++;
       InBytePos=0;
       break;
      default :
-         InBytePos+=Shift%2;
+      InBytePos+=Shift%2;
    }
  }
+
 if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<stream->Size))
  {
    if((Offset<0)||(Offset>=ViewedLen))
@@ -651,7 +632,6 @@ if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<stream->Size))
   GetVariablesAtPos(CurrentPos+Offset);
 }
 
-
 void __fastcall TStreamEdit::CopyMenuItemClick(TObject *Sender)
 {
 int Start;
@@ -659,21 +639,23 @@ int End;
 int Len;
 TMemoryStream* buf=new TMemoryStream();
 if(HexMemo->SelLength>0)
-    { Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-      End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);}
+  {
+    Start=ConvertHexPosToGlobal(HexMemo->SelStart);
+    End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
+  }
  else
-    {End=ConvertHexPosToGlobal(HexMemo->SelStart);
-      Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength); }
+  {
+    End=ConvertHexPosToGlobal(HexMemo->SelStart);
+    Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
+  }
   Len=End-Start+1;
   stream->Position=Start+CurrentPos;
   Len=buf->CopyFrom(stream,Len);
 ClipBoard->Add(buf);
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::PopupMenu1Popup(TObject *Sender)
 {
-
 int i;
 int len;
 TMenuItem* menu;
@@ -711,52 +693,48 @@ for(i=0;i<ClipBoard->Count;i++)
    menu->Caption=caption;
    menu->OnClick=EditBufMenuClick;
    EditBufMenuItem->Add(menu);
-
-
  }
-
 }
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
 void __fastcall TStreamEdit::PasteMenuItemClick(TObject *Sender)
 {
-int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-stream->Position=Start+CurrentPos;
-stream->CopyFrom((TStream*)ClipBoard->Last(),0);
-
-LoadFromStream();
+  int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
+  stream->Position=Start+CurrentPos;
+  stream->CopyFrom((TStream*)ClipBoard->Last(),0);
+  LoadFromStream();
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::DeleteSubMenuClick(TObject *Sender)
 {
-TMenuItem* menu=(TMenuItem*)Sender;
-int num=menu->Caption.ToInt();
-delete (TMemoryStream*)ClipBoard->Items[num];
-ClipBoard->Delete(num);
+  TMenuItem* menu=(TMenuItem*)Sender;
+  int num=menu->Caption.ToInt();
+  delete (TMemoryStream*)ClipBoard->Items[num];
+  ClipBoard->Delete(num);
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::CopytoMenuClick(TObject *Sender)
 {
-TMenuItem* menu=(TMenuItem*)Sender;
-int num=menu->Caption.ToInt();
+  TMenuItem* menu=(TMenuItem*)Sender;
+  int num=menu->Caption.ToInt();
+  int Start;
+  int End;
+  int Len;
 
-
-int Start;
-int End;
-int Len;
-if(HexMemo->SelLength>0)
-    { Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-      End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);}
- else
-    {End=ConvertHexPosToGlobal(HexMemo->SelStart);
-      Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength); }
+  if(HexMemo->SelLength>0)
+    {
+      Start=ConvertHexPosToGlobal(HexMemo->SelStart);
+      End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
+    }
+  else
+    {
+      End=ConvertHexPosToGlobal(HexMemo->SelStart);
+      Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
+    }
   Len=End-Start+1;
   stream->Position=Start+CurrentPos;
-((TMemoryStream*)(ClipBoard->Items[num]))->Clear();
-((TMemoryStream*)ClipBoard->Items[num])->CopyFrom(stream,Len);
-
-
+  ((TMemoryStream*)(ClipBoard->Items[num]))->Clear();
+  ((TMemoryStream*)ClipBoard->Items[num])->CopyFrom(stream,Len);
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::PasteFromMenuClick(TObject *Sender)
@@ -782,145 +760,116 @@ for(int i=0;i<ClipBoard->Count;i++)
 }
 //---------------------------------------------------------------------------
 
-
-
-
 void __fastcall TStreamEdit::Font1Click(TObject *Sender)
 {
-FontDialog->Execute();
-HexMemo->Font=FontDialog->Font;
-StringMemo->Font=FontDialog->Font;
-PointerMemo->Font=FontDialog->Font;
-
+  FontDialog->Execute();
+  HexMemo->Font=FontDialog->Font;
+  StringMemo->Font=FontDialog->Font;
+  PointerMemo->Font=FontDialog->Font;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::Color1Click(TObject *Sender)
 {
-ColorDialog->Execute();
-HexMemo->Color=ColorDialog->Color;
-StringMemo->Color=ColorDialog->Color;
-PointerMemo->Color=ColorDialog->Color;
+  ColorDialog->Execute();
+  HexMemo->Color=ColorDialog->Color;
+  StringMemo->Color=ColorDialog->Color;
+  PointerMemo->Color=ColorDialog->Color;
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::ChangeColor(TObject *Sender)
 {
-ColorDialog->Execute();
-((TMemo*)Sender)->Color=ColorDialog->Color;
-
+  ColorDialog->Execute();
+  ((TMemo*)Sender)->Color=ColorDialog->Color;
 }
 //---------------------------------------------------------------------------
-
-
-
 void __fastcall TStreamEdit::StringFontMenuItemClick(TObject *Sender)
 {
 if(FontDialog->Execute())
  StringMemo->Font=FontDialog->Font;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::PointerFontMenuItemClick(TObject *Sender)
 {
-if(FontDialog->Execute())
-PointerMemo->Font=FontDialog->Font;
+  if(FontDialog->Execute())
+    PointerMemo->Font=FontDialog->Font;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::HexFontMenuItemClick(TObject *Sender)
 {
-if(FontDialog->Execute())
-HexMemo->Font=FontDialog->Font;
+  if(FontDialog->Execute())
+  HexMemo->Font=FontDialog->Font;
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::StringColorMenuItemClick(TObject *Sender)
 {
-if(ColorDialog->Execute())
- StringMemo->Color=ColorDialog->Color;
+  if(ColorDialog->Execute())
+    StringMemo->Color=ColorDialog->Color;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::PointerColorMenuItemClick(TObject *Sender)
 {
-if(ColorDialog->Execute())
-PointerMemo->Color=ColorDialog->Color;
+  if(ColorDialog->Execute())
+    PointerMemo->Color=ColorDialog->Color;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::HexColorMenuItemClick(TObject *Sender)
 {
-if(ColorDialog->Execute())
-HexMemo->Color=ColorDialog->Color;
+  if(ColorDialog->Execute())
+    HexMemo->Color=ColorDialog->Color;
 }
 //---------------------------------------------------------------------------
-
 void __fastcall TStreamEdit::EditBufMenuClick(TObject *Sender)
 {
-TMenuItem* menu=(TMenuItem*)Sender;
-
-int num=menu->Caption.ToInt();
-
-TEditMemoryForm* EditMemoryForm=new TEditMemoryForm(this);
-
-//BufferClipBoard.Value->Write(stream,true);
-
-EditMemoryForm->Width=500;
-EditMemoryForm->Height=400;
-EditMemoryForm->StreamEdit->stream=(TMemoryStream*)ClipBoard->Items[num];
-
-
-EditMemoryForm->Show();
+  TMenuItem* menu=(TMenuItem*)Sender;
+  int num=menu->Caption.ToInt();
+  TEditMemoryForm* EditMemoryForm=new TEditMemoryForm(this);
+  //BufferClipBoard.Value->Write(stream,true);
+  EditMemoryForm->Width=500;
+  EditMemoryForm->Height=400;
+  EditMemoryForm->StreamEdit->stream=(TMemoryStream*)ClipBoard->Items[num];
+  EditMemoryForm->Show();
 /*BufferClipBoard.BeginWork();
 BufferClipBoard.SetPosition(num);
 stream->Position=0;
 BufferClipBoard.Value->Read(stream);*/
-
-
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::StringsOptionChangedEvent(TObject *Sender,DWORD value)
 {
-try
-{
- NumberOfString=AnsiToulong(StringNumberEdit->Text.c_str());
- StringLen=AnsiToulong(StringLengthEdit->Text.c_str());
-}
-catch(...)
- {
-
- }
- LoadFromStream();
+  try
+  {
+    NumberOfString=AnsiToulong(StringNumberEdit->Text.c_str());
+    StringLen=AnsiToulong(StringLengthEdit->Text.c_str());
+  }
+  catch(...)
+  {
+  }
+  LoadFromStream();
 }
 //---------------------------------------------------------------------------
-
-
 int __fastcall TStreamEdit::ConvertGlobalToStringPos(int value)
 {
-
  return (StringLen+2)*(value/StringLen)+(value%StringLen);
 }
 
 int __fastcall TStreamEdit::ConvertStringPosToGlobal(int value)
 {
-int res=0;
-res+=StringLen*(value/(StringLen+2))+(value%(StringLen+2));
-
-return res;
+  int res=0;
+  res+=StringLen*(value/(StringLen+2))+(value%(StringLen+2));
+  return res;
 }
 void __fastcall TStreamEdit::StringRichEditKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
 {
-
       if(Key==0x27)//right
        {
-
          ShiftStringSelStart(1);
        }
       else
        {
         if(Key==0x25) //left
          {
-         ShiftStringSelStart(-1);
+           ShiftStringSelStart(-1);
          }
         else
          {
@@ -938,12 +887,13 @@ void __fastcall TStreamEdit::StringRichEditKeyDown(TObject *Sender,
              {
               if(Key==0x23)//end
                {
+
                }
               else
                {
                 if(Key==0x22)//PgDown
                  {
-               ShiftStringSelStart(StringLen*NumberOfString);
+                   ShiftStringSelStart(StringLen*NumberOfString);
                  }
                 else
                  {
@@ -955,25 +905,25 @@ void __fastcall TStreamEdit::StringRichEditKeyDown(TObject *Sender,
                    {
                     if(Key==0x24)//Home
                      {
+
                      }
                     else
                      {
                       if(Key==0x9) //Tab
                        {
                          int pos=ConvertStringPosToGlobal(StringMemo->SelStart);
-                          HexMemo->SelStart=ConvertGlobalToHexPos(pos);
+                         HexMemo->SelStart=ConvertGlobalToHexPos(pos);
                          HexMemo->SetFocus();
                        }
                       else
                        {
                         if(Key==0x1)   //??
                          {
+
                          }
                         else
                          {
-
 //                        StringRichEditKeyPres(Key);
-
                          }
                        }
                      }
@@ -984,13 +934,9 @@ void __fastcall TStreamEdit::StringRichEditKeyDown(TObject *Sender,
            }
          }
        }
-
-
  Key=0;
 }
 //---------------------------------------------------------------------------
-
-
 void __fastcall TStreamEdit::ShiftStringSelStart(int Shift)
 {
 int value=StringMemo->SelStart;
@@ -1026,8 +972,8 @@ StringMemo->SelLength=0;
 
 stream->Write(ch,1);
 ShiftIfWrongStringSelStart();
-
 }
+
 void __fastcall TStreamEdit::StringRichEditKeyPress(TObject *Sender,
       char &Key)
 {
@@ -1036,7 +982,6 @@ if(Key!=0x9)// not tab
 Key=0;
 }
 //---------------------------------------------------------------------------
-
 
 void __fastcall TStreamEdit::ShiftIfWrongStringSelStart(void)
 {
@@ -1078,7 +1023,6 @@ void __fastcall TStreamEdit::PointersNotifyEvent(int value)
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::Setstream(TStream* value)
 {
-
    Fstream=value;
    LoadFromStream();
 }
@@ -1087,8 +1031,8 @@ void __fastcall TStreamEdit::ContinueSearchMenuItemClick(
       TObject *Sender)
 {
 Search(false);
-
 }
+
 //---------------------------------------------------------------------------
 /*bool __fastcall TStreamEdit::Search(bool IsNewSearch)
 {
@@ -1143,7 +1087,6 @@ InfoEdit->Lines->Add(AnsiString("Search started at ") +StartSearch.DateTimeStrin
 return    PointersFound>0;
 }
 
-
 bool __fastcall TStreamEdit::SlowSearch(void)
 {
 TDateTime StartSearch=TDateTime::CurrentDateTime();
@@ -1158,15 +1101,12 @@ EndSearch=TDateTime::CurrentDateTime();
 InfoEdit->Lines->Add(AnsiString("Search started at ") +StartSearch.DateTimeString()+AnsiString(" ")+AnsiString("finished at ")+EndSearch.DateTimeString()+AnsiString(" search time ")+(EndSearch-StartSearch).TimeString()+AnsiString(" Found :")+AnsiString(PointersFound)+AnsiString(" matches."));
 return    PointersFound>0;
 }
-
-
-
-
 //----------------------------------------------
 void __fastcall TStreamEdit::DoProgress(int pos)
 {
  ProgressBar->Position=pos;
 }
+
 
 void __fastcall TStreamEdit::GetVariablesAtPos(int pos)
 {

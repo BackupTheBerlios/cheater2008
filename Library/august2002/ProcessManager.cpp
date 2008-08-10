@@ -34,10 +34,13 @@ void __fastcall TProcessManager::SetSize(DWORD NewSize)
 {
 if (NewSize>0)
  FSize=NewSize;
+
  if(FPosition>NewSize)
   FPosition=NewSize;
+
 if(FSize>0)
   Protect(0,FSize);
+
 }
 
 int __fastcall TProcessManager::Write(const void * Buffer, int Count)
@@ -50,6 +53,7 @@ if((Count>0)&&(Buffer!=NULL))
   if((DWORD)Count+FPosition>=FSize) NeedWrite=FSize-FPosition;
    else
   NeedWrite=(DWORD)Count;
+
 if( WriteProcessMemory(
     ProcessInformation.hProcess,// handle to process whose memory is written to
     (void*)(FPosition+FStart),	// address to start writing to
@@ -86,10 +90,10 @@ if( WriteProcessMemory(
  }
 else
   FPosition+=RealWrite;
-
  }
 return RealWrite;
 }
+
 //-----------------------------------------------------------------
 int __fastcall TProcessManager::Read(void * Buffer, int Count)
 {
@@ -119,15 +123,18 @@ if( ReadProcessMemory(
         );
 
     newPos=(DWORD)MemoryInfo.BaseAddress+MemoryInfo.RegionSize-FStart;
+
     if(newPos<=FPosition)
-     Position+=SystemInfo.dwPageSize;
+     FPosition+=SystemInfo.dwPageSize;
     else
-     Position=newPos;
+     FPosition=newPos;
+
  }
 else
  FPosition+=RealRead;
  }
 return RealRead;
+
 }
 
 bool __fastcall TProcessManager::CreateProcess(AnsiString FileName)
