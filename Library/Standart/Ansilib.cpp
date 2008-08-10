@@ -144,16 +144,10 @@ return res;
 //-----------------------------------------------------------------------------
 std::string  __fastcall  ulongToHexAnsi(unsigned long num)
  {
-  std::string res=EMPTY_STRING;
-  WORK_ANSILIB_UNION_FOR_CONVERT work;
-  while(num>0)
-   {
-    work._ulong=num%16;
-    num=num/16;
-    res.insert(0,IntToHex(work._int));
-   }
-  if(res.size()==0) res=std::string("0");
-  return res;
+  std::stringstream ret;
+  ret << std::hex << std::uppercase << num;
+  if(ret.str().size()==0) ret << "0";
+  return ret.str();
  }
 //-----------------------------------------------------------------------------
 std::string  __fastcall  ulongToHexAnsi(unsigned long num,unsigned long len)
