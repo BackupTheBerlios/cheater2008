@@ -23,7 +23,7 @@ char* StringType[]={"hex num","dec num","string","hex string","float num","doubl
 std::string IntToHex(int i_num)
 {
 	std::stringstream ret;
-	ret << std::setfill('0') << std::setw(2) << std::hex<< i_num;
+	ret << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i_num;
 	return ret.str();
 }
 
@@ -54,7 +54,7 @@ std::string IntToString(int i_num)
 std::string  __fastcall  byteptrToHexAnsi(byte * buf, unsigned long len)
  {
   std::string res=EMPTY_STRING;
-   WORK_ANSILIB_UNION_FOR_CONVERT work;
+  WORK_ANSILIB_UNION_FOR_CONVERT work;
   if(buf!=NULL)
    {
     for(unsigned long i=0;i<len;i++)
@@ -70,8 +70,8 @@ std::string  __fastcall  byteptrToHexAnsi(byte * buf, unsigned long len)
 std::string  __fastcall  byteptrToHexAnsiWithSpace(byte * buf, unsigned long len)
  {
   std::string res=EMPTY_STRING;
-   WORK_ANSILIB_UNION_FOR_CONVERT work;
-    unsigned long i=0;
+  WORK_ANSILIB_UNION_FOR_CONVERT work;
+  unsigned long i=0;
   if(buf!=NULL)
    {
     if(len!=0)
@@ -82,12 +82,13 @@ std::string  __fastcall  byteptrToHexAnsiWithSpace(byte * buf, unsigned long len
 		res+=IntToHex(work._int);
         res+=std::string(SPACE_STRING);
        }
-        work._ulong=buf[i];
-		res+=IntToHex(work._int);
+      work._ulong=buf[i];
+      res+=IntToHex(work._int);
      }
    }
   return res;
  }
+
 //-----------------------------------------------------------------------------
 byte*      __fastcall   HexAnsiTobyteptr(const std::string& Str)
  {
@@ -98,12 +99,13 @@ byte*      __fastcall   HexAnsiTobyteptr(const std::string& Str)
 	buf=new byte[Str.size()/2];
 	for(unsigned long i=0;i<Str.size()/2;i++)
      {
-      work._ulong=HexAnsiToulong(Str.substr(2*i+1,2));
+      work._ulong=HexAnsiToulong(Str.substr(2*i,2));
       buf[i]=work.byte_;
      }
    }
   return buf;
  }
+
 //-----------------------------------------------------------------------------
 std::string  __fastcall  ulongToAnsi(unsigned long num)
  {
@@ -118,6 +120,7 @@ std::string  __fastcall  ulongToAnsi(unsigned long num)
   if(res.size()==0) res=std::string("0");
   return res;
  }
+
 //-----------------------------------------------------------------------------
 unsigned long __fastcall AnsiToulong(const std::string& Str)
  {
@@ -136,7 +139,6 @@ unsigned long __fastcall AnsiToulong(const std::string& Str)
     res+=pow*work.byte_;
     pow=pow*10;
    }
-
 return res;
  }
 //-----------------------------------------------------------------------------
@@ -166,7 +168,6 @@ std::string  __fastcall  ulongToHexAnsi(unsigned long num,unsigned long len)
    }
   return res;
  }
-
 //-----------------------------------------------------------------------------
 unsigned long __fastcall HexAnsiToulong(const std::string& Str )
  {
@@ -195,14 +196,13 @@ unsigned long __fastcall HexAnsiToulong(const std::string& Str )
            work.char_=work.char_-'A'+10;
           }
         }
-
      }
     res+=pow*work.byte_;
     pow=pow*16;
    }
-
 return res;
  }
+
 //-----------------------------------------------------------------------------
 bool IsDouble(std::string& Str)
  {
@@ -283,10 +283,9 @@ byte* __fastcall TypedAnsiTobyteptr(const std::string& Text, int Type, unsigned 
              res=new byte[*len];
              memcpy(res,Text.c_str(),*len);
    }
-
-
  return res;
  }
+
 unsigned long __fastcall PointerAnsiToulong(const std::string& Text, int Type)
  {
 unsigned long res=0;
@@ -331,9 +330,9 @@ const byte* buf;
 //unsigned long __fastcall FindInBuf(byte *,unsigned long,byte *,unsigned long );
 //-----------------------------------------------------------------------------
 int WhatAnsiType(const std::string& value)
- {
+{
   int res=DEC_NUM;
-  for (int i=1;i<=value.size();i++)
+  for (int i=0;i<value.size();i++)
    {
     if((value[i]<'0')||(value[i]>'9'))
      if(((value[i]>='a')&&(value[i]<='f'))||((value[i]>='A')&&(value[i]<='F')))
@@ -349,6 +348,7 @@ int WhatAnsiType(const std::string& value)
    }
   return res;
  }
+
 //-----------------------------------------------------------------------------
 unsigned char __fastcall ConvertToPrintSign(unsigned char value)
  {
@@ -366,6 +366,7 @@ unsigned char __fastcall ConvertToPrintSign(unsigned char value)
   if(Is) ch=value;
    return ch;
  }
+
 //-----------------------------------------------------------------------------
 std::string __fastcall ConvertToPrintString(byte* buf,unsigned long len)
  {
@@ -387,6 +388,7 @@ std::string __fastcall ulongTo8digitHexString(unsigned long num)
  {
   return ulongToHexAnsi(num,8);
  }
+
 //-----------------------------------------------------------------------------
 byte __fastcall KeyToHex(WORD key)
  {
@@ -394,6 +396,7 @@ byte __fastcall KeyToHex(WORD key)
  if ((key>=0x41)&&(key<=0x46)) return key-0x41+10;
  return 0xff;
  }
+
 //-----------------------------------------------------------------------------
 byte* __fastcall ulongTobyteptr(unsigned long num ,unsigned long* len)
  {
@@ -412,6 +415,7 @@ byte* __fastcall ulongTobyteptr(unsigned long num ,unsigned long* len)
     }
   return res;
  }
+
 //-----------------------------------------------------------------------------
 unsigned long __fastcall byteptrToulong(const byte* buf,unsigned long len)
  {
@@ -428,6 +432,7 @@ unsigned long __fastcall byteptrToulong(const byte* buf,unsigned long len)
    }
   return work._ulong;
  }
+
 //--------------------------------------------------------------------------------------------------------
 char* InsertDilimeters(char* src, int srcLen,char* dilim, int dilimLen,int step,int flag,int* resLen)
  {
@@ -471,7 +476,7 @@ char* RemoveDilimeters(char* src, int srcLen,char* dilim, int dilimLen,int* resL
      if(memcmp(src+i,dilim,dilimLen)==0)
       {DilimetrsPos[DilimetrsCount]=i;DilimetrsCount++;i+=dilimLen;}
      else
-      i++; 
+      i++;
     }
     *resLen=0;
     res=new byte[srcLen-DilimetrsCount*dilimLen];
