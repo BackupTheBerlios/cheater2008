@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 
@@ -9,12 +8,9 @@
 #pragma resource "*.dfm"
 //TProcessChoice *ProcessChoice;
 
-
-
 BOOL CALLBACK EnumResNameProc(
-
     HANDLE hModule,	// resource-module handle
-    LPCTSTR lpszType,	// pointer to resource type 
+    LPCTSTR lpszType,	// pointer to resource type
     LPTSTR lpszName,	// pointer to resource name
     LONG lParam 	// application-defined parameter
    )
@@ -28,20 +24,22 @@ return TRUE;
 __fastcall TProcessChoice1::TProcessChoice1(TComponent* Owner)
         : TFrame(Owner)
 {
-}                     
+}
 //---------------------------------------------------------------------------
 
 void __fastcall TProcessChoice1::GetProcesses(void)
 {
 MODULEINFO modinfo;
-   TTreeNode* ProcessId;
-  DWORD cb=200;            // size of array
-  DWORD lpidProcess[200];  // array of process identifiers
-  DWORD cbNeeded;      // number of bytes returned
-ProcessTree->Items->Clear();
+TTreeNode* ProcessId;
+const DWORD cb=1024;            // size of array
+DWORD lpidProcess[cb * sizeof(DWORD)];  // array of process identifiers
+HANDLE  lphModule[cb * sizeof(HANDLE)];
+DWORD cbNeeded;      // number of bytes returned
 HANDLE handle;
-HANDLE  lphModule[200];
-  DWORD cbNeededModule;
+DWORD cbNeededModule;
+
+ProcessTree->Items->Clear();
+
 if( EnumProcesses(
   lpidProcess,  // array of process identifiers
    cb*sizeof(DWORD),            // size of array
@@ -96,7 +94,6 @@ if( EnumProcesses(
 
    }
   }
-
 }
 void __fastcall TProcessChoice1::ProcessTreeEnter(TObject *Sender)
 {
@@ -140,7 +137,7 @@ hModule=LoadLibraryEx(
 
     Path.c_str(),	// points to name of executable module
     NULL,	// reserved, must be NULL
-    LOAD_LIBRARY_AS_DATAFILE 	// entry-point execution flag 
+    LOAD_LIBRARY_AS_DATAFILE 	// entry-point execution flag
    );
 
 Type=AnsiString("RT_ACCELERATOR");//	Accelerator table
@@ -153,166 +150,124 @@ EnumResourceNames(
     (LONG) ((void*)this) 	// application-defined parameter
    );
 
-
-
 Type=AnsiString("RT_ANICURSOR");//	Animated cursor
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     hModule,	// resource-module handling
     RT_ANICURSOR,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_ANIICON");//	Animated icon
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     hModule,	// resource-module handling
     RT_ANIICON,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_BITMAP");//	Bitmap resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     hModule,	// resource-module handling
     RT_BITMAP,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
 
-
 Type=AnsiString("RT_CURSOR");//	Hardware-dependent cursor resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
-    hModule,	// resource-module handling
+     hModule,	// resource-module handling
     RT_CURSOR,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
-   );
-
-
+    );
 Type=AnsiString("RT_DIALOG");//	Dialog box
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     hModule,	// resource-module handling
     RT_DIALOG,	// pointer to resource type
-    (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
-    (LONG) ((void*)this) 	// application-defined parameter
+   (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
+   (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_FONT");//	Font resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_FONT,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
 
-
 Type=AnsiString("RT_FONTDIR");//	Font directory resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_FONTDIR,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_GROUP_CURSOR");//	Hardware-independent cursor resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_GROUP_CURSOR,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_GROUP_ICON");//	Hardware-independent icon resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_GROUP_ICON,	// pointer to resource type
-    (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
-    (LONG) ((void*)this) 	// application-defined parameter
+   (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
+   (LONG) ((void*)this) 	// application-defined parameter
    );
-
 
 Type=AnsiString("RT_ICON");//	Hardware-dependent icon resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_ICON,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_MENU");//	Menu resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_MENU,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_MESSAGETABLE");//	Message-table entry
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_MESSAGETABLE,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_RCDATA");//	Application-defined resource (raw data)
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_RCDATA,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_STRING") ;//	String-table entry
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_STRING,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
     (LONG) ((void*)this) 	// application-defined parameter
    );
-
-
 Type=AnsiString("RT_VERSION");//	Version resource
 WorkNode=AdditionalInfo->Items->AddFirst(NULL,Type);
 EnumResourceNames(
-
     (void*)hModule,	// resource-module handling
     RT_VERSION,	// pointer to resource type
     (ENUMRESNAMEPROC)EnumResNameProc,	// pointer to callback function
@@ -322,4 +277,5 @@ EnumResourceNames(
  }
 }
 //---------------------------------------------------------------------------
+
 
