@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #ifndef StreamEditH
 #define StreamEditH
 //---------------------------------------------------------------------------
@@ -86,7 +85,8 @@ __published:	// IDE-managed Components
         TSplitter *Splitter4;
         void __fastcall SearchMenuItemClick(TObject *Sender);
         void __fastcall LoadFromStreamMenuitemClick(TObject *Sender);
-        void __fastcall HexRichEditKeyDown(TObject *Sender, WORD &Key,
+
+       void __fastcall HexRichEditKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
         void __fastcall GotoMenuItemClick(TObject *Sender);
         void __fastcall HexRichEditKeyPress(TObject *Sender, char &Key);
@@ -122,7 +122,7 @@ private:
    void __fastcall PointersNotifyEvent(int);
    void __fastcall UpdateInfoString(void);
    void __fastcall InitInterface(void);
-void __fastcall StringsOptionChangedEvent(TObject *Sender,DWORD value);   
+void __fastcall StringsOptionChangedEvent(TObject *Sender,DWORD value);
 //        TMemoryStream* MemoryStream;
         int StringLen;
         int NumberOfString;
@@ -151,8 +151,7 @@ void __fastcall StringsOptionChangedEvent(TObject *Sender,DWORD value);
 
 public:		// User declarations
         __fastcall TStreamEdit(TComponent* Owner);
-        __fastcall ~TStreamEdit
-        (void);
+        __fastcall ~TStreamEdit(void);
         void __fastcall ShiftHexSelStart(int Shift);
         int __fastcall ConvertGlobalToStringPos(int value);
         int __fastcall ConvertStringPosToGlobal(int value);
@@ -170,3 +169,4 @@ protected:
 };
 //---------------------------------------------------------------------------
 #endif
+

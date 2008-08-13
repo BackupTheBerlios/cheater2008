@@ -1107,7 +1107,6 @@ void __fastcall TStreamEdit::DoProgress(int pos)
  ProgressBar->Position=pos;
 }
 
-
 void __fastcall TStreamEdit::GetVariablesAtPos(int pos)
 {
 WORK_ANSILIB_UNION_FOR_CONVERT buf;
@@ -1176,3 +1175,4 @@ TSearcher* __fastcall TStreamEdit::GetSearcher(void)
 {
 return SearcherProperties->Searcher;
 }
+
