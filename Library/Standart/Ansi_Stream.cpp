@@ -19,7 +19,7 @@ std::string  __fastcall  ConvertStreamToHexAnsi(TStream* stream)
 	{
 
       stream->Read(&work._ulong,1);
-	  ret += IntToHex(work._int);
+	  ret += intToHex(work._int,2);
     }
   return ret;
  }
@@ -36,11 +36,11 @@ std::string  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream)
      while(stream->Position<stream->Size-1)
       {
         stream->Read(&work._ulong,1);
-		res+=IntToHex(work._int);
+		res+=intToHex(work._int,2);
        res+=std::string(SPACE_STRING);
       }
       stream->Read(&work._ulong,1);
-      res+=IntToHex(work._int);
+      res+=intToHex(work._int,2);
    }
   return res;
  }

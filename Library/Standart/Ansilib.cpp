@@ -20,10 +20,10 @@ char* StringType[]={"hex num","dec num","string","hex string","float num","doubl
  unsigned long HEX_MASK_1=0x000000FF;
  unsigned char* PRINT_TABLE="`1234567890-=qwertyuiop[]';lkjhgfdsazxcvbnm,./ \~!@#$%^&*()_+}{POIUYTREWQASDFGHJKL:""?><MNBVCXZ|יצףךוםדרשחץת‎זהכמנןאגûפÿקסלטעüב‏.\ֹײ׃Êֳֵֽ״ÙַױÚÝִֶֻ־׀ְֲֿÛװß׳ָּׁׂÜֱÞ,/ ";
 
-std::string IntToHex(int i_num)
+std::string intToHex(int i_num, int i_width)
 {
 	std::stringstream ret;
-	ret << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << i_num;
+	ret << std::setfill('0') << std::setw(i_width) << std::hex << std::uppercase << i_num;
 	return ret.str();
 }
 
@@ -60,7 +60,7 @@ std::string  __fastcall  byteptrToHexAnsi(byte * buf, unsigned long len)
     for(unsigned long i=0;i<len;i++)
      {
       work._ulong=buf[i];
-	  res+=IntToHex(work._int);
+	  res+=intToHex(work._int,2);
      }
    }
   return res;
@@ -79,11 +79,11 @@ std::string  __fastcall  byteptrToHexAnsiWithSpace(byte * buf, unsigned long len
       for(;i<len-1;i++)
        {
         work._ulong=buf[i];
-		res+=IntToHex(work._int);
+		res+=intToHex(work._int,2);
         res+=std::string(SPACE_STRING);
        }
       work._ulong=buf[i];
-      res+=IntToHex(work._int);
+      res+=intToHex(work._int,2);
      }
    }
   return res;
@@ -158,7 +158,7 @@ std::string  __fastcall  ulongToHexAnsi(unsigned long num,unsigned long len)
    {
     work._ulong=num%16;
     num=num/16;
-    res.insert(0,IntToHex(work._int));
+    res.insert(0,intToHex(work._int,1));
    }
   return res;
  }

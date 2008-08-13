@@ -69,7 +69,8 @@ unsigned long __fastcall byteptrToulong(const byte* buf,unsigned long len);
 //---------------------------------------------------------------------------
 
 // Auxiliary functions
-std::string IntToHex(int i_num);
+// width minimum number of output digits 
+std::string intToHex(int i_num,int i_width);
 int ToInt(const std::string& i_str);
 double ToDouble(const std::string& i_str);
 std::string IntToString(int i_num);
