@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 
@@ -377,7 +376,8 @@ void __fastcall TPointersViewBox::KeyDown(TObject *Sender,WORD &Key, TShiftState
 if(Key==0x2E) //delete key
 {
  DeleteSelectedPointers();
-Key=0; 
+Key=0;
 }
 
 }
+
