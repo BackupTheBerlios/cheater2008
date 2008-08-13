@@ -1,6 +1,4 @@
 //---------------------------------------------------------------------------
-
-
 #ifndef ProcessChoiceFrameH
 #define ProcessChoiceFrameH
 //---------------------------------------------------------------------------
@@ -30,3 +28,4 @@ public:		// User declarations
 //extern PACKAGE TProcessChoice *ProcessChoice;
 //---------------------------------------------------------------------------
 #endif
+

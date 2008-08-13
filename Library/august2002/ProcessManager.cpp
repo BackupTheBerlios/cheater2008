@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 //---------------------------------------------------------------------------
@@ -7,8 +6,6 @@
 #pragma package(smart_init)
 __fastcall TProcessManager::TProcessManager(void) :TStream()
 {
-
-
 GetSystemInfo((LPSYSTEM_INFO)&SystemInfo);
 }
 //-------------------------------------------------------
@@ -33,14 +30,11 @@ FStart=value;
 void __fastcall TProcessManager::SetSize(DWORD NewSize)
 {
 if (NewSize>0)
- FSize=NewSize;
-
+FSize=NewSize;
  if(FPosition>NewSize)
-  FPosition=NewSize;
-
+ FPosition=NewSize;
 if(FSize>0)
-  Protect(0,FSize);
-
+ Protect(0,FSize);
 }
 
 int __fastcall TProcessManager::Write(const void * Buffer, int Count)
@@ -189,12 +183,10 @@ CurrentDirectory=ApplicationName.SubString(1,ApplicationName.LastDelimiter("\\")
 
 }
 
-
 void __fastcall TProcessManager::OpenProcess(DWORD id)
 {
 ProcessInformation.dwProcessId=id;
  ProcessInformation.hProcess=::OpenProcess(
-
     PROCESS_ALL_ACCESS	,	// access flag
     FALSE,	// handle inheritance flag
     id 	// process identifier
@@ -244,6 +236,7 @@ VirtualQueryEx(ProcessInformation.hProcess,
         );
 return MemoryInfo;
 }
+
 void __fastcall TProcessManager::SetMemoryInfo(MEMORY_BASIC_INFORMATION MemInfo)
 {
 DWORD work;
@@ -255,3 +248,4 @@ DWORD work;
     &work 	// address of variable to get old protection
    );
 }
+
