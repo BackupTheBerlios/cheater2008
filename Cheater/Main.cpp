@@ -82,9 +82,9 @@ void __fastcall TForm1::Button1Click(TObject *Sender)
 {
 ListBox->Items->Clear();
 processNum=0;
-  DWORD *lpidProcess=new DWORD[1024];
-  HMODULE *lphModule=new HMODULE[1024];
-DWORD cb=50*sizeof(DWORD);
+DWORD cb=1024*sizeof(DWORD);
+DWORD *lpidProcess=new DWORD[cb];
+HMODULE *lphModule=new HMODULE[cb];
 DWORD cbNeeded;
  EnumProcesses(
 lpidProcess,  // array of process identifiers
@@ -122,8 +122,8 @@ processNum++;
 //  }
  }
 
-delete lphModule;
-delete lpidProcess;
+delete[] lphModule;
+delete[] lpidProcess;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::ListBoxClick(TObject *Sender)

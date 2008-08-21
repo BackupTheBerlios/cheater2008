@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #ifndef searcherH
 #define searcherH
 //typedef TStream* TStrteamPtr;
@@ -14,8 +13,6 @@ union _export VoidInt
  };
 class  _export TSearcher
 {
-
-
 private:
         int FPageSize;
         TList* FPointers;
@@ -41,13 +38,11 @@ public:
         __fastcall TSearcher(TSearcher*);
         __property int PageSize  = { read=FPageSize,write=SetPageSize };
 
-
         __property TList* Pointers  = { read=FPointers };
         __property TStream* stream  = { read=Fstream, write=Setstream };
         __property TMemoryStream* Find  = { read=FFind};
         __property TMemoryStream* Replace  = { read=FReplace};
 };
 #endif
-
 
 

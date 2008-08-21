@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 
@@ -45,7 +44,6 @@ __fastcall TSearcher::TSearcher(TStream* value)
 Init();
 Fstream=value;
 }
-
 __fastcall TSearcher::~TSearcher()
 {
      delete FPointers;
@@ -71,10 +69,7 @@ if(stream!=NULL)
        if(stream->Read(Buffer,len)==len)
           if(memcmp(Buffer,str,len)==0)
             newPointers->Add(voidint.v);
-
-
-
-     }
+    }
   delete Pointers;
   FPointers=newPointers;
   delete Buffer;
@@ -181,7 +176,7 @@ if((src!=NULL)&&(src!=this))
    FPointers->Add(src->FPointers->Items[i]);
  }
 else
-   throw Exception(AnsiString("You are not cool guy ")); 
+   throw Exception(AnsiString("You are not cool guy "));
 }
 
 __fastcall TSearcher::TSearcher(TSearcher* src)
@@ -206,3 +201,4 @@ void __fastcall TSearcher::SetPageSize(int value)
  if(value>0)
   FPageSize=value;
 }
+

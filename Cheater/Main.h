@@ -1,5 +1,4 @@
 ﻿//---------------------------------------------------------------------------
-
 #ifndef MainH
 #define MainH
 //---------------------------------------------------------------------------
@@ -97,10 +96,9 @@ __published:	// IDE-managed Components
         void __fastcall SetClick(TObject *Sender);
         void __fastcall ReloadClick(TObject *Sender);
         void __fastcall ServerSocket1ClientRead(TObject *Sender,
-          TCustomWinSocket *Socket);
-
-private:
-        DWORD idProcess[50];
+           TCustomWinSocket *Socket);
+ private:
+         DWORD idProcess[50];
         int processNum;
         TFileStream* file;
         int pos;
@@ -116,3 +114,4 @@ public:		// User declarations
 extern PACKAGE TForm1 *Form1;
 //---------------------------------------------------------------------------
 #endif
+

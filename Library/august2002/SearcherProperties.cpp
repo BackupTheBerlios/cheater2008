@@ -1,8 +1,6 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
-
 #include "SearcherProperties.h"
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
@@ -84,7 +82,7 @@ void __fastcall TSearcherProperties::SetSearcher(TSearcher* value)
   else
    Pointers->List=NULL;
   if(Showing)  Reload();
-// throw Exception("Sergey15");    
+// throw Exception("Sergey15");
 }
 
 TSearcher* __fastcall TSearcherProperties::GetSearcher(void)
@@ -191,10 +189,6 @@ EndSearch=TDateTime::CurrentDateTime();
 Reload();
 return Searcher->Pointers->Count;
 }
-
-
-
-
 //----------------------------------------------------------------------------
 int __fastcall TSearcherProperties::SlowSearch(TStream* stream,AfterReadNotify DoProgress)
 {
@@ -205,6 +199,7 @@ unsigned long len;
 bool SearchResult;
 VoidInt vi;
 Searcher->stream=stream;
+
 Searcher->NotifyEvent=DoProgress;
 //ProgressBar->Max=stream->Size;
 //ProgressBar->Min=0;ProgressBar->Position=0;
@@ -244,3 +239,4 @@ if(!Replace->IsEmpty())
    Searcher->ReplaceAll();
  }
 }
+

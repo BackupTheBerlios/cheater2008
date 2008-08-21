@@ -40,7 +40,7 @@ object Form1: TForm1
     Top = 0
     Width = 940
     Height = 705
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Align = alClient
     TabOrder = 1
     object TabSheet1: TTabSheet
@@ -58,10 +58,6 @@ object Form1: TForm1
     object TabSheet2: TTabSheet
       Caption = 'Process chose'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Button1: TButton
         Left = 456
         Top = 8
@@ -113,10 +109,6 @@ object Form1: TForm1
     object TabSheet4: TTabSheet
       Caption = 'Memory Info'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Button2: TButton
         Left = 696
         Top = 24
@@ -277,10 +269,6 @@ object Form1: TForm1
     object TabSheet5: TTabSheet
       Caption = 'Searcher List'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ChitProperties: TChitThreadProperties
         Left = 0
         Top = 0

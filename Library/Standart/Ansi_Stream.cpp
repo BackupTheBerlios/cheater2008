@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 #include "Ansi_Stream.h"
@@ -10,20 +9,17 @@
 //------------------------------------------------------
 std::string  __fastcall  ConvertStreamToHexAnsi(TStream* stream)
  {
-
   std::string ret;
   stream->Position=0;
    WORK_ANSILIB_UNION_FOR_CONVERT work;
       work._ulong=0;
    while(stream->Position<stream->Size)
-	{
-
+    {
       stream->Read(&work._ulong,1);
 	  ret += intToHex(work._int,2);
     }
   return ret;
  }
-
 //-----------------------------------------------------------------------------
 std::string  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream)
  {
@@ -56,7 +52,7 @@ unsigned long i=0;
 	  work._ulong=HexAnsiToulong(Str.substr(2*i+1,2));
       stream->Write(&work.byte_,1);
      }
-   }     
+   }
   return i;
  }
 
@@ -161,7 +157,7 @@ int InsertDilimeters(TStream* src,TStream* dest,TStream* dilim, int step,int fla
        if(flag&dlLeft!=0) Len+=dest->CopyFrom(dilim,0);
     for(int j=0;j<src->Size-step;j+=step)
      {
-        Len+=dest->CopyFrom(src,step);
+       Len+=dest->CopyFrom(src,step);
         Len+=dest->CopyFrom(dilim,0);
      }
         dest->CopyFrom(src,step);
@@ -215,8 +211,8 @@ unsigned long len;
    {
     stream->Read(&work._ulong,sizeof(unsigned long));
     list->Add(work.pvoid);
-
    }
  }
 //--------------------------------------------------------------------------
 #pragma package(smart_init)
+

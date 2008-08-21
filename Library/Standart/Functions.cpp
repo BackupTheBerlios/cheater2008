@@ -1,8 +1,6 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
-
 #include "Functions.h"
 
 //---------------------------------------------------------------------------
@@ -29,9 +27,10 @@ int Pointer;
  io_stream.Write(&num,sizeof(int));
   for(;i<num;i++)
    {
-    Pointer=(int)i_list.Items[i];   
+    Pointer=(int)i_list.Items[i];
 	io_stream.Write(&Pointer,sizeof(int));
 
    }
   return i;
 }
+
