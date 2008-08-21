@@ -1,8 +1,6 @@
 object EditMemoryForm: TEditMemoryForm
   Left = 105
   Top = 169
-  Width = 846
-  Height = 571
   HorzScrollBar.ButtonSize = 10
   HorzScrollBar.Color = clInfoText
   HorzScrollBar.ParentColor = False
@@ -10,6 +8,8 @@ object EditMemoryForm: TEditMemoryForm
   HorzScrollBar.Size = 122
   HorzScrollBar.Tracking = True
   Caption = 'EditMemoryForm'
+  ClientHeight = 544
+  ClientWidth = 838
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -29,5 +29,7 @@ object EditMemoryForm: TEditMemoryForm
     Align = alClient
     Caption = 'StreamEdit'
     TabOrder = 0
+    ExplicitLeft = 8
+    ExplicitTop = 8
   end
 end
