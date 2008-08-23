@@ -1,5 +1,9 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
+
+#include <sstream>
+#include <stdexcept>
+
 #pragma hdrstop
 
 #include "searcher.h"
@@ -176,7 +180,13 @@ if((src!=NULL)&&(src!=this))
    FPointers->Add(src->FPointers->Items[i]);
  }
 else
-   throw Exception(AnsiString("You are not cool guy "));
+{
+std::stringstream msg;
+msg << "src is either null or itselt" << std::endl << std::endl
+    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+throw std::runtime_error( msg.str() );
+}
+
 }
 
 __fastcall TSearcher::TSearcher(TSearcher* src)

@@ -1,5 +1,7 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
+#include <sstream>
+#include <stdexcept>
 #pragma hdrstop
 
 
@@ -26,7 +28,13 @@ TChitThread* GlobalChit=NULL;
 __fastcall TChitThread::TChitThread(bool CreateSuspended)
         : TThread(CreateSuspended)
 {
-if(GlobalChit!=NULL) throw Exception("One chiter is enough");
+if(GlobalChit!=NULL)
+{
+std::stringstream msg;
+msg << "Only one chiter at any time can exist" << std::endl << std::endl
+    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+throw std::runtime_error( msg.str() );
+}
 GlobalChit=this;
 sleep=10000;
 FSearchers=new TList();

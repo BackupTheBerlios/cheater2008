@@ -1,5 +1,7 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
+#include <sstream>
+#include <stdexcept>
 #pragma hdrstop
 
 #include "CountEdit.h"
@@ -69,7 +71,13 @@ Max=100;
 
 void __fastcall TCountEdit::UpDownFieldChangingEventEx(System::TObject* Sender, bool &AllowChange, short NewValue, TUpDownDirection Direction)
 {
-if(Direction==updNone) throw "TCountEdit::UpDownFieldChangingEventEx Error";
+if(Direction==updNone)
+{
+std::stringstream msg;
+msg << "Direction==updNone" << std::endl << std::endl
+    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+throw std::runtime_error( msg.str() );
+}
 DWORD value=AnsiToulong(std::string(EditField->Text.c_str()));
 if(Direction==updUp)
 {
