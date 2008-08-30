@@ -50,7 +50,7 @@ TComboBox* TInputGroupBox::CreateTextBox(void)
  Work->Top=25;
  Work->Left=2;
  Work->OnChange=TInputGroupBoxTextBoxChange;
- Work->Parent=this; 
+ Work->Parent=this;
  return Work;
 }
 //--------------------------------------------------------------------------------
@@ -69,19 +69,16 @@ TTypeComboBox* TInputGroupBox::CreateTypeBox(void)
 void TInputGroupBox::CreateLabels(void)
 {
  TLabel *Work=new TLabel((TComponent*)this);
- Work->Caption="Текст";
+ Work->Caption="Value";
  Work->Top=12;
  Work->Left=2;
  Work->Parent=this;
  Work=new TLabel((TComponent*)this);
- Work->Caption="Тип";
+ Work->Caption="Type";
  Work->Top=46;
  Work->Left=2;
  Work->Parent=this;
 }
-
-
-
 
 void __fastcall TInputGroupBox::InitBox(const std::string& i_str,int Type)
 {
@@ -91,9 +88,7 @@ if(Type<=FLOAT_NUM)
   TypeBox->ItemIndex=Type;
   TextBox->Text=i_str.c_str();
  }
-
 }
-
 
 void __fastcall TInputGroupBox::SetTypeOfBox(AnsiString value)
 {
@@ -105,26 +100,21 @@ AnsiString __fastcall TInputGroupBox::GetTypeOfBox()
   return FTypeOfBox;
 }
 
-
 __fastcall TInputGroupBox::~TInputGroupBox(void)
 {
     //TODO: Add your source code here
-
-
 }
 //----------------------------------------------------------------------------------
 void __fastcall TInputGroupBox::TInputGroupBoxTextBoxChange(TObject*)
 {
 //
 BoxesChange();
-
 }
 //----------------------------------------------------------------------------------
 void __fastcall TInputGroupBox::TInputGroupBoxTypeBoxChange(TObject*)
 {
 //
 BoxesChange();
-
 }
 //------------------------------------------------------------------------
 void __fastcall TInputGroupBox::TInputGroupBoxOnEnter(TObject*)
@@ -143,8 +133,6 @@ if(TypeBox->Items->Count==0)
     TypeBox->Items->Add(StringType[DOUBLE_NUM]);
    }
  }
-
-
 }
 //-----------------------------------------------------------------------------------
 void __fastcall TInputGroupBox::WriteDataToStream(TStream* stream)
@@ -153,13 +141,11 @@ void __fastcall TInputGroupBox::WriteDataToStream(TStream* stream)
 WriteTypedAnsiToStream(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,stream);
 }
 
-
 unsigned long __fastcall TInputGroupBox::GetPointer(void)
 {
     //TODO: Add your source code here
     return PointerAnsiToulong(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex);
 }
-
 
 bool __fastcall TInputGroupBox::IsEmpty(void)
 {
@@ -167,15 +153,11 @@ bool __fastcall TInputGroupBox::IsEmpty(void)
     return TextBox->Text.IsEmpty()||TypeBox->Text.IsEmpty();
 }
 
-
 //--------------------------------------------------------------------------------
-
-
 AnsiString __fastcall TInputGroupBox::GetText()
 {
  return TextBox->Text;
 }
-
 
 void __fastcall TInputGroupBox::BoxesChange(void)
 {
@@ -200,7 +182,6 @@ void __fastcall TInputGroupBox::Clear(void)
     TextBox->Items->Clear();
 }
 
-
 void __fastcall TInputGroupBox::Add(const std::string& str)
 {
     //TODO: Add your source code here
@@ -208,12 +189,10 @@ if(TextBox->Items->IndexOf(str.c_str())==-1)
  TextBox->Items->Add(str.c_str());
 }
 
-
 TStrings* __fastcall TInputGroupBox::GetStrings()
 {
     return TextBox->Items;
 }
-
 
 TPopupMenu* __fastcall TInputGroupBox::CreatePopupMenu(void)
 {
@@ -228,7 +207,6 @@ TPopupMenu* __fastcall TInputGroupBox::CreatePopupMenu(void)
     SavePointerMenuItem->Enabled=false;
     MenuItem->OnClick=TInputGroupBoxSavePointerMenuItemOnClick;
     work->Items->Add(MenuItem);
-
     MenuItem=new TMenuItem(work);
     ClearPointersMenuItem=MenuItem;
     MenuItem->Caption="Очистить TextBox";
@@ -243,11 +221,9 @@ TPopupMenu* __fastcall TInputGroupBox::CreatePopupMenu(void)
 
     MenuItem=new TMenuItem(work);
     ConvertToMenuItem=MenuItem;
-    MenuItem->Caption="Перевести в...";
+    MenuItem->Caption="Convert to...";
     ConvertToMenuItem->Enabled=true;
     work->Items->Add(MenuItem);
-
-
 
     MenuItem=new TMenuItem(ConvertToMenuItem);
     ConvertToDecNumMenuItem=MenuItem;
@@ -292,9 +268,7 @@ TPopupMenu* __fastcall TInputGroupBox::CreatePopupMenu(void)
     ConvertToMenuItem->Add(MenuItem);
 
     return work;
-
 }
-
 
 void __fastcall TInputGroupBox::TInputGroupBoxSavePointerMenuItemOnClick(TObject*)
 {
@@ -302,13 +276,11 @@ void __fastcall TInputGroupBox::TInputGroupBoxSavePointerMenuItemOnClick(TObject
 Add(TextBox->Text.c_str());
 }
 
-
 void __fastcall TInputGroupBox::TInputGroupBoxClearPointersMenuItemOnClick(TObject*)
 {
     //TODO: Add your source code here
     TextBox->Items->Clear();
 }
-
 
 void __fastcall TInputGroupBox::TInputGroupBoxPopupMenuAppear(TObject*)
 {
@@ -317,7 +289,6 @@ void __fastcall TInputGroupBox::TInputGroupBoxPopupMenuAppear(TObject*)
     ConvertToMenuItem->Enabled=!IsEmpty();
     ClearPointersMenuItem->Enabled=(TextBox->Items->Count!=0);
 }
-
 
 void __fastcall TInputGroupBox::TInputGroupBoxConvertToHexNumMenuItemOnClick(TObject*)
 {
@@ -329,7 +300,6 @@ TypeBox->ItemIndex=HEX_NUM;
 TextBox->Text=AnsiString(ulongToHexAnsi(num).c_str());
 }
 
-
 void __fastcall TInputGroupBox::TInputGroupBoxConvertToHexStringMenuItemOnClick(TObject*)
 {
     //TODO: Add your source code here
@@ -340,7 +310,6 @@ TypeBox->ItemIndex=HEX_STRING;
 TextBox->Text=AnsiString(byteptrToHexAnsi(x,len).c_str());
 delete x;
 }
-
 
 void __fastcall TInputGroupBox::TInputGroupBoxConvertToStringMenuItemOnClick(TObject*)
 {
@@ -361,7 +330,6 @@ TextBox->Text=res;
 delete x;
 }
 
-
 void __fastcall TInputGroupBox::TInputGroupBoxConvertToDecNumMenuItemOnClick(TObject*)
 {
     //TODO: Add your source code here
@@ -371,6 +339,7 @@ num=GetPointer();
 TypeBox->ItemIndex=DEC_NUM;
 TextBox->Text=AnsiString(ulongToAnsi(num).c_str());
 }
+
 void __fastcall TInputGroupBox::TInputGroupBoxConvertToDoubleNumMenuItemOnClick(TObject*)
 {
     //TODO: Add your source code here
