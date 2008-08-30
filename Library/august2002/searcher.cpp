@@ -43,7 +43,7 @@ if(stream!=NULL)
  }
 return Pointers->Count>0;
 }
-__fastcall TSearcher::TSearcher(TStream* value)
+__fastcall TSearcher::TSearcher(boost::shared_ptr<TStream> value)
 {
 Init();
 Fstream=value;
@@ -85,7 +85,7 @@ else
 return Pointers->Count>0;
 }
 
-void __fastcall TSearcher::Setstream(TStream* value)
+void __fastcall TSearcher::Setstream(boost::shared_ptr<TStream> value)
 {
      Fstream=value;
 }
@@ -198,7 +198,7 @@ Assign(src);
 void TSearcher::Init(void)
 {
   FPageSize=4096;
-  Fstream=NULL;
+  Fstream=boost::shared_ptr<TStream>((TStream*)0);
   FPointers=new TList();
   FPointers->Add((void*)111);
   NotifyEvent=NULL;

@@ -1,6 +1,7 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
+#include <boost/shared_ptr.hpp>
 #include "Main.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -18,18 +19,16 @@ __fastcall TForm1::TForm1(TComponent* Owner)
         : TForm(Owner)
 {
 InputForm=new TInputForm(this);
-file=NULL;
+file=boost::shared_ptr<TFileStream>((TFileStream*)0);
 pos=0;
 IsProcessKeyDown=false;
 TcpServer1->OnReceive=TcpServer1OnRecieveEvent;
-Process=new TProcessManager();
+Process=boost::shared_ptr<TProcessManager>(new TProcessManager());
 new TChitThread(true);
 }
 //---------------------------------------------------------------------------
 __fastcall TForm1::~TForm1()
 {
-  if(file!=NULL) {delete file;file=NULL;}
-  if(Process!=NULL) {delete Process;Process=NULL;}
   if(GlobalChit!=NULL) delete GlobalChit;
 }
 //---------------------------------------------------------------------------
@@ -37,8 +36,7 @@ void __fastcall TForm1::OpenFileMenuItemClick(TObject *Sender)
 {
 if(OpenDialog1->Execute())
  {
-   if(file!=NULL) {delete file;file=NULL;}
-  file=new TFileStream(OpenDialog1->FileName,fmOpenReadWrite);
+  file=boost::shared_ptr<TFileStream>(new TFileStream(OpenDialog1->FileName,fmOpenReadWrite));
   this->EditMemoryFrame->stream=file;
  }
 }
@@ -204,7 +202,7 @@ void __fastcall TForm1::AddSearcherMenuItemClick(TObject *Sender)
 {
 if(EditMemoryFrame->stream!=NULL)
  {
-  TSearcher* work=new TSearcher((TStream*)NULL);
+  TSearcher* work=new TSearcher(boost::shared_ptr<TStream>((TStream*)0));
   TSearcher* work2=EditMemoryFrame->GetSearcher();
  work->Assign(work2);
  GlobalChit->Searchers->Add(work);
@@ -267,6 +265,4 @@ void __fastcall TForm1::TcpServer1OnRecieveEvent(TObject* Sender, char* buf, int
   this->ListBox->Items->Add(text);
   this->ListBox->Items->Add(AnsiString("End3"));
 }
-
-
 

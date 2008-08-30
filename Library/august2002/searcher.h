@@ -1,6 +1,8 @@
 //---------------------------------------------------------------------------
 #ifndef searcherH
 #define searcherH
+
+#include <boost/shared_ptr.hpp>
 //typedef TStream* TStrteamPtr;
 
 typedef void __fastcall (__closure *AfterReadNotify)(int);
@@ -16,17 +18,17 @@ class  _export TSearcher
 private:
         int FPageSize;
         TList* FPointers;
-        TStream* Fstream;
+        boost::shared_ptr<TStream> Fstream;
         TMemoryStream* FFind;
         TMemoryStream* FReplace;
         void __fastcall SetPageSize(int value);
-        void __fastcall Setstream(TStream* value);
+        void __fastcall Setstream(boost::shared_ptr<TStream> value);
         void __fastcall Setsearcher(TSearcher* value);
         void Init(void);
 
 public:
         bool StartSearch(void);
-        __fastcall TSearcher(TStream*);
+        __fastcall TSearcher(boost::shared_ptr<TStream>);
         virtual __fastcall ~TSearcher();
         bool __fastcall ContinueSearch(void);
 
@@ -39,7 +41,7 @@ public:
         __property int PageSize  = { read=FPageSize,write=SetPageSize };
 
         __property TList* Pointers  = { read=FPointers };
-        __property TStream* stream  = { read=Fstream, write=Setstream };
+        __property boost::shared_ptr<TStream> stream  = { read=Fstream, write=Setstream };
         __property TMemoryStream* Find  = { read=FFind};
         __property TMemoryStream* Replace  = { read=FReplace};
 };

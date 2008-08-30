@@ -7,6 +7,9 @@
 #include <StdCtrls.hpp>
 #include <Forms.hpp>
 #include <Dialogs.hpp>
+
+#include <boost/shared_ptr.hpp>
+
 #include "searcher.h"
 #include "processmanager.h"
 //#include "HexEdit.h"
@@ -100,11 +103,11 @@ __published:	// IDE-managed Components
  private:
          DWORD idProcess[50];
         int processNum;
-        TFileStream* file;
+        boost::shared_ptr<TFileStream> file;
         int pos;
         bool IsProcessKeyDown;
 void __fastcall TcpServer1OnRecieveEvent(TObject* Sender, char* buf, int & DataLen);
-        TProcessManager* Process;
+        boost::shared_ptr<TProcessManager> Process;
         TInputForm* InputDialog;	// User declarations
 public:		// User declarations
         __fastcall TForm1(TComponent* Owner);
