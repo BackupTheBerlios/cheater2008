@@ -19,23 +19,29 @@ __fastcall TPointersViewBox::TPointersViewBox(TComponent* Owner)
 {
 Init();
 NotifyDblClick=NULL;
-List=NULL;
+SetList(boost::shared_ptr<TList>((TList*)0));
 PointersBox->OnKeyDown=KeyDown;
 }
 //---------------------------------------------------------------------------
 
 
-void __fastcall TPointersViewBox::SetList(TList* value)
+void __fastcall TPointersViewBox::SetList(boost::shared_ptr<TList> value)
 {
 FList=value;
+Update();
+}
+
+void __fastcall TPointersViewBox::Update()
+{
    ScrollBar->Min=0;
    ScrollBar->Position=0;
-if(value!=NULL)
-  if(value->Count>0)
-   {ScrollBar->Max=List->Count-1;ScrollBar->Enabled=true;Reload(0);return;}
+if(FList)
+  if(FList->Count>0)
+   {ScrollBar->Max=FList->Count-1;ScrollBar->Enabled=true;Reload(0);return;}
    ScrollBar->Max=0;ScrollBar->Enabled=false;
    Reload(0);
 }
+
 void __fastcall TPointersViewBox::ScrollBarScroll(TObject *Sender,
       TScrollCode ScrollCode, int &ScrollPos)
 {
@@ -50,7 +56,7 @@ void __fastcall TPointersViewBox::PointersBoxDblClick(TObject *Sender)
 if(NotifyDblClick!=NULL)
   if(FList!=NULL)
    if(FList->Count>0)
-   NotifyDblClick((int)(List->Items[PointersBox->ItemIndex+ScrollBar->Position]));
+   NotifyDblClick((int)(FList->Items[PointersBox->ItemIndex+ScrollBar->Position]));
 }
 //---------------------------------------------------------------------------
 namespace Pointersviewbox
@@ -190,15 +196,15 @@ for(i=0;i<PoitersDB->Count;i++)
 }
 void __fastcall TPointersViewBox::WritePointersToFile(TObject*)
 {
-if(List!=NULL)
- if(List->Count>0)
+if(FList)
+ if(FList->Count>0)
  {
  TSaveDialog* dialog=new TSaveDialog(NULL);
  if(dialog->Execute())
   {
    FileClose(FileCreate(dialog->FileName));
    TFileStream* file=new TFileStream(dialog->FileName,fmOpenWrite);
-   WriteTListToStream(List,file);
+   WriteTListToStream(FList.get(),file);
    delete file;
   }
  delete dialog;
@@ -207,48 +213,48 @@ if(List!=NULL)
 
 void __fastcall TPointersViewBox::LoadPointersFromFile(TObject*)
 {
-if(List!=NULL)
+if(FList)
  {
-  TOpenDialog* dialog=new TOpenDialog(NULL);
+  boost::shared_ptr<TOpenDialog> dialog=boost::shared_ptr<TOpenDialog>(new TOpenDialog(NULL));
   if(dialog->Execute())
     {
-     TFileStream* file=new TFileStream(dialog->FileName,fmOpenRead);
+     boost::shared_ptr<TFileStream> file=boost::shared_ptr<TFileStream>(new TFileStream(dialog->FileName,fmOpenRead));
      file->Position=0;
-     ReadTListFromStream(List,file);
-     delete file;
-     List=FList;
+     boost::shared_ptr<TList> list(new TList());
+     ReadTListFromStream(list.get(),file.get());
+     SetList(list);
     }
-   delete dialog;
  }
 }
 
 
 void __fastcall TPointersViewBox::CopyMenuItemClick(TObject*)
 {
-if(List!=NULL)
- if(List->Count>0)
+if(FList!=NULL)
+ if(FList->Count>0)
  {
  TList* destList=new TList;
  PoitersDB->Add(destList);
- for(int i=0;i<List->Count;i++)
+ for(int i=0;i<FList->Count;i++)
   {
-    destList->Add((void*)(List->Items[i]));
+    destList->Add((void*)(FList->Items[i]));
   }
  }
 }
 
 void __fastcall TPointersViewBox::PasteMenuItemClick(TObject*)
 {
-if(List!=NULL)
- if((List->Count>0)&&(PoitersDB->Count>0))
+if(FList)
+ if((FList->Count>0)&&(PoitersDB->Count>0))
  {
-    List->Clear();
+    //FList->Clear();
+    boost::shared_ptr<TList> list = boost::shared_ptr<TList>(new TList());
     TList* sourceList=(TList*)PoitersDB->Items[0];
  for(int i=0;i<sourceList->Count;i++)
   {
-    List->Add((void*)(sourceList->Items[i]));
+    list->Add((void*)(sourceList->Items[i]));
   }
-       List=FList;
+       SetList(list);
  }
 }
 
@@ -268,13 +274,13 @@ void __fastcall TPointersViewBox::CopytoMenuClick(TObject *Sender)
 TMenuItem* menu=(TMenuItem*)Sender;
 int num=menu->Caption.ToInt();
 
-if(List!=NULL)
- if((List->Count>0)&&(PoitersDB->Count>0)&&(num<PoitersDB->Count))
+if(FList!=NULL)
+ if((FList->Count>0)&&(PoitersDB->Count>0)&&(num<PoitersDB->Count))
  {
  TList* destList=(TList*)(PoitersDB->Items[num]);
- for(int i=0;i<List->Count;i++)
+ for(int i=0;i<FList->Count;i++)
   {
-    destList->Add((void*)(List->Items[i]));
+    destList->Add((void*)(FList->Items[i]));
   }
  }
 
@@ -285,16 +291,17 @@ void __fastcall TPointersViewBox::PasteFromMenuClick(TObject *Sender)
 TMenuItem* menu=(TMenuItem*)Sender;
 int num=menu->Caption.ToInt();
 
-if(List!=NULL)
+if(FList!=NULL)
  if((PoitersDB->Count>0)&&(num<PoitersDB->Count))
  {
-    List->Clear();
+    //FList->Clear();
+    boost::shared_ptr<TList> list(new TList());
     TList* sourceList=(TList*)PoitersDB->Items[num];
  for(int i=0;i<sourceList->Count;i++)
   {
-    List->Add((void*)(sourceList->Items[i]));
+    list->Add((void*)(sourceList->Items[i]));
   }
-       List=FList;
+       SetList(list);
  }
 }
 
@@ -303,7 +310,7 @@ void __fastcall TPointersViewBox::ClearClipBoardMenuItemClick(TObject* Sender)
 if(PoitersDB!=NULL)
  if(PoitersDB->Count>0)
  {
-    List->Clear();
+    FList->Clear();
  for(int i=0;i<PoitersDB->Count;i++)
   {
     TList* list=(TList*)PoitersDB->Items[i];
@@ -319,7 +326,7 @@ void __fastcall TPointersViewBox::AddPointerToListMenuItemClick (TObject* Sender
  TMenuItem* menu=(TMenuItem*)Sender;
 int num=menu->Caption.ToInt();
 
-if(List!=NULL)
+if(FList!=NULL)
  if((PoitersDB->Count>0)&&(num<PoitersDB->Count))
  {
 
@@ -331,10 +338,12 @@ if(List!=NULL)
      }
  }
 }
+
 void __fastcall TPointersViewBox::DeletePointerMenuItemClick (TObject* Sender)
 {
 DeleteSelectedPointers();
 }
+
 void __fastcall TPointersViewBox::Reload(int pos)
 {
 if(Showing)
@@ -345,28 +354,30 @@ if(Showing)
    if(pos<FList->Count)
     {
      int itemCount=abs(PointersBox->Height/(abs(PointersBox->Font->Height)+2));
-     if (itemCount>List->Count-pos) itemCount=List->Count-pos;
+     if (itemCount>FList->Count-pos) itemCount=FList->Count-pos;
      for(int i=0;i<itemCount;i++)
       {
-       PointersBox->Items->Add(ulongToHexAnsi((unsigned long)List->Items[pos+i],8).c_str());
+       PointersBox->Items->Add(ulongToHexAnsi((unsigned long)FList->Items[pos+i],8).c_str());
       }
     }
     PointersBox->Items->EndUpdate();
+
  }
 }
 
 
 void __fastcall TPointersViewBox::DeleteSelectedPointers(void)
 {
-if(List!=NULL)
+if(FList)
 {
 
     for(int i=0;i<PointersBox->Count;i++)
      {
         if(PointersBox->Selected[i])
-        List->Remove((void*)(HexAnsiToulong(PointersBox->Items->Strings[i].c_str())));
+        FList->Remove((void*)(HexAnsiToulong(PointersBox->Items->Strings[i].c_str())));
      }
-            List=FList;
+
+    Update();
 }
 
 }

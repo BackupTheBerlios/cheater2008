@@ -89,17 +89,17 @@ if(Type<=FLOAT_NUM)
   TextBox->Text=i_str.c_str();
  }
 }
-
-void __fastcall TInputGroupBox::SetTypeOfBox(AnsiString value)
+/*
+void __fastcall TInputGroupBox::SetTypeOfBox(std::string  value)
 {
   FTypeOfBox=value;
 }
 
-AnsiString __fastcall TInputGroupBox::GetTypeOfBox()
+std::string  __fastcall TInputGroupBox::GetTypeOfBox()
 {
   return FTypeOfBox;
 }
-
+*/
 __fastcall TInputGroupBox::~TInputGroupBox(void)
 {
     //TODO: Add your source code here
@@ -125,7 +125,7 @@ if(TypeBox->Items->Count==0)
   TypeBox->Clear();
   TypeBox->Items->Add(StringType[HEX_NUM]);
   TypeBox->Items->Add(StringType[DEC_NUM]);
-  if(FTypeOfBox!="для указателей")
+  if(FTypeOfBox!=FOR_POINTERS)
    {
     TypeBox->Items->Add(StringType[STRING]);
     TypeBox->Items->Add(StringType[HEX_STRING]);
@@ -154,9 +154,9 @@ bool __fastcall TInputGroupBox::IsEmpty(void)
 }
 
 //--------------------------------------------------------------------------------
-AnsiString __fastcall TInputGroupBox::GetText()
+std::string __fastcall TInputGroupBox::GetText()
 {
- return TextBox->Text;
+ return std::string(TextBox->Text.c_str());
 }
 
 void __fastcall TInputGroupBox::BoxesChange(void)

@@ -146,7 +146,7 @@ void __fastcall StringsOptionChangedEvent(TObject *Sender,DWORD value);
         void __fastcall GetVariablesAtPos(int);
         TMemoryStream* __fastcall GetFindStream();
         TMemoryStream* __fastcall GetReplaceStream();
-        TList* __fastcall GetFindPointers();
+//        TList* __fastcall GetFindPointers();
         void __fastcall SetKeyPressed(AnsiString value);
         void __fastcall SetCurrectEditSelection(AnsiString value);
 

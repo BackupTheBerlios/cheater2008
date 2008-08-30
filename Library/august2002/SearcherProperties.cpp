@@ -80,9 +80,9 @@ void __fastcall TSearcherProperties::SetSearcher(TSearcher* value)
 // throw Exception("Sergey14");
     FSearcher=value;
   if(Searcher!=NULL)
-   Pointers->List=Searcher->Pointers;
+   Pointers->SetList(Searcher->Pointers);
   else
-   Pointers->List=NULL;
+   Pointers->SetList(boost::shared_ptr<TList>((TList*)0));
   if(Showing)  Reload();
 // throw Exception("Sergey15");
 }
@@ -100,7 +100,7 @@ void __fastcall TSearcherProperties::Reload(void)
 if((Searcher!=NULL)&&(Showing))
  { Find->InitBox(ConvertStreamToHexAnsi(Searcher->Find),HEX_STRING);
    Replace->InitBox(ConvertStreamToHexAnsi(Searcher->Replace),HEX_STRING);
-   Pointers->List=Searcher->Pointers;
+   Pointers->SetList(Searcher->Pointers);
    PageSize->InitBox(IntToString(Searcher->PageSize),DEC_NUM);
  }
 }
@@ -126,7 +126,7 @@ void __fastcall TSearcherProperties::ReloadClick(TObject*)
 {
  if(Searcher!=NULL)
   {
-   Pointers->List=Searcher->Pointers;
+   Pointers->SetList(Searcher->Pointers);
    Reload();
   }
 }

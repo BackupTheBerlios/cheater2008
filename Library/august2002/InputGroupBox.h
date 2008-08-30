@@ -7,6 +7,7 @@
 #include <Classes.hpp>
 #include <Forms.hpp>
 #include <StdCtrls.hpp>
+#include <string>
 #include "TypeComboBox.h"
 #include "Ansilib.h"
 
@@ -18,10 +19,10 @@ private:
     TComboBox* CreateTextBox(void);
     TTypeComboBox* CreateTypeBox(void);
     void CreateLabels(void);
-    void __fastcall SetTypeOfBox(AnsiString value);
-    AnsiString __fastcall GetTypeOfBox();
-    AnsiString FTypeOfBox;
-    AnsiString __fastcall GetText();
+//    void __fastcall SetTypeOfBox(std::string  value);
+//    std::string  __fastcall GetTypeOfBox();
+    std::string FTypeOfBox;
+    std::string __fastcall GetText();
     void __fastcall BoxesChange(void);
 static unsigned long Instance;
     TMenuItem* SavePointerMenuItem;
@@ -65,10 +66,10 @@ public:
     void __fastcall InitBox(const std::string&,int);
 //        void __fastcall LoadPointers(SMemoryPointers* list);
     void __fastcall LoadPointers(TList* list);
-    __property AnsiString Text  = { read = GetText };
-__published:
-    __property AnsiString TypeOfBox  = { read = GetTypeOfBox, write = SetTypeOfBox };
+    __property std::string Text  = { read = GetText };
 
+//    __property std::string TypeOfBox  = { read = GetTypeOfBox, write = SetTypeOfBox };
+  __published:
 };
 
 //---------------------------------------------------------------------------

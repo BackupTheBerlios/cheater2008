@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #include <vcl.h>
 #pragma hdrstop
 
@@ -19,8 +18,9 @@ __fastcall TEditMemoryForm::TEditMemoryForm(TComponent* Owner)
 void __fastcall TEditMemoryForm::FormClose(TObject *Sender,
       TCloseAction &Action)
 {
-Action=caFree;	
+Action=caFree;
 }
 //---------------------------------------------------------------------------
+
 
 

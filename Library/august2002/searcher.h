@@ -17,7 +17,7 @@ class  _export TSearcher
 {
 private:
         int FPageSize;
-        TList* FPointers;
+        boost::shared_ptr<TList> FPointers;
         boost::shared_ptr<TStream> Fstream;
         TMemoryStream* FFind;
         TMemoryStream* FReplace;
@@ -40,7 +40,7 @@ public:
         __fastcall TSearcher(TSearcher*);
         __property int PageSize  = { read=FPageSize,write=SetPageSize };
 
-        __property TList* Pointers  = { read=FPointers };
+        __property boost::shared_ptr<TList> Pointers  = { read=FPointers };
         __property boost::shared_ptr<TStream> stream  = { read=Fstream, write=Setstream };
         __property TMemoryStream* Find  = { read=FFind};
         __property TMemoryStream* Replace  = { read=FReplace};

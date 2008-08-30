@@ -8,6 +8,7 @@
 #include <Classes.hpp>
 #include <Forms.hpp>
 #include <StdCtrls.hpp>
+#include <boost/shared_ptr.hpp>
 #include "Ansi_Stream.h"
 extern TList* PoitersDB;
 
@@ -33,8 +34,7 @@ private:
         void __fastcall ScrollBarScroll(TObject *Sender,
           TScrollCode ScrollCode, int &ScrollPos);
         void __fastcall PointersBoxDblClick(TObject *Sender);
-        TList* FList;
-        void __fastcall SetList(TList* value);
+        boost::shared_ptr<TList> FList;
         void __fastcall Init(void);
         void __fastcall PopupMenuOnPopup(TObject *Sender);
         void __fastcall WritePointersToFile(TObject*);
@@ -55,10 +55,12 @@ private:
 
         void __fastcall KeyDown(TObject *Sender,WORD &Key, TShiftState Shift);
         void __fastcall Reload(int);	// User declarations
+        void __fastcall Update();        
 public:		// User declarations
+        void __fastcall SetList(boost::shared_ptr<TList> value);
          TPointerSelectEvent NotifyDblClick;
         __fastcall TPointersViewBox(TComponent* Owner);
-        __property TList* List  = { read=FList, write=SetList };
+//        __property TList* List  = { read=FList, write=SetList };
 };
 //---------------------------------------------------------------------------
 #endif

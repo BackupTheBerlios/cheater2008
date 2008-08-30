@@ -50,7 +50,6 @@ Fstream=value;
 }
 __fastcall TSearcher::~TSearcher()
 {
-     delete FPointers;
      delete FFind;
      delete FReplace;
 }
@@ -65,7 +64,7 @@ if(stream!=NULL)
   len=FFind->Size;
   char* Buffer=new char[len];
   int i;
-  TList* newPointers=new TList();
+  boost::shared_ptr<TList> newPointers=boost::shared_ptr<TList>(new TList());
     for(i=0;i<Pointers->Count;i++)
      {
        voidint.v=Pointers->Items[i];
@@ -74,7 +73,6 @@ if(stream!=NULL)
           if(memcmp(Buffer,str,len)==0)
             newPointers->Add(voidint.v);
     }
-  delete Pointers;
   FPointers=newPointers;
   delete Buffer;
  }
@@ -199,7 +197,7 @@ void TSearcher::Init(void)
 {
   FPageSize=4096;
   Fstream=boost::shared_ptr<TStream>((TStream*)0);
-  FPointers=new TList();
+  FPointers=boost::shared_ptr<TList>(new TList());
   FPointers->Add((void*)111);
   NotifyEvent=NULL;
   FFind=new TMemoryStream();
