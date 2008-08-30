@@ -82,7 +82,7 @@ void __fastcall TSearcherProperties::SetSearcher(TSearcher* value)
   if(Searcher!=NULL)
    Pointers->SetList(Searcher->Pointers);
   else
-   Pointers->SetList(boost::shared_ptr<TList>((TList*)0));
+   Pointers->SetList(boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0));
   if(Showing)  Reload();
 // throw Exception("Sergey15");
 }
@@ -182,11 +182,11 @@ if(!Find->IsEmpty())
    }
 if(SearchResult)
  {
-  if(Searcher->Pointers->Count<200)
+  if(Searcher->Pointers->size()<200)
    {
-     for(int i=0;i<Searcher->Pointers->Count;i++)
+     for(int i=0;i<Searcher->Pointers->size();i++)
       {
-       vi.v=Searcher->Pointers->Items[i];
+       vi.ul=(*(Searcher->Pointers))[i];
 //       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
       }
    }
@@ -195,7 +195,7 @@ if(SearchResult)
 EndSearch=TDateTime::CurrentDateTime();
 
 Reload();
-return Searcher->Pointers->Count;
+return Searcher->Pointers->size();
 }
 //----------------------------------------------------------------------------
 int __fastcall TSearcherProperties::SlowSearch(boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
@@ -227,11 +227,11 @@ if(!Find->IsEmpty())
 
 if(SearchResult)
  {
-  if(Searcher->Pointers->Count<200)
+  if(Searcher->Pointers->size()<200)
    {
-     for(int i=0;i<Searcher->Pointers->Count;i++)
+     for(int i=0;i<Searcher->Pointers->size();i++)
       {
-       vi.v=Searcher->Pointers->Items[i];
+       vi.ul=(*(Searcher->Pointers))[i];
 //       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
       }
    }
@@ -240,7 +240,7 @@ if(SearchResult)
 EndSearch=TDateTime::CurrentDateTime();
 
 Reload();
-return Searcher->Pointers->Count;
+return Searcher->Pointers->size();
 }
 
 //----------------------------------------------------------------------------

@@ -1,7 +1,9 @@
 //---------------------------------------------------------------------------
 #ifndef searcherH
 #define searcherH
-
+#include <vector>
+typedef unsigned int PointerType;
+#include "ansi_stream.h"
 #include <boost/shared_ptr.hpp>
 //typedef TStream* TStrteamPtr;
 
@@ -17,7 +19,7 @@ class  _export TSearcher
 {
 private:
         int FPageSize;
-        boost::shared_ptr<TList> FPointers;
+        boost::shared_ptr<std::vector<PointerType> > FPointers;
         boost::shared_ptr<TStream> Fstream;
         TMemoryStream* FFind;
         TMemoryStream* FReplace;
@@ -40,7 +42,7 @@ public:
         __fastcall TSearcher(TSearcher*);
         __property int PageSize  = { read=FPageSize,write=SetPageSize };
 
-        __property boost::shared_ptr<TList> Pointers  = { read=FPointers };
+        __property boost::shared_ptr<std::vector<PointerType> > Pointers  = { read=FPointers };
         __property boost::shared_ptr<TStream> stream  = { read=Fstream, write=Setstream };
         __property TMemoryStream* Find  = { read=FFind};
         __property TMemoryStream* Replace  = { read=FReplace};

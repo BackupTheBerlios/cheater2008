@@ -189,7 +189,7 @@ int RemoveDilimeters(TStream* src, TStream* dest,TStream* dilim )
    return Len;
  }
 //--------------------------------------------------------------------------
-void WriteTListToStream(TList* list,TStream* stream)
+/*void WriteTListToStream(TList* list,TStream* stream)
  {
 WORK_ANSILIB_UNION_FOR_CONVERT work;
 work._ulong=list->Count;
@@ -199,18 +199,18 @@ work._ulong=list->Count;
     work.pvoid=list->Items[i];
     stream->Write(&work._ulong,sizeof(unsigned long));
    }
- }
+ }*/
 //--------------------------------------------------------------------------
 
-void ReadTListFromStream(TList* list,TStream* stream)
+void ReadTListFromStream(std::vector<PointerType>&  list,TStream* stream)
  {
 WORK_ANSILIB_UNION_FOR_CONVERT work;
 unsigned long len;
     stream->Read(&len,sizeof(unsigned long));
   for(int i=0;i<len;i++)
    {
-    stream->Read(&work._ulong,sizeof(unsigned long));
-    list->Add(work.pvoid);
+    stream->Read(&work._ulong,sizeof(PointerType));
+    list.push_back(work._ulong);
    }
  }
 //--------------------------------------------------------------------------

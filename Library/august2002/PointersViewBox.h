@@ -9,8 +9,9 @@
 #include <Forms.hpp>
 #include <StdCtrls.hpp>
 #include <boost/shared_ptr.hpp>
+#include <vector>
 #include "Ansi_Stream.h"
-extern TList* PoitersDB;
+extern std::vector< boost::shared_ptr<std::vector<PointerType> > > PoitersDB;
 
 typedef void __fastcall (__closure *TPointerSelectEvent)(int);
 //---------------------------------------------------------------------------
@@ -34,7 +35,7 @@ private:
         void __fastcall ScrollBarScroll(TObject *Sender,
           TScrollCode ScrollCode, int &ScrollPos);
         void __fastcall PointersBoxDblClick(TObject *Sender);
-        boost::shared_ptr<TList> FList;
+        boost::shared_ptr< std::vector<PointerType> > FList;
         void __fastcall Init(void);
         void __fastcall PopupMenuOnPopup(TObject *Sender);
         void __fastcall WritePointersToFile(TObject*);
@@ -57,7 +58,7 @@ private:
         void __fastcall Reload(int);	// User declarations
         void __fastcall Update();        
 public:		// User declarations
-        void __fastcall SetList(boost::shared_ptr<TList> value);
+        void __fastcall SetList(boost::shared_ptr< std::vector<PointerType> > value);
          TPointerSelectEvent NotifyDblClick;
         __fastcall TPointersViewBox(TComponent* Owner);
 //        __property TList* List  = { read=FList, write=SetList };

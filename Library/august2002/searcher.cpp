@@ -14,7 +14,7 @@
 bool TSearcher::StartSearch(void)
 {
 VoidInt voidint;
-Pointers->Clear();
+Pointers->clear();
 if(stream!=NULL)
  {
  char* str; int length;
@@ -33,7 +33,7 @@ if(stream!=NULL)
     for(i=0;i<=realBufferLength-length;i++)
      {
       if(memcmp(Buffer+i,str,length)==0)
-       {voidint.i=i+posBufInStream;Pointers->Add(voidint.v);}
+       {voidint.i=i+posBufInStream;Pointers->push_back(voidint.ul);}
       }
      if(NotifyEvent!=NULL)NotifyEvent(stream->Position);
    }
@@ -41,7 +41,7 @@ if(stream!=NULL)
 //  i= 1-length;
  delete Buffer;
  }
-return Pointers->Count>0;
+return Pointers->size()>0;
 }
 __fastcall TSearcher::TSearcher(boost::shared_ptr<TStream> value)
 {
@@ -64,23 +64,23 @@ if(stream!=NULL)
   len=FFind->Size;
   char* Buffer=new char[len];
   int i;
-  boost::shared_ptr<TList> newPointers=boost::shared_ptr<TList>(new TList());
-    for(i=0;i<Pointers->Count;i++)
+  boost::shared_ptr<std::vector<PointerType> > newPointers=boost::shared_ptr<std::vector<PointerType> >(new std::vector<PointerType>());
+    for(i=0;i<Pointers->size();i++)
      {
-       voidint.v=Pointers->Items[i];
+       voidint.ul=(*Pointers)[i];
        stream->Seek(voidint.i,soFromBeginning);
        if(stream->Read(Buffer,len)==len)
           if(memcmp(Buffer,str,len)==0)
-            newPointers->Add(voidint.v);
+            newPointers->push_back(voidint.ul);
     }
   FPointers=newPointers;
   delete Buffer;
  }
 else
  {
-  Pointers->Clear();
+  Pointers->clear();
  }
-return Pointers->Count>0;
+return Pointers->size()>0;
 }
 
 void __fastcall TSearcher::Setstream(boost::shared_ptr<TStream> value)
@@ -91,7 +91,7 @@ void __fastcall TSearcher::Setstream(boost::shared_ptr<TStream> value)
 bool __fastcall TSearcher::SlowSearch(void)
 {
  VoidInt voidint;
-  Pointers->Clear();
+  Pointers->clear();
 if(stream!=NULL)
  {
  char* str; int length;
@@ -110,7 +110,7 @@ if(stream!=NULL)
     for(;i<realBufferLength;i++)
      {
       if(memcmp(Buffer+i,str,length)==0)
-       {voidint.i=i+posBufInStream-(length-1);Pointers->Add(voidint.v);}
+       {voidint.i=i+posBufInStream-(length-1);Pointers->push_back(voidint.ul);}
       }
      if(realBufferLength==FPageSize){i=0;CopyMemory(Buffer,Buffer+FPageSize,length-1);}
       else i=length-1;
@@ -120,12 +120,12 @@ if(stream!=NULL)
 //  i= 1-length;
  delete Buffer;
  }
- return Pointers->Count>0;
+ return Pointers->size()>0;
 }
 bool __fastcall TSearcher::StartSearchDilim(void)
 {
 VoidInt voidint;
-Pointers->Clear();
+Pointers->clear();
 if(stream!=NULL)
  {
  char* str; int length;
@@ -144,7 +144,7 @@ if(stream!=NULL)
     for(i=0;i<=realBufferLength-length;i++)
      {
       if(memcmp(Buffer+i,str,length)==0)
-       {voidint.i=i+posBufInStream;Pointers->Add(voidint.v);i+=length-1;}
+       {voidint.i=i+posBufInStream;Pointers->push_back(voidint.ul);i+=length-1;}
       }
      if(NotifyEvent!=NULL)NotifyEvent(stream->Position);
    }
@@ -152,14 +152,14 @@ if(stream!=NULL)
 //  i= 1-length;
  delete Buffer;
  }
-return Pointers->Count>0;
+return Pointers->size()>0;
 }
 //--------------------------------------------------------------------------
 void __fastcall TSearcher::ReplaceAll(void)
 {
-for(int i=0;i<Pointers->Count;i++)
+for(int i=0;i<Pointers->size();i++)
  {
-  stream->Position=(unsigned long)Pointers->Items[i];
+  stream->Position=(unsigned long)((*Pointers)[i]);
   stream->Write(Replace->Memory,Replace->Size);
  }
 }
@@ -173,9 +173,7 @@ if((src!=NULL)&&(src!=this))
   FReplace->CopyFrom(src->Replace,0);
   FPageSize=src->PageSize;
   Fstream=src->Fstream;
-  FPointers->Clear();
-  for(int i=0;i<src->FPointers->Count;i++)
-   FPointers->Add(src->FPointers->Items[i]);
+  (*FPointers) = *(src->FPointers);
  }
 else
 {
@@ -197,8 +195,8 @@ void TSearcher::Init(void)
 {
   FPageSize=4096;
   Fstream=boost::shared_ptr<TStream>((TStream*)0);
-  FPointers=boost::shared_ptr<TList>(new TList());
-  FPointers->Add((void*)111);
+  FPointers=boost::shared_ptr<std::vector<PointerType> >(new std::vector<PointerType>());
+  FPointers->push_back(111);
   NotifyEvent=NULL;
   FFind=new TMemoryStream();
   FReplace=new TMemoryStream();
