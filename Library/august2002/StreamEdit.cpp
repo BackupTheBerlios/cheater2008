@@ -2,6 +2,13 @@
 #include <vcl.h>
 #pragma hdrstop
 
+#include <list>
+#include <vector>
+#include <sstream>
+#include <stdexcept>
+#include <iomanip>
+#include <boost/shared_ptr.hpp>
+
 #include "StreamEdit.h"
 #include "EditForm.h"
 #pragma package(smart_init)
@@ -10,8 +17,8 @@
 // any pure virtual functions.
 //
 int NumberOfCopies=0;
-char* WhatFind="Что искать";
- TList* ClipBoard;     // clipboard for selections
+char* WhatFind="Search query";
+std::vector< boost::shared_ptr<TMemoryStream> > ClipBoard;     // clipboard for selections
 static inline void ValidCtrCheck(TStreamEdit *)
 {
         new TStreamEdit(NULL);
@@ -33,9 +40,9 @@ __fastcall TStreamEdit::TStreamEdit(TComponent* Owner)
 InitInterface();
 if(NumberOfCopies==0)
  {
-  ClipBoard=new TList();
+//  ClipBoard=new TList();
  }
-Fstream=NULL;
+Fstream=boost::shared_ptr<TStream>((TStream*)0);
 FCurrentPos=0;
 ViewedLen=0;
 NumberOfString=20;
@@ -294,11 +301,12 @@ __fastcall TStreamEdit::~TStreamEdit(void)
 NumberOfCopies--;
 if(NumberOfCopies==0)
  {
-  for(int i=0;i<ClipBoard->Count;i++)
+/*  for(int i=0;i<ClipBoard->Count;i++)
    {
     delete (TMemoryStream*)ClipBoard->Items[i];
    }
   delete ClipBoard;
+*/  
  }
 }
 
@@ -637,7 +645,7 @@ void __fastcall TStreamEdit::CopyMenuItemClick(TObject *Sender)
 int Start;
 int End;
 int Len;
-TMemoryStream* buf=new TMemoryStream();
+boost::shared_ptr<TMemoryStream> buf=boost::shared_ptr<TMemoryStream>(new TMemoryStream());
 if(HexMemo->SelLength>0)
   {
     Start=ConvertHexPosToGlobal(HexMemo->SelStart);
@@ -650,8 +658,8 @@ if(HexMemo->SelLength>0)
   }
   Len=End-Start+1;
   stream->Position=Start+CurrentPos;
-  Len=buf->CopyFrom(stream,Len);
-ClipBoard->Add(buf);
+  Len=buf->CopyFrom(stream.get(),Len);
+ClipBoard.push_back(buf);
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::PopupMenu1Popup(TObject *Sender)
@@ -664,14 +672,14 @@ AnsiString caption;
  PasteFromMenuItem->Clear();
  DeleteMenuItem->Clear();
  EditBufMenuItem->Clear();
- EditBufMenuItem->Enabled=(ClipBoard->Count!=0);
-    DeleteMenuItem->Enabled=(ClipBoard->Count!=0);
-    PasteFromMenuItem->Enabled=(ClipBoard->Count!=0);
-    PasteMenuItem->Enabled=(ClipBoard->Count!=0);
-    CopytoMenuItem->Enabled=((ClipBoard->Count!=0)&&(HexMemo->SelLength!=0));
-    ClearClipBoardMenuItem->Enabled=(ClipBoard->Count!=0);
+ EditBufMenuItem->Enabled=(! ClipBoard.empty());
+    DeleteMenuItem->Enabled=(! ClipBoard.empty());
+    PasteFromMenuItem->Enabled=(! ClipBoard.empty());
+    PasteMenuItem->Enabled=(! ClipBoard.empty());
+    CopytoMenuItem->Enabled=((! ClipBoard.empty())&&(HexMemo->SelLength!=0));
+    ClearClipBoardMenuItem->Enabled=(! ClipBoard.empty());
     CopyMenuItem->Enabled=(HexMemo->SelLength!=0);
-for(i=0;i<ClipBoard->Count;i++)
+for(i=0;i<ClipBoard.size();i++)
  {
    caption=ulongToAnsi(i).c_str();
    menu= new TMenuItem(DeleteMenuItem);
@@ -701,16 +709,23 @@ void __fastcall TStreamEdit::PasteMenuItemClick(TObject *Sender)
 {
   int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
   stream->Position=Start+CurrentPos;
-  stream->CopyFrom((TStream*)ClipBoard->Last(),0);
+  stream->CopyFrom(ClipBoard.back().get(),0);
   LoadFromStream();
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::DeleteSubMenuClick(TObject *Sender)
 {
   TMenuItem* menu=(TMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
-  delete (TMemoryStream*)ClipBoard->Items[num];
-  ClipBoard->Delete(num);
+  int num = menu->Caption.ToInt();
+  if(num < ClipBoard.size() )
+      ClipBoard.erase( ClipBoard.begin()+num );
+  else
+  {
+    std::stringstream msg;
+    msg << "Can't delete element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
+        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__  << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::CopytoMenuClick(TObject *Sender)
@@ -733,8 +748,20 @@ void __fastcall TStreamEdit::CopytoMenuClick(TObject *Sender)
     }
   Len=End-Start+1;
   stream->Position=Start+CurrentPos;
-  ((TMemoryStream*)(ClipBoard->Items[num]))->Clear();
-  ((TMemoryStream*)ClipBoard->Items[num])->CopyFrom(stream,Len);
+  if( num < ClipBoard.size() )
+  {
+    boost::shared_ptr<TMemoryStream> memory = ((*(ClipBoard.begin()+num)));
+    memory->Clear();
+    memory->CopyFrom(stream.get(),Len);
+  }
+  else
+  {
+    std::stringstream msg;
+    msg << "Can't copy to element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
+        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__  << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
+
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::PasteFromMenuClick(TObject *Sender)
@@ -744,7 +771,17 @@ int num=menu->Caption.ToInt();
 
 int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
 stream->Position=Start+CurrentPos;
-stream->CopyFrom(((TMemoryStream*)ClipBoard->Items[num]),0);
+  if( num < ClipBoard.size() )
+  {
+    stream->CopyFrom((*(ClipBoard.begin() + num)).get(),0);
+  }
+  else
+  {
+    std::stringstream msg;
+    msg << "Can't copy from element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
+        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__  << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
 
 LoadFromStream();
 }
@@ -752,11 +789,7 @@ LoadFromStream();
 void __fastcall TStreamEdit::ClearClipBoardMenuItemClick(
       TObject *Sender)
 {
-for(int i=0;i<ClipBoard->Count;i++)
- {
-  delete (TMemoryStream*)ClipBoard->Items[i];
- }
- ClipBoard->Clear();
+ClipBoard.clear();
 }
 //---------------------------------------------------------------------------
 
@@ -822,16 +855,27 @@ void __fastcall TStreamEdit::EditBufMenuClick(TObject *Sender)
 {
   TMenuItem* menu=(TMenuItem*)Sender;
   int num=menu->Caption.ToInt();
-  TEditMemoryForm* EditMemoryForm=new TEditMemoryForm(this);
-  //BufferClipBoard.Value->Write(stream,true);
-  EditMemoryForm->Width=500;
-  EditMemoryForm->Height=400;
-  EditMemoryForm->StreamEdit->stream=(TMemoryStream*)ClipBoard->Items[num];
-  EditMemoryForm->Show();
-/*BufferClipBoard.BeginWork();
-BufferClipBoard.SetPosition(num);
-stream->Position=0;
-BufferClipBoard.Value->Read(stream);*/
+if( num < ClipBoard.size() )
+  {
+    TEditMemoryForm* EditMemoryForm=new TEditMemoryForm(this);
+      //BufferClipBoard.Value->Write(stream,true);
+      EditMemoryForm->Width=500;
+      EditMemoryForm->Height=400;
+      EditMemoryForm->StreamEdit->stream=(*(ClipBoard.begin() + num));
+      EditMemoryForm->Show();
+    /*BufferClipBoard.BeginWork();
+    BufferClipBoard.SetPosition(num);
+    stream->Position=0;
+    BufferClipBoard.Value->Read(stream);*/
+  }
+  else
+  {
+    std::stringstream msg;
+    msg << "Can't edit element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
+        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__  << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
+
 }
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::StringsOptionChangedEvent(TObject *Sender,DWORD value)
@@ -1021,7 +1065,7 @@ void __fastcall TStreamEdit::PointersNotifyEvent(int value)
   CurrentPos=value;
  }
 //---------------------------------------------------------------------------
-void __fastcall TStreamEdit::Setstream(TStream* value)
+void __fastcall TStreamEdit::Setstream(boost::shared_ptr<TStream> value)
 {
    Fstream=value;
    LoadFromStream();
@@ -1169,7 +1213,7 @@ InfoEdit->Lines->Strings[0]=KeyPressed+AnsiString("   ")+CurrectEditSelection;
 InfoEdit->SelStart=0;
 }
 
-
+   
 //-------------------------------------------------------------
 TSearcher* __fastcall TStreamEdit::GetSearcher(void)
 {
