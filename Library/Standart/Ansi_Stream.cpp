@@ -49,7 +49,7 @@ unsigned long i=0;
    {
 	for(i;i<Str.size()/2;i++)
      {
-	  work._ulong=HexAnsiToulong(Str.substr(2*i+1,2));
+	  work._ulong=HexAnsiToulong(Str.substr(2*i,2));
       stream->Write(&work.byte_,1);
      }
    }
