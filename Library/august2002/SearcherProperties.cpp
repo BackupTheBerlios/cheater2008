@@ -1,5 +1,7 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
+#include <sstream>
+#include <stdexcept>
 #pragma hdrstop
 #include "SearcherProperties.h"
 #pragma package(smart_init)
@@ -88,7 +90,7 @@ void __fastcall TSearcherProperties::SetSearcher(TSearcher* value)
 TSearcher* __fastcall TSearcherProperties::GetSearcher(void)
 {
 
-   if(!FSearcher) FSearcher=new TSearcher((TStream*)NULL);
+   if(!FSearcher) FSearcher=new TSearcher(boost::shared_ptr<TStream>((TStream*)0));
    return FSearcher;
 
 }
@@ -145,9 +147,15 @@ void __fastcall TSearcherProperties::SetPageSizeClick(TObject*)
 }
 
 //----------------------------------------------------------------------------
-int __fastcall TSearcherProperties::Search(bool IsNewSearch, TStream* stream,AfterReadNotify DoProgress)
+int __fastcall TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
 {
-if(Searcher==NULL) throw Exception("SerError3");
+if(Searcher==NULL)
+{
+std::stringstream msg;
+msg << "Searcher is null" << std::endl << std::endl
+    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+throw std::runtime_error( msg.str() );
+}
 TDateTime StartSearch=TDateTime::CurrentDateTime();
 TDateTime EndSearch;
 unsigned long len;
@@ -190,9 +198,15 @@ Reload();
 return Searcher->Pointers->Count;
 }
 //----------------------------------------------------------------------------
-int __fastcall TSearcherProperties::SlowSearch(TStream* stream,AfterReadNotify DoProgress)
+int __fastcall TSearcherProperties::SlowSearch(boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
 {
-if(Searcher==NULL) throw Exception("SerError3");
+if(Searcher==NULL)
+{
+std::stringstream msg;
+msg << "Searcher is null" << std::endl << std::endl
+    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+throw std::runtime_error( msg.str() );
+}
 TDateTime StartSearch=TDateTime::CurrentDateTime();
 TDateTime EndSearch;
 unsigned long len;
