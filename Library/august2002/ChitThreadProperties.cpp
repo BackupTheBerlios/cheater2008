@@ -26,7 +26,6 @@ InsertControl(Scroll);
 SearcherProperties=new TSearcherProperties(this);
 SearcherProperties->Align=alClient;
 InsertControl(SearcherProperties);
-FSearchers=NULL;
 PopupMenu=new TPopupMenu(this);
 PopupMenu->AutoHotkeys=maManual;
 TMenuItem* menu=new TMenuItem(this);
@@ -51,13 +50,12 @@ namespace Chitthreadproperties
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TChitThreadProperties::SetSearchers(TList* value)
+void __fastcall TChitThreadProperties::SetSearchers(std::vector< boost::shared_ptr<TSearcher> > value)
 {
    FSearchers=value;
    Scroll->Min=0;Scroll->Position=0;
    Scroll->Max=0;
-   if(FSearchers!=NULL)
-    if(value->Count>0) {Scroll->Max=value->Count-1;Reload(0);}
+   if(FSearchers.size()>0) {Scroll->Max=FSearchers.size()-1;Reload(0);}
 }
 
 //----------------------------------------------------------------------------
@@ -68,11 +66,10 @@ Reload(ScrollPos);
 
 void __fastcall TChitThreadProperties::DeleteUnitMenuItemClick(TObject*)
 {
-if(Searchers!=NULL)
- if(Scroll->Position<Searchers->Count)
+if(!FSearchers.empty())
+ if(Scroll->Position<FSearchers.size())
    {
-    delete      (TSearcher*)Searchers->Items[Scroll->Position];
-     Searchers->Delete(Scroll->Position);
+     FSearchers.erase(FSearchers.begin()+Scroll->Position);
      if(Scroll->Max>0)
       Scroll->Max--;
     }
@@ -80,23 +77,23 @@ if(Searchers!=NULL)
 
 void __fastcall TChitThreadProperties::Reload(int ScrollPos)
 {
-if(Searchers!=NULL)
+if(!FSearchers.empty())
  {
-  if(Scroll->Max>=Searchers->Count)
+  if(Scroll->Max>=FSearchers.size())
    {
-    if(Searchers->Count!=0)
-     Scroll->Max=Searchers->Count-1;
+    if(FSearchers.size()!=0)
+     Scroll->Max=FSearchers.size()-1;
     else
      Scroll->Max=0;
    }
   else
    {
-           Scroll->Max=Searchers->Count-1;
+           Scroll->Max=FSearchers.size()-1;
    }
-  if(Searchers->Count>0)
+  if(!Searchers.size()>0)
    {
-    if(ScrollPos<Searchers->Count) {SearcherProperties->Searcher=(TSearcher*)Searchers->Items[ScrollPos];
-    Caption=AnsiString("Searcher - ")+AnsiString(ScrollPos+1)+AnsiString(" / ")+AnsiString(Searchers->Count);}
+    if(ScrollPos<Searchers.size()) {SearcherProperties->Searcher=Searchers[ScrollPos];
+    Caption=AnsiString("Searcher - ")+AnsiString(ScrollPos+1)+AnsiString(" / ")+AnsiString(Searchers.size());}
    }
   else
      Caption=AnsiString("! Empty !");

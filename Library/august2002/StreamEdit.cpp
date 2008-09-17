@@ -1215,7 +1215,7 @@ InfoEdit->SelStart=0;
 
    
 //-------------------------------------------------------------
-TSearcher* __fastcall TStreamEdit::GetSearcher(void)
+boost::shared_ptr<TSearcher> __fastcall TStreamEdit::GetSearcher(void)
 {
 return SearcherProperties->Searcher;
 }

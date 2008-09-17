@@ -163,9 +163,9 @@ for(int i=0;i<Pointers->size();i++)
   stream->Write(Replace->Memory,Replace->Size);
  }
 }
-void __fastcall TSearcher::Assign(TSearcher* src)
+void __fastcall TSearcher::Assign(boost::shared_ptr<TSearcher> src)
 {
-if((src!=NULL)&&(src!=this))
+if(((bool)src)&&(src.get()!=this))
  {
   FFind->Clear();
   FFind->CopyFrom(src->Find,0);
@@ -185,7 +185,7 @@ throw std::runtime_error( msg.str() );
 
 }
 
-__fastcall TSearcher::TSearcher(TSearcher* src)
+__fastcall TSearcher::TSearcher(boost::shared_ptr<TSearcher> src)
 {
 Init();
 Assign(src);

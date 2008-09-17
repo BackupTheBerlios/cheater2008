@@ -59,9 +59,7 @@ this->InsertControl(Pointers);
  split->Beveled=true;
  split->Align=alBottom;
 this->InsertControl(split);
-// throw Exception("Sergey13");
-FSearcher=NULL;
-// throw Exception("Sergey14");
+
 }
 //---------------------------------------------------------------------------
 namespace Searcherproperties
@@ -75,11 +73,11 @@ namespace Searcherproperties
 //---------------------------------------------------------------------------
 
 
-void __fastcall TSearcherProperties::SetSearcher(TSearcher* value)
+void __fastcall TSearcherProperties::SetSearcher(boost::shared_ptr<TSearcher> value)
 {
 // throw Exception("Sergey14");
     FSearcher=value;
-  if(Searcher!=NULL)
+  if(Searcher)
    Pointers->SetList(Searcher->Pointers);
   else
    Pointers->SetList(boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0));
@@ -87,10 +85,10 @@ void __fastcall TSearcherProperties::SetSearcher(TSearcher* value)
 // throw Exception("Sergey15");
 }
 
-TSearcher* __fastcall TSearcherProperties::GetSearcher(void)
+boost::shared_ptr<TSearcher> __fastcall TSearcherProperties::GetSearcher(void)
 {
 
-   if(!FSearcher) FSearcher=new TSearcher(boost::shared_ptr<TStream>((TStream*)0));
+   if(!FSearcher) FSearcher=boost::shared_ptr<TSearcher>(new TSearcher(boost::shared_ptr<TStream>((TStream*)0)));
    return FSearcher;
 
 }
@@ -107,7 +105,7 @@ if((Searcher!=NULL)&&(Showing))
 
 void __fastcall TSearcherProperties::SetFindClick(TObject*)
 {
-  if(Searcher!=NULL)
+  if(Searcher)
   { Searcher->Find->Clear();
    Find->WriteDataToStream(Searcher->Find);
   }
@@ -115,7 +113,7 @@ void __fastcall TSearcherProperties::SetFindClick(TObject*)
 
 void __fastcall TSearcherProperties::SetReplaceClick(TObject*)
 {
-if(Searcher!=NULL)
+if(Searcher)
  {
   Searcher->Replace->Clear();
   Replace->WriteDataToStream(Searcher->Replace);
@@ -124,7 +122,7 @@ if(Searcher!=NULL)
 
 void __fastcall TSearcherProperties::ReloadClick(TObject*)
 {
- if(Searcher!=NULL)
+ if(Searcher)
   {
    Pointers->SetList(Searcher->Pointers);
    Reload();
@@ -142,14 +140,14 @@ void __fastcall TSearcherProperties::SetOnSelectPointer(TPointerSelectEvent valu
 //----------------------------------------------------------------------------
 void __fastcall TSearcherProperties::SetPageSizeClick(TObject*)
 {
- if(Searcher!=NULL)
+ if(Searcher)
   Searcher->PageSize=PageSize->GetPointer();
 }
 
 //----------------------------------------------------------------------------
 int __fastcall TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
 {
-if(Searcher==NULL)
+if(! Searcher)
 {
 std::stringstream msg;
 msg << "Searcher is null" << std::endl << std::endl
@@ -200,7 +198,7 @@ return Searcher->Pointers->size();
 //----------------------------------------------------------------------------
 int __fastcall TSearcherProperties::SlowSearch(boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
 {
-if(Searcher==NULL)
+if(!Searcher)
 {
 std::stringstream msg;
 msg << "Searcher is null" << std::endl << std::endl

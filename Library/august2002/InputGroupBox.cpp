@@ -203,13 +203,13 @@ TPopupMenu* __fastcall TInputGroupBox::CreatePopupMenu(void)
    // work->
     MenuItem=new TMenuItem(work);
     SavePointerMenuItem=MenuItem;
-    MenuItem->Caption="Сохранить указатель";
+    MenuItem->Caption="Save value";
     SavePointerMenuItem->Enabled=false;
     MenuItem->OnClick=TInputGroupBoxSavePointerMenuItemOnClick;
     work->Items->Add(MenuItem);
     MenuItem=new TMenuItem(work);
     ClearPointersMenuItem=MenuItem;
-    MenuItem->Caption="Очистить TextBox";
+    MenuItem->Caption="Clear TextBox";
     ClearPointersMenuItem->Enabled=true;
     MenuItem->OnClick=TInputGroupBoxClearPointersMenuItemOnClick;
     work->Items->Add(MenuItem);

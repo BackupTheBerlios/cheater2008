@@ -50,7 +50,7 @@ void __fastcall TForm1::CreateProcessMenuItemClick(TObject *Sender)
 {
 if(OpenDialog1->Execute())
  {
-   Process->CreateProcess(OpenDialog1->FileName);
+   Process->createProcess(OpenDialog1->FileName.c_str());
    EditMemoryFrame->stream=Process;
  }
 }
@@ -126,7 +126,7 @@ delete[] lpidProcess;
 //---------------------------------------------------------------------------
 void __fastcall TForm1::ListBoxClick(TObject *Sender)
 {
-Process->OpenProcess(    idProcess[ListBox->ItemIndex]);
+Process->openProcess(    idProcess[ListBox->ItemIndex]);
    EditMemoryFrame->stream=Process;
 }
 //---------------------------------------------------------------------------
@@ -202,10 +202,10 @@ void __fastcall TForm1::AddSearcherMenuItemClick(TObject *Sender)
 {
 if(EditMemoryFrame->stream!=NULL)
  {
-  TSearcher* work=new TSearcher(boost::shared_ptr<TStream>((TStream*)0));
-  TSearcher* work2=EditMemoryFrame->GetSearcher();
+  boost::shared_ptr<TSearcher> work=boost::shared_ptr<TSearcher>( new TSearcher(boost::shared_ptr<TStream>((TStream*)0)) );
+  boost::shared_ptr<TSearcher> work2=EditMemoryFrame->GetSearcher();
  work->Assign(work2);
- GlobalChit->Searchers->Add(work);
+ GlobalChit->Searchers.push_back(work);
  }
 }
 //---------------------------------------------------------------------------
@@ -217,12 +217,12 @@ Suspend->Checked=TChitThread::GetGlobal()->Suspended;
 //---------------------------------------------------------------------------
 void __fastcall TForm1::SetClick(TObject *Sender)
 {
-  Process->SetMemoryInfo(MemoryInfo->GetMemoryInfo());
+  Process->setMemoryInfo(MemoryInfo->GetMemoryInfo());
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::ReloadClick(TObject *Sender)
 {
-MemoryInfo->SetMemoryInfo(Process->GetMemoryInfo(MemPtr->GetPointer()));
+MemoryInfo->SetMemoryInfo(Process->getMemoryInfo(MemPtr->GetPointer()));
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::ServerSocket1ClientRead(TObject *Sender,

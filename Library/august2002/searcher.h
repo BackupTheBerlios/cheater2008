@@ -38,8 +38,8 @@ public:
         bool __fastcall SlowSearch(void);
         bool __fastcall StartSearchDilim(void);
         void __fastcall ReplaceAll(void);
-        void __fastcall Assign(TSearcher*);
-        __fastcall TSearcher(TSearcher*);
+        void __fastcall Assign(boost::shared_ptr<TSearcher>);
+        __fastcall TSearcher(boost::shared_ptr<TSearcher>);
         __property int PageSize  = { read=FPageSize,write=SetPageSize };
 
         __property boost::shared_ptr<std::vector<PointerType> > Pointers  = { read=FPointers };

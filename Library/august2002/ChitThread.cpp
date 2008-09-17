@@ -37,7 +37,6 @@ throw std::runtime_error( msg.str() );
 }
 GlobalChit=this;
 sleep=10000;
-FSearchers=new TList();
 }
 
 //---------------------------------------------------------------------------
@@ -53,17 +52,14 @@ while(!Terminated)
 //---------------------------------------------------------------------------
 void __fastcall TChitThread::Work(void)
 {
-    for(int i=0;i<Searchers->Count;i++)
+    for(int i=0;i<Searchers.size();i++)
      {
-      ((TSearcher*)Searchers->Items[i])->ReplaceAll();
+      Searchers[i]->ReplaceAll();
      }
 }
 
 __fastcall TChitThread::~TChitThread()
 {
-      for(int i=0;i<Searchers->Count;i++)
-       delete (TSearcher*) Searchers->Items[i];
-      delete Searchers;
       GlobalChit=NULL;
 }
 

@@ -20,7 +20,7 @@ private:
 //        TInputGroupBox* Replace;
         TButton* SetFind;
         TButton* SetReplace;
-        TSearcher* FSearcher;
+        boost::shared_ptr<TSearcher> FSearcher;
         TButton* ReloadProperties;
         TPointersViewBox* Pointers;
         TInputGroupBox* FFind;
@@ -30,8 +30,8 @@ private:
         void __fastcall SetFindClick(TObject*);
         void __fastcall SetReplaceClick(TObject*);
         void __fastcall ReloadClick(TObject*);
-        void __fastcall SetSearcher(TSearcher* value);
-        TSearcher*  __fastcall GetSearcher(void);
+        void __fastcall SetSearcher(boost::shared_ptr<TSearcher> value);
+        boost::shared_ptr<TSearcher>  __fastcall GetSearcher(void);
         void __fastcall SetOnSelectPointer(TPointerSelectEvent value);
         void __fastcall SetPageSizeClick(TObject*);
 protected:
@@ -45,7 +45,7 @@ int __fastcall SlowSearch(boost::shared_ptr<TStream>,AfterReadNotify DoProgress)
         void __fastcall Reload(void);
         void __fastcall ReplaceAll(void);
         __fastcall ~TSearcherProperties(void);
-        __property TSearcher* Searcher  = { read=GetSearcher, write=SetSearcher };
+        __property boost::shared_ptr<TSearcher> Searcher  = { read=GetSearcher, write=SetSearcher };
         __property TPointerSelectEvent OnSelectPointer  = { write=SetOnSelectPointer };
         __property TInputGroupBox* Find  = { read=FFind };
         __property TInputGroupBox* Replace  = { read=FReplace };

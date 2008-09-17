@@ -160,7 +160,7 @@ public:		// User declarations
         void __fastcall StringRichEditKeyPres(unsigned char);
         void __fastcall ShiftIfWrongStringSelStart(void);
         bool __fastcall Search(bool IsNewSearch);
-        TSearcher* __fastcall GetSearcher(void);
+        boost::shared_ptr<TSearcher> __fastcall GetSearcher(void);
         bool __fastcall TStreamEdit::SlowSearch(void);
         __property  int CurrentPos  = { read=FCurrentPos, write=SetCurrentPos };
         __property boost::shared_ptr<TStream> stream  = { read=Fstream, write=Setstream };

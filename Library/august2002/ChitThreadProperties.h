@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #ifndef ChitThreadPropertiesH
 #define ChitThreadPropertiesH
 //---------------------------------------------------------------------------
@@ -14,8 +13,8 @@ class PACKAGE TChitThreadProperties : public TGroupBox
 {
 private:
         TSearcherProperties* SearcherProperties;
-        TList* FSearchers;
-        void __fastcall SetSearchers(TList* value);
+        std::vector< boost::shared_ptr<TSearcher> > FSearchers;
+        void __fastcall SetSearchers(std::vector< boost::shared_ptr<TSearcher> > value);
         TScrollBar* Scroll;
   void __fastcall ScrollEvent(System::TObject* Sender, TScrollCode ScrollCode, int &ScrollPos);
         void __fastcall DeleteUnitMenuItemClick(TObject*);
@@ -26,8 +25,9 @@ public:
 
 
         __fastcall TChitThreadProperties(TComponent* Owner);
-        __property TList* Searchers  = { read=FSearchers, write=SetSearchers };
+        __property std::vector< boost::shared_ptr<TSearcher> > Searchers  = { read=FSearchers, write=SetSearchers };
 __published:
 };
 //---------------------------------------------------------------------------
 #endif
+

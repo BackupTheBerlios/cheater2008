@@ -145,9 +145,6 @@ DeletePointerMenuItem=new TMenuItem(PopupMenu);
 DeletePointerMenuItem->Caption=AnsiString("Delete Pointer");
 DeletePointerMenuItem->OnClick=DeletePointerMenuItemClick;
 PopupMenu->Items->Add(DeletePointerMenuItem);
-
-
-
 }
 
 
