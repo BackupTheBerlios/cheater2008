@@ -5,6 +5,8 @@
 #include <list>
 #include <vector>
 #include <sstream>
+#include <fstream>
+#include <fstream>
 #include <stdexcept>
 #include <iomanip>
 #include <boost/shared_ptr.hpp>
@@ -18,7 +20,7 @@
 //
 int NumberOfCopies=0;
 char* WhatFind="Search query";
-std::vector< boost::shared_ptr<TMemoryStream> > ClipBoard;     // clipboard for selections
+std::vector< boost::shared_ptr<std::stringstream> > ClipBoard;     // clipboard for selections
 static inline void ValidCtrCheck(TStreamEdit *)
 {
         new TStreamEdit(NULL);
@@ -42,7 +44,7 @@ if(NumberOfCopies==0)
  {
 //  ClipBoard=new TList();
  }
-Fstream=boost::shared_ptr<TStream>((TStream*)0);
+Fstream=boost::shared_ptr<std::iostream>((std::iostream*)0);
 FCurrentPos=0;
 ViewedLen=0;
 NumberOfString=20;
@@ -328,22 +330,38 @@ if(Showing)
   PointerMemo->Lines->Clear();
 try
  {
-  if(stream!=NULL)
+  if(stream)
    {
-     GroupBox1->Caption=AnsiString("StreamObject ")+stream->ClassName()+AnsiString(". Поле редактирования Размер : ")+AnsiString::IntToHex(stream->Size,8)+AnsiString(" (hex), (dec) - ")+AnsiString(stream->Size);
-     stream->Position=CurrentPos;
+//
+std::string streamName;
+if(dynamic_cast<std::ifstream*>(stream.get()))
+    streamName = "std::ifstream";
+else if(dynamic_cast<std::stringstream*>(stream.get()))
+    streamName = "std::stringstream";
+else
+     streamName = "ProcessStream";
+
+     std::stringstream caption;
+     caption << "StreamObject "
+             << streamName
+             << ". Edit field size : "
+             << std::setfill('0') << std::setw(8) << stream->seekg(0,std::ios_base::end).tellg()
+             << " (hex), (dec) - " << stream->seekg(0,std::ios_base::end).tellg();
+     GroupBox1->Caption = caption.str().c_str();
+     stream->seekg(CurrentPos,std::ios_base::beg);
+
     for(int i=0;(i<NumberOfString)&&(RealRead!=0);i++)
       {
-       if((RealRead=stream->Read(ch,StringLen))>0)
+       if((RealRead=stream->read(ch,StringLen).gcount())>0)
         {
-           PointerMemo->Lines->Add(ulongTo8digitHexString(stream->Position-RealRead).c_str());
+           PointerMemo->Lines->Add(ulongTo8digitHexString(stream->tellg()-RealRead).c_str());
 		   HexMemo->Lines->Add(byteptrToHexAnsiWithSpace(ch,RealRead).c_str());
 		   StringMemo->Lines->Add(ConvertToPrintString(ch,RealRead).c_str());
            ViewedLen+=RealRead;
         }
        else
         if(i==0)
-         if(stream->Position>CurrentPos) CurrentPos=stream->Position;
+         if(stream->tellg()>CurrentPos) CurrentPos=stream->tellg();
       }
    }
  }
@@ -522,7 +540,7 @@ int StringPos=ConvertGlobalToStringPos(pos);
 StringMemo->SelStart=StringPos;
 StringMemo->SelLength=1;
 
-stream->Position=CurrentPos+pos;
+stream->seekp(CurrentPos+pos,std::ios_base::beg);
 HexMemo->SelLength=1;
 
 HexMemo->SelText=AnsiString::IntToHex(value,1);
@@ -533,7 +551,7 @@ ch=HexAnsiTobyteptr(HexMemo->SelText.c_str());
 print[0]=ConvertToPrintSign(*ch);
 StringMemo->SelText=AnsiString(print);
 HexMemo->SelLength=0;
-stream->Write(ch,1);
+stream->write(ch,1);
 HexMemo->SelStart=rem;
 ShiftIfWrongHexSelStart();
 
@@ -597,7 +615,7 @@ return -1;*/
 
 void __fastcall TStreamEdit::SetCurrentPos( int value)
 {
-if((value<stream->Size)&&(value>=0))
+if((value<stream->seekg(0,std::ios_base::end).tellg())&&(value>=0))
  {
   FCurrentPos=value;
   LoadFromStream();
@@ -628,7 +646,7 @@ if(Shift%2!=0)
    }
  }
 
-if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<stream->Size))
+if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<stream->seekg(0,std::ios_base::end).tellg()))
  {
    if((Offset<0)||(Offset>=ViewedLen))
     {
@@ -645,7 +663,7 @@ void __fastcall TStreamEdit::CopyMenuItemClick(TObject *Sender)
 int Start;
 int End;
 int Len;
-boost::shared_ptr<TMemoryStream> buf=boost::shared_ptr<TMemoryStream>(new TMemoryStream());
+boost::shared_ptr<std::stringstream> buf=boost::shared_ptr<std::stringstream>(new std::stringstream());
 if(HexMemo->SelLength>0)
   {
     Start=ConvertHexPosToGlobal(HexMemo->SelStart);
@@ -657,8 +675,13 @@ if(HexMemo->SelLength>0)
     Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
   }
   Len=End-Start+1;
-  stream->Position=Start+CurrentPos;
-  Len=buf->CopyFrom(stream.get(),Len);
+  stream->seekg(Start+CurrentPos,std::ios_base::beg);
+  //   copy
+  std::vector<char> myBuf;
+  myBuf.resize(Len);
+  Len = stream->read(&(myBuf[0]),Len).gcount();
+  buf->write(&(myBuf[0]),Len);
+//  Len=buf->CopyFrom(stream.get(),Len);
 ClipBoard.push_back(buf);
 }
 //---------------------------------------------------------------------------
@@ -704,12 +727,42 @@ for(i=0;i<ClipBoard.size();i++)
  }
 }
 
+// read in from current position to the end
+// read data transfered to out
+void copyTheRest(std::ostream& out, std::istream& in,
+std::istream::traits_type::int_type len =  std::istream::traits_type::eof())
+{
+  if( len == std::istream::traits_type::eof())
+  {
+  while (out && in)
+      {
+       char ch;
+       in.read(&ch,1);
+       out.write(&ch,1);
+      }
+  }
+  else
+  {
+      std::istream::traits_type::int_type count = 0 ;
+      while (out && in && (count++ < len ))
+      {
+        char ch;
+        in.read(&ch,1);
+        out.write(&ch,1);
+      }
+  }
+
+}
 //---------------------------------------------------------------------------
 void __fastcall TStreamEdit::PasteMenuItemClick(TObject *Sender)
 {
   int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-  stream->Position=Start+CurrentPos;
-  stream->CopyFrom(ClipBoard.back().get(),0);
+  // initialize current position
+  stream->seekp(Start+CurrentPos, std::ios_base::beg);
+  // set read pointer to the beginnig
+  ClipBoard.back().get()->seekg(0,std::ios_base::beg);
+  copyTheRest(*stream,*(ClipBoard.back()));
+//  stream->CopyFrom(ClipBoard.back().get(),0);
   LoadFromStream();
 }
 //---------------------------------------------------------------------------
@@ -747,12 +800,13 @@ void __fastcall TStreamEdit::CopytoMenuClick(TObject *Sender)
       Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
     }
   Len=End-Start+1;
-  stream->Position=Start+CurrentPos;
+  stream->seekg(Start+CurrentPos, std::ios_base::beg);
   if( num < ClipBoard.size() )
   {
-    boost::shared_ptr<TMemoryStream> memory = ((*(ClipBoard.begin()+num)));
-    memory->Clear();
-    memory->CopyFrom(stream.get(),Len);
+    boost::shared_ptr<std::stringstream> memory = ((*(ClipBoard.begin()+num)));
+    memory->str("");
+    copyTheRest(*memory,*stream,Len);  // clear content
+//    memory->CopyFrom(*stream,Len);
   }
   else
   {
@@ -770,10 +824,12 @@ TMenuItem* menu=(TMenuItem*)Sender;
 int num=menu->Caption.ToInt();
 
 int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-stream->Position=Start+CurrentPos;
+stream->seekp(Start+CurrentPos,std::ios_base::beg);
   if( num < ClipBoard.size() )
   {
-    stream->CopyFrom((*(ClipBoard.begin() + num)).get(),0);
+    (*(ClipBoard.begin() + num)).get()->seekg(0,std::ios_base::beg);
+    copyTheRest(*stream,*(*(ClipBoard.begin() + num)));
+//    stream->CopyFrom((*(ClipBoard.begin() + num)).get(),0);
   }
   else
   {
@@ -988,7 +1044,7 @@ int Offset=ConvertStringPosToGlobal(value);
 int OldOffset=Offset;
 Offset+=Shift;
 
-if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<stream->Size))
+if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<stream->seekg(0,std::ios_base::end).tellg()))
  {
    if((Offset<0)||(Offset>=ViewedLen))
     {
@@ -1009,12 +1065,12 @@ char ch[2];
 HexMemo->SelText=byteptrToHexAnsi(&value,1).c_str();
 ch[0]=ConvertToPrintSign(value);
 ch[1]=0;
-stream->Position=CurrentPos+pos;
+stream->seekp(CurrentPos+pos,std::ios_base::beg);
 StringMemo->SelLength=1;
 StringMemo->SelText=AnsiString(ch);
 StringMemo->SelLength=0;
 
-stream->Write(ch,1);
+stream->write(ch,1);
 ShiftIfWrongStringSelStart();
 }
 
@@ -1065,7 +1121,7 @@ void __fastcall TStreamEdit::PointersNotifyEvent(int value)
   CurrentPos=value;
  }
 //---------------------------------------------------------------------------
-void __fastcall TStreamEdit::Setstream(boost::shared_ptr<TStream> value)
+void __fastcall TStreamEdit::Setstream(boost::shared_ptr<std::iostream> value)
 {
    Fstream=value;
    LoadFromStream();
@@ -1121,13 +1177,18 @@ bool __fastcall TStreamEdit::Search(bool IsNewSearch)
 TDateTime StartSearch=TDateTime::CurrentDateTime();
 TDateTime EndSearch;
 int PointersFound;
-ProgressBar->Max=stream->Size;
+stream->clear();// clear flags 
+DWORD streamSize = stream->seekg(0,std::ios_base::end).tellg();
+ProgressBar->Max=  100;
 ProgressBar->Min=0;ProgressBar->Position=0;
 
 PointersFound=SearcherProperties->Search(IsNewSearch,stream,DoProgress);
 ProgressBar->Position=0;
 EndSearch=TDateTime::CurrentDateTime();
-InfoEdit->Lines->Add(AnsiString("Search started at ") +StartSearch.DateTimeString()+AnsiString(" ")+AnsiString("finished at ")+EndSearch.DateTimeString()+AnsiString(" search time ")+(EndSearch-StartSearch).TimeString()+AnsiString(" Found :")+AnsiString(PointersFound)+AnsiString(" matches."));
+InfoEdit->Lines->Add(AnsiString("Search started at ") +
+StartSearch.DateTimeString()+
+AnsiString(" ")+AnsiString("finished at ")+
+EndSearch.DateTimeString()+AnsiString(" search time ")+(EndSearch-StartSearch).TimeString()+AnsiString(" Found :")+AnsiString(PointersFound)+AnsiString(" matches."));
 return    PointersFound>0;
 }
 
@@ -1136,7 +1197,8 @@ bool __fastcall TStreamEdit::SlowSearch(void)
 TDateTime StartSearch=TDateTime::CurrentDateTime();
 TDateTime EndSearch;
 int PointersFound;
-ProgressBar->Max=stream->Size;
+DWORD streamSize = stream->seekg(0,std::ios_base::end).tellg();
+ProgressBar->Max=100;
 ProgressBar->Min=0;ProgressBar->Position=0;
 
 PointersFound=SearcherProperties->SlowSearch(stream,DoProgress);
@@ -1154,8 +1216,8 @@ void __fastcall TStreamEdit::DoProgress(int pos)
 void __fastcall TStreamEdit::GetVariablesAtPos(int pos)
 {
 WORK_ANSILIB_UNION_FOR_CONVERT buf;
-stream->Position=pos;
-stream->Read(&buf,sizeof(buf));
+stream->seekg(pos,std::ios_base::beg);
+stream->read((char*)&buf,sizeof(buf));
 AnsiString newInfo=AnsiString("char ")+AnsiString((int)buf.char_)+AnsiString(",");
 newInfo+=AnsiString("byte ")+ulongToAnsi(buf.byte_).c_str()+AnsiString(",");
 newInfo+=AnsiString("ulong ")+ulongToAnsi(buf._ulong).c_str()+AnsiString(",");

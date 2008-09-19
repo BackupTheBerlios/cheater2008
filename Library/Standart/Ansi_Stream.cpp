@@ -6,43 +6,51 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 //------------------------------------------------------
-std::string  __fastcall  ConvertStreamToHexAnsi(TStream* stream)
+std::string  __fastcall  ConvertStreamToHexAnsi(std::istream& io_stream)
  {
   std::string ret;
-  stream->Position=0;
+  io_stream.clear();
+  std::istream::streampos backupPos = io_stream.tellg();
+  io_stream.seekg(0,std::ios_base::beg);
    WORK_ANSILIB_UNION_FOR_CONVERT work;
       work._ulong=0;
-   while(stream->Position<stream->Size)
+   while(io_stream.read((char*)&work._ulong,1))
     {
-      stream->Read(&work._ulong,1);
 	  ret += intToHex(work._int,2);
     }
+  io_stream.clear();
+  io_stream.seekg(backupPos,std::ios_base::beg);
   return ret;
  }
 //-----------------------------------------------------------------------------
-std::string  __fastcall  ConvertStreamToHexAnsiWithSpace(TStream* stream)
+std::string  __fastcall  ConvertStreamToHexAnsiWithSpace(std::istream& io_stream)
  {
+  io_stream.clear();
+  std::istream::streampos backupPos = io_stream.tellg();
   std::string res=EMPTY_STRING;
    WORK_ANSILIB_UNION_FOR_CONVERT work;
       work._ulong=0;
-  stream->Position=0;
-  if(stream->Size!=stream->Position)
-   {
-     while(stream->Position<stream->Size-1)
+  io_stream.seekg(0,std::ios_base::beg);
+     if( io_stream.read((char*)&work._ulong,1) );
+         res+=intToHex(work._int,2);
+     while(io_stream.read((char*)&work._ulong,1))
       {
-        stream->Read(&work._ulong,1);
+        res+=std::string(SPACE_STRING);
 		res+=intToHex(work._int,2);
-       res+=std::string(SPACE_STRING);
+
       }
-      stream->Read(&work._ulong,1);
-      res+=intToHex(work._int,2);
-   }
+  io_stream.clear();
+  io_stream.seekg(backupPos,std::ios_base::beg);
   return res;
  }
 //-----------------------------------------------------------------------------
-int      __fastcall   WriteHexAnsiToStream(const std::string& Str,TStream* stream)
+int      __fastcall   WriteHexAnsiToStream(const std::string& Str,std::ostream& io_stream)
  {
+    io_stream.clear();
   WORK_ANSILIB_UNION_FOR_CONVERT work;
 unsigned long i=0;
   if(Str.size()!=0)
@@ -50,7 +58,7 @@ unsigned long i=0;
 	for(i;i<Str.size()/2;i++)
      {
 	  work._ulong=HexAnsiToulong(Str.substr(2*i,2));
-      stream->Write(&work.byte_,1);
+      io_stream.write((char*)&work.byte_,1);
      }
    }
   return i;
@@ -65,7 +73,7 @@ unsigned long i=0;
   "hex string"
                                        Text           Type                      len
    */
-int __fastcall WriteTypedAnsiToStream(const std::string& Text, int Type, TStream* stream)
+int __fastcall WriteTypedAnsiToStream(const std::string& Text, int Type, std::ostream& io_stream)
  {
 
   int len=0;
@@ -74,27 +82,28 @@ int __fastcall WriteTypedAnsiToStream(const std::string& Text, int Type, TStream
    {
     case DEC_NUM:
 	   work._int=ToInt(Text);
-       len=WriteulongToStream(work._ulong,stream);
+       len=WriteulongToStream(work._ulong,io_stream);
     break;
     case HEX_NUM:
-       len=WriteulongToStream(HexAnsiToulong(Text),stream);
+       len=WriteulongToStream(HexAnsiToulong(Text),io_stream);
     break;
     case HEX_STRING:
-        len=WriteHexAnsiToStream(Text,stream);
+        len=WriteHexAnsiToStream(Text,io_stream);
     break;
     case DOUBLE_NUM:
       len=sizeof(double);
 	  work.double_=ToDouble(Text);
-      stream->Write(&work.double_,len);
+      io_stream.write((char*)&work.double_,len);
     break;
     case FLOAT_NUM:
       len=sizeof(float);
       work.float_=(float)ToDouble(Text);
-      stream->Write(&work.float_,len);
+      io_stream.write((char*)&work.float_,len);
     break;
     default:
             len=Text.size();
-            stream->Write(Text.c_str(),len);
+            io_stream.clear();             
+            io_stream.write(Text.c_str(),len);
    }
 
 
@@ -104,56 +113,69 @@ int __fastcall WriteTypedAnsiToStream(const std::string& Text, int Type, TStream
 //-----------------------------------------------------------------------------
 //unsigned long __fastcall FindInBuf(byte *,unsigned long,byte *,unsigned long );
 //-----------------------------------------------------------------------------
-std::string __fastcall ConvertStreamToPrintString(TStream* stream)
+std::string __fastcall ConvertStreamToPrintString(std::istream& io_stream)
  {
-  stream->Position=0;
+  io_stream.clear(); 
+  std::istream::streampos backupPos = io_stream.tellg();
+  io_stream.seekg(0,std::ios_base::beg);
   std::string res=EMPTY_STRING;
   WORK_ANSILIB_UNION_FOR_CONVERT work;
   work.ch[1]=0;
- while(stream->Position<stream->Size)
+ while(io_stream.read((char*)&work.char_,1))
       {
-       stream->Read(&work.char_,1);
        ConvertToPrintSign(work.byte_);
        res+=std::string(work.ch);
       }
-
+  io_stream.clear();
+  io_stream.seekg(backupPos,std::ios_base::beg);
   return res;
  }
 //-----------------------------------------------------------------------------
-int __fastcall WriteulongToStream(unsigned long num ,TStream* stream)
+int __fastcall WriteulongToStream(unsigned long num ,std::ostream& io_stream)
  {
   int len=4;
+  io_stream.clear();  
   WORK_ANSILIB_UNION_FOR_CONVERT work;
   work._ulong=num;
-   for(;len>0;len=len-1)
+  std::ostream::streampos beg = io_stream.tellp();
+   for(;len>0;len--)
     {
       if(work.bt[len-1]!=0) break;
     }
    if(len!=0)
-      len=stream->Write(work.bt,len);
+      io_stream.write((char*)work.bt,len);
    else
     {len++;
-     len=stream->Write(work.bt,len);
+     io_stream.write((char*)work.bt,len);
     }
-  return len;
+  std::ostream::streampos end = io_stream.tellp();
+  return (end-beg);
  }
 //-----------------------------------------------------------------------------
-unsigned long __fastcall ConvertStreamToulong(TStream* stream)
+unsigned long __fastcall ConvertStreamToulong(std::istream& io_stream)
  {
   WORK_ANSILIB_UNION_FOR_CONVERT work;
   work._ulong=0;
-  stream->Position=0;
-  if(stream->Size>4)
-     stream->Read(&work._ulong,4);
+  io_stream.clear();
+  std::istream::streampos backupPos = io_stream.tellg();
+  std::istream::streampos size=io_stream.seekg(0,std::ios_base::end).tellg();
+  io_stream.seekg(0,std::ios_base::beg);
+  if(size>4)
+     io_stream.read((char*)&work._ulong,4);
   else
-    stream->Read(&work._ulong,stream->Size);
+    io_stream.read((char*)&work._ulong,size);
+  io_stream.clear();
+  io_stream.seekg(backupPos,std::ios_base::beg);
   return work._ulong;
  }
+ /*
 //--------------------------------------------------------------------------------------------------------
-int InsertDilimeters(TStream* src,TStream* dest,TStream* dilim, int step,int flag)
+int InsertDilimeters(std::istream& src,
+std::ostream& dest,
+std::istream& dilim, int step,int flag)
  {
    int Len=0;
-   src->Position=0;
+  src.seekg(0,std::ios_base::beg);
        if(flag&dlLeft!=0) Len+=dest->CopyFrom(dilim,0);
     for(int j=0;j<src->Size-step;j+=step)
      {
@@ -167,8 +189,9 @@ int InsertDilimeters(TStream* src,TStream* dest,TStream* dilim, int step,int fla
   //  if(j!=srcLen) {memcpy(res+i,src+j-step,srcLen-(j-step));i+=srcLen-(j-step);}
        if((flag&dlRight)!=0) Len+=dest->CopyFrom(dilim,0);
    return Len;
- }
+ }         */
 //--------------------------------------------------------------------------------------------------------
+/*
 int RemoveDilimeters(TStream* src, TStream* dest,TStream* dilim )
  {
    int Len=0;
@@ -188,7 +211,9 @@ int RemoveDilimeters(TStream* src, TStream* dest,TStream* dilim )
     }
    return Len;
  }
+ */
 //--------------------------------------------------------------------------
+
 /*void WriteTListToStream(TList* list,TStream* stream)
  {
 WORK_ANSILIB_UNION_FOR_CONVERT work;
@@ -202,14 +227,30 @@ work._ulong=list->Count;
  }*/
 //--------------------------------------------------------------------------
 
-void ReadTListFromStream(std::vector<PointerType>&  list,TStream* stream)
+void ReadTListFromStream(std::vector<PointerType>&  list,std::istream& io_stream)
  {
 WORK_ANSILIB_UNION_FOR_CONVERT work;
 unsigned long len;
-    stream->Read(&len,sizeof(unsigned long));
+  io_stream.clear();
+  io_stream.read((char*)&len,sizeof(unsigned long));
+  if(!io_stream)
+   {
+      std::stringstream msg;
+      msg << "Wrong data format" << std::endl << std::endl
+          << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+      throw std::runtime_error( msg.str() );
+   }
+
   for(int i=0;i<len;i++)
    {
-    stream->Read(&work._ulong,sizeof(PointerType));
+    io_stream.read((char*)&work._ulong,sizeof(PointerType));
+    if(!io_stream)
+    {
+        std::stringstream msg;
+        msg << "Wrong data format" << std::endl << std::endl
+            << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNC__ << std::endl;
+        throw std::runtime_error( msg.str() );
+    }
     list.push_back(work._ulong);
    }
  }

@@ -57,7 +57,7 @@ public:
      void __fastcall TInputGroupBoxOnEnter(TObject*);
      __fastcall TInputGroupBox(TComponent* Owner);
     __fastcall ~TInputGroupBox(void);
-    void __fastcall WriteDataToStream(TStream*);
+    void __fastcall WriteDataToStream(std::ostream& io_stream);
     unsigned long __fastcall GetPointer(void);
     bool __fastcall IsEmpty(void);
     void __fastcall Clear(void);

@@ -131,7 +131,7 @@ void __fastcall StringsOptionChangedEvent(TObject *Sender,DWORD value);
         int ViewedLen;
          int FCurrentPos;
         bool IsProcessKeyDown;
-        boost::shared_ptr<TStream> Fstream;
+        boost::shared_ptr<std::iostream> Fstream;
         AnsiString FKeyPressed;
         AnsiString FCurrectEditSelection;
         void __fastcall LoadFromStream(void);
@@ -141,7 +141,7 @@ void __fastcall StringsOptionChangedEvent(TObject *Sender,DWORD value);
         int __fastcall ConvertGlobalToHexPos(int value);
         int FindInStream(char* buf, int len);
         void __fastcall SetCurrentPos( int value);
-        void __fastcall Setstream(boost::shared_ptr<TStream> value);
+        void __fastcall Setstream(boost::shared_ptr<std::iostream> value);
         void __fastcall DoProgress(int pos);
         void __fastcall GetVariablesAtPos(int);
         TMemoryStream* __fastcall GetFindStream();
@@ -163,7 +163,7 @@ public:		// User declarations
         boost::shared_ptr<TSearcher> __fastcall GetSearcher(void);
         bool __fastcall TStreamEdit::SlowSearch(void);
         __property  int CurrentPos  = { read=FCurrentPos, write=SetCurrentPos };
-        __property boost::shared_ptr<TStream> stream  = { read=Fstream, write=Setstream };
+        __property boost::shared_ptr<std::iostream> stream  = { read=Fstream, write=Setstream };
         __property AnsiString KeyPressed  = { read=FKeyPressed, write=SetKeyPressed };
         __property AnsiString CurrectEditSelection  = { read=FCurrectEditSelection,write=SetCurrectEditSelection };
 protected:

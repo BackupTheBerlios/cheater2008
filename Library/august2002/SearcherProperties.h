@@ -40,8 +40,8 @@ public:
 
 __published:
 public:
-int __fastcall Search(bool IsNewSearch, boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress);
-int __fastcall SlowSearch(boost::shared_ptr<TStream>,AfterReadNotify DoProgress);
+int __fastcall Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress);
+int __fastcall SlowSearch(boost::shared_ptr<std::iostream>,AfterReadNotify DoProgress);
         void __fastcall Reload(void);
         void __fastcall ReplaceAll(void);
         __fastcall ~TSearcherProperties(void);

@@ -44,27 +44,26 @@ class ProcessStreamBuf: public std::streambuf
         virtual int overflow ( int c = EOF );
 };
 //---------------------------------------------------------------------------
-class TProcessManager:public TStream
+class TProcessManager:public std::iostream
 {
 private:
-        void __fastcall SetStart(DWORD value); 	// pointer to PROCESS_INFORMATION
-        DWORD __fastcall GetStart(); 	// pointer to PROCESS_INFORMATION
-        std::iostream d_processMemoryStream;
         ProcessStreamBuf d_processMemoryStreamBuffer;
 public:
-        __fastcall ~TProcessManager();
+        virtual ~TProcessManager();
         void  createProcess(const std::string& i_process);
         void  openProcess(DWORD id);
         void  setMemoryInfo(MEMORY_BASIC_INFORMATION MemInfo);
-        MEMORY_BASIC_INFORMATION  getMemoryInfo(DWORD Pos);                   
+        MEMORY_BASIC_INFORMATION  getMemoryInfo(DWORD Pos);
         std::iostream& getStreamInterface();
         __fastcall TProcessManager(void);
         virtual int __fastcall Seek(int Offset, Word Origin);
         virtual int __fastcall Write(const void * Buffer, int Count);
         virtual int __fastcall Read(void * Buffer, int Count);
 //        void __fastcall Assign(TProcessManager* value);
-        __property DWORD Start  = { read=GetStart, write=SetStart };
+        void  setStart(DWORD value);
+        DWORD  getStart();
+        void  setSize(DWORD value);
+        DWORD  getSize();
 protected:
-        virtual void __fastcall SetSize(DWORD NewSize);
         };
 #endif

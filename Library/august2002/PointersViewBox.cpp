@@ -2,6 +2,7 @@
 #include <vcl.h>
 #pragma hdrstop
 #include <algorithm>
+#include <fstream>
 
 #include "PointersViewBox.h"
 #pragma package(smart_init)
@@ -201,9 +202,9 @@ if(FList)
  if(dialog->Execute())
   {
    FileClose(FileCreate(dialog->FileName));
-   TFileStream* file=new TFileStream(dialog->FileName,fmOpenWrite);
+   std::ofstream file(dialog->FileName.c_str());
    WriteTListToStream(*FList,file);
-   delete file;
+
   }
  delete dialog;
  }
@@ -216,10 +217,9 @@ if(FList)
   boost::shared_ptr<TOpenDialog> dialog=boost::shared_ptr<TOpenDialog>(new TOpenDialog(NULL));
   if(dialog->Execute())
     {
-     boost::shared_ptr<TFileStream> file=boost::shared_ptr<TFileStream>(new TFileStream(dialog->FileName,fmOpenRead));
-     file->Position=0;
+     boost::shared_ptr<std::ifstream> file=boost::shared_ptr<std::ifstream>(new std::ifstream(dialog->FileName.c_str()));
      boost::shared_ptr< std::vector<PointerType> > list(new std::vector<PointerType>());
-     ReadTListFromStream(*list,file.get());
+     ReadTListFromStream(*list,*file);
      SetList(list);
     }
  }

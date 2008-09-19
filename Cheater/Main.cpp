@@ -19,7 +19,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
         : TForm(Owner)
 {
 InputForm=new TInputForm(this);
-file=boost::shared_ptr<TFileStream>((TFileStream*)0);
+file=boost::shared_ptr<std::fstream>((std::fstream*)0);
 pos=0;
 IsProcessKeyDown=false;
 TcpServer1->OnReceive=TcpServer1OnRecieveEvent;
@@ -36,7 +36,7 @@ void __fastcall TForm1::OpenFileMenuItemClick(TObject *Sender)
 {
 if(OpenDialog1->Execute())
  {
-  file=boost::shared_ptr<TFileStream>(new TFileStream(OpenDialog1->FileName,fmOpenReadWrite));
+  file=boost::shared_ptr<std::fstream>(new std::fstream(OpenDialog1->FileName.c_str(),std::ios_base::out));
   this->EditMemoryFrame->stream=file;
  }
 }
@@ -57,22 +57,22 @@ if(OpenDialog1->Execute())
 //---------------------------------------------------------------------------
 void __fastcall TForm1::SetStartMenuItemClick(TObject *Sender)
 {
-InputForm->InputBox->InitBox(ulongToHexAnsi(Process->Start),HEX_NUM);
+InputForm->InputBox->InitBox(ulongToHexAnsi(Process->getStart()),HEX_NUM);
 
 if(InputForm->ShowModal()==mrOk)
  {
-  Process->Start=InputForm->InputBox->GetPointer();
+  Process->setStart ( InputForm->InputBox->GetPointer() );
  }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::SetSizeMenuItemClick(TObject *Sender)
 {
-InputForm->InputBox->InitBox(ulongToHexAnsi(Process->Size),HEX_NUM);
+InputForm->InputBox->InitBox(ulongToHexAnsi(Process->getSize()),HEX_NUM);
 
 if(InputForm->ShowModal()==mrOk)
  {
-  Process->Size=InputForm->InputBox->GetPointer();
+  Process->setSize(InputForm->InputBox->GetPointer());
  }
 }
 //---------------------------------------------------------------------------
@@ -202,7 +202,7 @@ void __fastcall TForm1::AddSearcherMenuItemClick(TObject *Sender)
 {
 if(EditMemoryFrame->stream!=NULL)
  {
-  boost::shared_ptr<TSearcher> work=boost::shared_ptr<TSearcher>( new TSearcher(boost::shared_ptr<TStream>((TStream*)0)) );
+  boost::shared_ptr<TSearcher> work=boost::shared_ptr<TSearcher>( new TSearcher(boost::shared_ptr<std::iostream>((std::iostream*)0)) );
   boost::shared_ptr<TSearcher> work2=EditMemoryFrame->GetSearcher();
  work->Assign(work2);
  GlobalChit->Searchers.push_back(work);
@@ -230,7 +230,7 @@ void __fastcall TForm1::ServerSocket1ClientRead(TObject *Sender,
 {
 {int Length=Socket->ReceiveLength();
 char *buf=new char[Length+1];
-      this->ListBox->Items->Add(AnsiString("Begin. Lenght= ")+AnsiString(Length));
+      this->ListBox->Items->Add(AnsiString("Begin. Length= ")+AnsiString(Length));
       TStringList* ServerStrings=new TStringList();
       Socket->ReceiveBuf(buf,Length);
       buf[Length]=0;

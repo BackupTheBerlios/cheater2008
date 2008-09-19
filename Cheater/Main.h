@@ -103,7 +103,7 @@ __published:	// IDE-managed Components
  private:
          DWORD idProcess[50];
         int processNum;
-        boost::shared_ptr<TFileStream> file;
+        boost::shared_ptr<std::fstream> file;
         int pos;
         bool IsProcessKeyDown;
 void __fastcall TcpServer1OnRecieveEvent(TObject* Sender, char* buf, int & DataLen);

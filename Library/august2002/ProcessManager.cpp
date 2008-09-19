@@ -286,6 +286,8 @@ return RealWrite;
 
 int  ProcessStreamBuf::rawRead(void * Buffer, int Count)
 {
+if( FPosition>=FSize )
+    return 0;
 MEMORY_BASIC_INFORMATION MemoryInfo;
 
 DWORD RealRead=0;
@@ -304,7 +306,6 @@ if( ReadProcessMemory(
     (DWORD*)&RealRead 	// actual number of bytes read
    )!=TRUE)
  {
-    RealRead=0;
     VirtualQueryEx(ProcessInformation.hProcess,
          (LPCVOID) (FPosition+FStart),	// address of region
          &MemoryInfo,	// address of information buffer
@@ -317,7 +318,7 @@ if( ReadProcessMemory(
      FPosition+=SystemInfo.dwPageSize;
     else
      FPosition=newPos;
-
+    RealRead+=rawRead((char*)Buffer+RealRead,Count-RealRead);
  }
 else
  FPosition+=RealRead;
@@ -325,20 +326,21 @@ else
 return RealRead;
 }
 
-__fastcall TProcessManager::TProcessManager(void) :TStream(),
-d_processMemoryStream(0)
+__fastcall TProcessManager::TProcessManager(void) :
+std::iostream(0)
+
 {
-d_processMemoryStream.rdbuf(&d_processMemoryStreamBuffer);
+    this->rdbuf(&d_processMemoryStreamBuffer);
 }
 
-__fastcall TProcessManager::~TProcessManager()
+TProcessManager::~TProcessManager()
 {
 
 }
 
 std::iostream& TProcessManager::getStreamInterface()
 {
-    return d_processMemoryStream;
+    return (*this);
 }
 
 //-------------------------------------------------------
@@ -348,26 +350,32 @@ return d_processMemoryStreamBuffer.seek(Offset,Origin);
 
 }
 
-void __fastcall TProcessManager::SetStart(DWORD value)
+void  TProcessManager::setStart(DWORD value)
 {
 d_processMemoryStreamBuffer.setStart(value);
 }
 
-DWORD  __fastcall TProcessManager::GetStart()
+DWORD   TProcessManager::getStart()
 {
 return d_processMemoryStreamBuffer.getStart();
 }
 
-void __fastcall TProcessManager::SetSize(DWORD NewSize)
+void  TProcessManager::setSize(DWORD NewSize)
 {
 d_processMemoryStreamBuffer.setSize(NewSize);
 }
 
+
+DWORD  TProcessManager::getSize()
+{
+return  d_processMemoryStreamBuffer.getSize();
+}
+
 int __fastcall TProcessManager::Write(const void * Buffer, int Count)
 {
-int pos1 =d_processMemoryStream.tellp();
-d_processMemoryStream.write(static_cast<const char*>(Buffer),Count);
-int pos2 =d_processMemoryStream.tellp();
+int pos1 =this->tellp();
+this->write(static_cast<const char*>(Buffer),Count);
+int pos2 =this->tellp();
 return (pos2-pos1);
 }
 
@@ -375,15 +383,15 @@ return (pos2-pos1);
 int __fastcall TProcessManager::Read(void * Buffer, int Count)
 {
 
-int pos1 =d_processMemoryStream.tellp();
-d_processMemoryStream.read(static_cast<char*>(Buffer),Count);
+int pos1 =this->tellp();
+this->read(static_cast<char*>(Buffer),Count);
 // if failed to read a desired number of bytes
 // stream has a fail state. But we my still continue reading
-int pos2 =d_processMemoryStream.tellp();
+int pos2 =this->tellp();
 int realRead=0;
-if(d_processMemoryStream)
+if(getStreamInterface())
     realRead=(pos2-pos1);
-d_processMemoryStream.clear();
+this->clear();
 return realRead;
 
 }

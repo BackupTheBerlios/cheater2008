@@ -88,7 +88,7 @@ void __fastcall TSearcherProperties::SetSearcher(boost::shared_ptr<TSearcher> va
 boost::shared_ptr<TSearcher> __fastcall TSearcherProperties::GetSearcher(void)
 {
 
-   if(!FSearcher) FSearcher=boost::shared_ptr<TSearcher>(new TSearcher(boost::shared_ptr<TStream>((TStream*)0)));
+   if(!FSearcher) FSearcher=boost::shared_ptr<TSearcher>(new TSearcher(boost::shared_ptr<std::iostream>((std::iostream*)0)));
    return FSearcher;
 
 }
@@ -96,8 +96,8 @@ boost::shared_ptr<TSearcher> __fastcall TSearcherProperties::GetSearcher(void)
 void __fastcall TSearcherProperties::Reload(void)
 {
 if((Searcher!=NULL)&&(Showing))
- { Find->InitBox(ConvertStreamToHexAnsi(Searcher->Find),HEX_STRING);
-   Replace->InitBox(ConvertStreamToHexAnsi(Searcher->Replace),HEX_STRING);
+ { Find->InitBox(ConvertStreamToHexAnsi(Searcher->getFind()),HEX_STRING);
+   Replace->InitBox(ConvertStreamToHexAnsi(Searcher->getReplace()),HEX_STRING);
    Pointers->SetList(Searcher->Pointers);
    PageSize->InitBox(IntToString(Searcher->PageSize),DEC_NUM);
  }
@@ -106,8 +106,9 @@ if((Searcher!=NULL)&&(Showing))
 void __fastcall TSearcherProperties::SetFindClick(TObject*)
 {
   if(Searcher)
-  { Searcher->Find->Clear();
-   Find->WriteDataToStream(Searcher->Find);
+  {
+   Searcher->getFind().str("");
+   Find->WriteDataToStream(Searcher->getFind());
   }
 }
 
@@ -115,8 +116,8 @@ void __fastcall TSearcherProperties::SetReplaceClick(TObject*)
 {
 if(Searcher)
  {
-  Searcher->Replace->Clear();
-  Replace->WriteDataToStream(Searcher->Replace);
+  Searcher->getReplace().str("");
+  Replace->WriteDataToStream(Searcher->getReplace());
  }
 }
 
@@ -145,7 +146,7 @@ void __fastcall TSearcherProperties::SetPageSizeClick(TObject*)
 }
 
 //----------------------------------------------------------------------------
-int __fastcall TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
+int __fastcall TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress)
 {
 if(! Searcher)
 {
@@ -166,8 +167,8 @@ Searcher->NotifyEvent=DoProgress;
 
 if(!Find->IsEmpty())
  {
-  Searcher->Find->Clear();
-  Find->WriteDataToStream(Searcher->Find);
+  Searcher->getFind().str("");
+  Find->WriteDataToStream(Searcher->getFind());
   if(IsNewSearch)
    {
 //    ProgressBar->Max=Searcher->stream->Size;
@@ -196,7 +197,7 @@ Reload();
 return Searcher->Pointers->size();
 }
 //----------------------------------------------------------------------------
-int __fastcall TSearcherProperties::SlowSearch(boost::shared_ptr<TStream> stream,AfterReadNotify DoProgress)
+int __fastcall TSearcherProperties::SlowSearch(boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress)
 {
 if(!Searcher)
 {
@@ -218,8 +219,8 @@ Searcher->NotifyEvent=DoProgress;
 
 if(!Find->IsEmpty())
  {
-  Searcher->Find->Clear();
-  Find->WriteDataToStream(Searcher->Find);
+  Searcher->getFind().str("");
+  Find->WriteDataToStream(Searcher->getFind());
 //    ProgressBar->Max=Searcher->stream->Size;
     SearchResult=Searcher->SlowSearch();
 
@@ -246,8 +247,8 @@ void __fastcall TSearcherProperties::ReplaceAll(void)
 {
 if(!Replace->IsEmpty())
  {
-   Searcher->Replace->Clear();
-   Replace->WriteDataToStream(Searcher->Replace);
+   Searcher->getReplace().str("");
+   Replace->WriteDataToStream(Searcher->getReplace());
    Searcher->ReplaceAll();
  }
 }

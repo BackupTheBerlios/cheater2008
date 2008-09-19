@@ -15,27 +15,36 @@ bool TSearcher::StartSearch(void)
 {
 VoidInt voidint;
 Pointers->clear();
-if(stream!=NULL)
+if(stream)
  {
- char* str; int length;
-  str=(char*)FFind->Memory;
-  length=FFind->Size;
+  stream->clear();
+  std::vector<char> buf;
+  char* str;
+  int length;
+  std::stringstream& findStream = getFind();
+  length=findStream.str().length();
+  buf.resize(length);
+  str=&(buf[0]);
+  findStream.seekg(0,std::ios_base::beg);
+  findStream.read(str,length);
+
   char* Buffer=new char[FPageSize];
   int i;
   int realBufferLength;
   int posBufInStream;
-  stream->Seek(0,soFromBeginning);
+  DWORD streamSize=stream->seekg(0,std::ios_base::end).tellg();
+  stream->seekg(0,std::ios_base::beg);
   i=0;
-  while(stream->Position<stream->Size)
+  while(*stream)
    {
-    posBufInStream=stream->Position;
-    realBufferLength=stream->Read(Buffer,FPageSize);
+    posBufInStream=stream->tellg();
+    realBufferLength=stream->read(Buffer,FPageSize).gcount();
     for(i=0;i<=realBufferLength-length;i++)
      {
       if(memcmp(Buffer+i,str,length)==0)
        {voidint.i=i+posBufInStream;Pointers->push_back(voidint.ul);}
       }
-     if(NotifyEvent!=NULL)NotifyEvent(stream->Position);
+     if(NotifyEvent!=NULL)NotifyEvent((int)(100 * (double)stream->tellg() / (double )streamSize)) ;
    }
 //  memcpy(Buffer,Buffer+FPageSize,length-1);
 //  i= 1-length;
@@ -43,34 +52,40 @@ if(stream!=NULL)
  }
 return Pointers->size()>0;
 }
-__fastcall TSearcher::TSearcher(boost::shared_ptr<TStream> value)
+__fastcall TSearcher::TSearcher(boost::shared_ptr<std::iostream> value)
 {
 Init();
 Fstream=value;
 }
 __fastcall TSearcher::~TSearcher()
 {
-     delete FFind;
-     delete FReplace;
 }
 
 bool __fastcall TSearcher::ContinueSearch(void)
 {
 VoidInt voidint;
-if(stream!=NULL)
+if(stream)
  {
- char* str; int len;
-  str=(char*)FFind->Memory;
-  len=FFind->Size;
-  char* Buffer=new char[len];
+  stream->clear();
+  std::vector<char> buf;
+  char* str;
+  int length;
+  std::stringstream& findStream = getFind();
+  length=findStream.str().length();
+  buf.resize(length);
+  str=&(buf[0]);
+  findStream.seekg(0,std::ios_base::beg);
+  findStream.read(str,length);
+  
+  char* Buffer=new char[length];
   int i;
   boost::shared_ptr<std::vector<PointerType> > newPointers=boost::shared_ptr<std::vector<PointerType> >(new std::vector<PointerType>());
     for(i=0;i<Pointers->size();i++)
      {
        voidint.ul=(*Pointers)[i];
-       stream->Seek(voidint.i,soFromBeginning);
-       if(stream->Read(Buffer,len)==len)
-          if(memcmp(Buffer,str,len)==0)
+       stream->seekg(voidint.i,std::ios_base::beg);
+       if(stream->read(Buffer,length).gcount()==length)
+          if(memcmp(Buffer,str,length)==0)
             newPointers->push_back(voidint.ul);
     }
   FPointers=newPointers;
@@ -83,7 +98,7 @@ else
 return Pointers->size()>0;
 }
 
-void __fastcall TSearcher::Setstream(boost::shared_ptr<TStream> value)
+void __fastcall TSearcher::Setstream(boost::shared_ptr<std::iostream> value)
 {
      Fstream=value;
 }
@@ -94,19 +109,29 @@ bool __fastcall TSearcher::SlowSearch(void)
   Pointers->clear();
 if(stream!=NULL)
  {
- char* str; int length;
-  str=(char*)FFind->Memory;
-  length=FFind->Size;
+  stream->clear();
+  std::vector<char> buf;
+  char* str;
+  int length;
+  std::stringstream& findStream = getFind();
+  length=findStream.str().length();
+  buf.resize(length);
+  str=&(buf[0]);
+  findStream.seekg(0,std::ios_base::beg);
+  findStream.read(str,length);
+  
   char* Buffer=new char[FPageSize+length-1];
   int i;
   int realBufferLength;
   int posBufInStream;
-  stream->Seek(0,soFromBeginning);
+  DWORD streamSize =  stream->seekg(0,std::ios_base::end).tellg();
+  stream->seekg(0,std::ios_base::beg);
   i=length-1;
+
   do
    {
-    posBufInStream=stream->Position;
-    realBufferLength=stream->Read(Buffer+length-1,FPageSize);
+    posBufInStream=stream->tellg();
+    realBufferLength=stream->read(Buffer+length-1,FPageSize).gcount();
     for(;i<realBufferLength;i++)
      {
       if(memcmp(Buffer+i,str,length)==0)
@@ -114,8 +139,8 @@ if(stream!=NULL)
       }
      if(realBufferLength==FPageSize){i=0;CopyMemory(Buffer,Buffer+FPageSize,length-1);}
       else i=length-1;
-     if(NotifyEvent!=NULL)NotifyEvent(stream->Position);
-   }while(stream->Position<stream->Size);
+     if(NotifyEvent!=NULL)NotifyEvent((int)(100 * (double)stream->tellg() / (double )streamSize)) ;
+   }while(*stream);
 //  memcpy(Buffer,Buffer+FPageSize,length-1);
 //  i= 1-length;
  delete Buffer;
@@ -126,27 +151,36 @@ bool __fastcall TSearcher::StartSearchDilim(void)
 {
 VoidInt voidint;
 Pointers->clear();
-if(stream!=NULL)
+if(stream)
  {
- char* str; int length;
-  str=(char*)FFind->Memory;
-  length=FFind->Size;
+  stream->clear();
+  std::vector<char> buf;
+  char* str;
+  int length;
+  std::stringstream& findStream = getFind();
+  length=findStream.str().length();
+  buf.resize(length);
+  str=&(buf[0]);
+  findStream.seekg(0,std::ios_base::beg);
+  findStream.read(str,length);
+
   char* Buffer=new char[FPageSize];
   int i;
   int realBufferLength;
   int posBufInStream;
-  stream->Seek(0,soFromBeginning);
+  DWORD streamSize = stream->seekg(0,std::ios_base::end).tellg();
+  stream->seekg(0,std::ios_base::beg);
   i=0;
-  while(stream->Position<stream->Size)
+  while(*stream)
    {
-    posBufInStream=stream->Position;
-    realBufferLength=stream->Read(Buffer,FPageSize);
+    posBufInStream=stream->tellg();
+    realBufferLength=stream->read(Buffer,FPageSize).gcount();
     for(i=0;i<=realBufferLength-length;i++)
      {
       if(memcmp(Buffer+i,str,length)==0)
        {voidint.i=i+posBufInStream;Pointers->push_back(voidint.ul);i+=length-1;}
       }
-     if(NotifyEvent!=NULL)NotifyEvent(stream->Position);
+     if(NotifyEvent!=NULL)NotifyEvent((int)(100 * (double)stream->tellg() / (double )streamSize)) ;
    }
 //  memcpy(Buffer,Buffer+FPageSize,length-1);
 //  i= 1-length;
@@ -157,20 +191,33 @@ return Pointers->size()>0;
 //--------------------------------------------------------------------------
 void __fastcall TSearcher::ReplaceAll(void)
 {
+if(stream)
+{
 for(int i=0;i<Pointers->size();i++)
  {
-  stream->Position=(unsigned long)((*Pointers)[i]);
-  stream->Write(Replace->Memory,Replace->Size);
+  stream->seekp((unsigned long)((*Pointers)[i]), std::ios_base::beg);
+
+  std::vector<char> buf;
+  char* str;
+  int length;
+  std::stringstream& replaceStream = getReplace();
+  length=replaceStream.str().length();
+  buf.resize(length);
+  str=&(buf[0]);
+  replaceStream.seekg(0,std::ios_base::beg);
+  replaceStream.read(str,length);
+
+  stream->write(str,length);
  }
+}
+
 }
 void __fastcall TSearcher::Assign(boost::shared_ptr<TSearcher> src)
 {
 if(((bool)src)&&(src.get()!=this))
  {
-  FFind->Clear();
-  FFind->CopyFrom(src->Find,0);
-  FReplace->Clear();
-  FReplace->CopyFrom(src->Replace,0);
+  getFind().str(src->getFind().str());
+  getReplace().str(src->getReplace().str());
   FPageSize=src->PageSize;
   Fstream=src->Fstream;
   (*FPointers) = *(src->FPointers);
@@ -194,17 +241,25 @@ Assign(src);
 void TSearcher::Init(void)
 {
   FPageSize=4096;
-  Fstream=boost::shared_ptr<TStream>((TStream*)0);
+  Fstream=boost::shared_ptr<std::iostream>((std::iostream*)0);
   FPointers=boost::shared_ptr<std::vector<PointerType> >(new std::vector<PointerType>());
   FPointers->push_back(111);
   NotifyEvent=NULL;
-  FFind=new TMemoryStream();
-  FReplace=new TMemoryStream();
 }
 //--------------------------------------------------------------------------
 void __fastcall TSearcher::SetPageSize(int value)
 {
  if(value>0)
   FPageSize=value;
+}
+
+std::stringstream& TSearcher::getFind()
+{
+    return FFind;
+}
+
+std::stringstream& TSearcher::getReplace()
+{
+    return FReplace;
 }
 

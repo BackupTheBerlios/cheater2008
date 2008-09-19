@@ -135,10 +135,10 @@ if(TypeBox->Items->Count==0)
  }
 }
 //-----------------------------------------------------------------------------------
-void __fastcall TInputGroupBox::WriteDataToStream(TStream* stream)
+void __fastcall TInputGroupBox::WriteDataToStream(std::ostream& io_stream)
 {
     //TODO: Add your source code here
-WriteTypedAnsiToStream(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,stream);
+WriteTypedAnsiToStream(std::string(TextBox->Text.c_str()),TypeBox->ItemIndex,io_stream);
 }
 
 unsigned long __fastcall TInputGroupBox::GetPointer(void)
