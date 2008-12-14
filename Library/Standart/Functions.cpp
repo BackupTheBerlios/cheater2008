@@ -6,28 +6,28 @@
 //---------------------------------------------------------------------------
 
 #pragma package(smart_init)
-int ReadPointers(std::istream& io_stream,TList& o_list)
+int ReadPointers(std::istream& io_stream,std::vector<DWORD>& o_list)
 {
 int num;
 int i=0;
-int Pointer;
+DWORD Pointer;
  io_stream.read((char*)&num,sizeof(int));
   for(;i<num;i++)
    {
 	io_stream.read((char*)&Pointer,sizeof(int));
-	o_list.Add((void*)Pointer);
+	o_list.push_back(Pointer);
    }
   return i;
 }
-int WritePointers(std::ostream& io_stream,TList& i_list)
+int WritePointers(std::ostream& io_stream,const std::vector<DWORD>& i_list)
 {
-int num=i_list.Count;
+int num=i_list.size();
 int i=0;
 int Pointer;
  io_stream.write((char*)&num,sizeof(int));
   for(;i<num;i++)
    {
-    Pointer=(int)i_list.Items[i];
+    Pointer=i_list[i];
 	io_stream.write((char*)&Pointer,sizeof(int));
 
    }
