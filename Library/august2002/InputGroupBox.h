@@ -8,6 +8,7 @@
 #include <Forms.hpp>
 #include <StdCtrls.hpp>
 #include <string>
+#include <vector>
 #include "TypeComboBox.h"
 #include "Ansilib.h"
 
@@ -65,7 +66,7 @@ public:
     void __fastcall TInputGroupBoxClearPointersMenuItemOnClick(TObject*);
     void __fastcall InitBox(const std::string&,int);
 //        void __fastcall LoadPointers(SMemoryPointers* list);
-    void __fastcall LoadPointers(TList* list);
+    void __fastcall LoadPointers(const std::vector<DWORD>& list);
     __property std::string Text  = { read = GetText };
 
 //    __property std::string TypeOfBox  = { read = GetTypeOfBox, write = SetTypeOfBox };

@@ -369,13 +369,13 @@ delete x;
 }
 
 //--------------------
-void __fastcall TInputGroupBox::LoadPointers(TList* list)
+void __fastcall TInputGroupBox::LoadPointers(const std::vector<DWORD>&   list)
 {
- if(list->Count<=200)
+ if(list.size()<=200)
   {
-  for(int i=0;i<list->Count;i++)
+  for(int i=0;i<list.size();i++)
     {
-     Add(ulongToHexAnsi((unsigned long)list->Items[i]));
+     Add(ulongToHexAnsi((unsigned long)list[i]));
     }
   }
 }
