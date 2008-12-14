@@ -68,7 +68,6 @@ Min=1;
 Max=100;
 }
 
-
 void __fastcall TCountEdit::UpDownFieldChangingEventEx(System::TObject* Sender, bool &AllowChange, short NewValue, TUpDownDirection Direction)
 {
 if(Direction==updNone)
@@ -93,9 +92,9 @@ value--;
 if((value>=Min)&&(value<=Max))
 {
   EditField->Text=AnsiString(ulongToAnsi(value).c_str());
-  if(OnChangeEvent) OnChangeEvent(dynamic_cast<TObject *>(this),value);
 
-}  
+ if(OnChangeEvent) OnChangeEvent(dynamic_cast<TObject *>(this),value);
+}
 AllowChange=false;
 }
 
@@ -132,5 +131,6 @@ void __fastcall TCountEdit::SetMin(DWORD value)
 void __fastcall TCountEdit::SetMax(DWORD value)
 {
         //TODO: Add your source code here
-        FMax=value;        
+        FMax=value;
 }
+

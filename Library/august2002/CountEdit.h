@@ -17,7 +17,7 @@ class PACKAGE TCountEdit : public TGroupBox
 private:
 
      void CreateInstance(void);
-    void __fastcall OnResizeEvent(TObject*);      
+    void __fastcall OnResizeEvent(TObject*);
 static unsigned long Instance;
         DWORD FMin;
         DWORD FMax;
@@ -40,7 +40,5 @@ void __fastcall UpDownFieldChangingEventEx(System::TObject* Sender, bool &AllowC
 };
 //---------------------------------------------------------------------------
 #endif
-
-
 
 
