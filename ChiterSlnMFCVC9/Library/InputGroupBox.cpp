@@ -366,16 +366,16 @@ CMenu*  InputGroupBox::CreatePopupMenu(void)
 	MenuItem->OnClick=InputGroupBoxConvertToFloatNumMenuItemOnClick;
 	ConvertToMenuItem->Add(MenuItem);
 */
-	work->AppendMenu(d_savePointerMenuItemState, ID_APP_EXIT, CString("Save value") );
-	work->AppendMenu(d_clearPointersMenuItemState, ID_APP_EXIT, CString("Clear TextBox") );
-	work->AppendMenu(d_convertToMenuItemState, ID_APP_EXIT, CString("Convert to...") );
-	work->AppendMenu(MF_STRING, HEX_NUM, CString( getStringType()[HEX_NUM] ) );
-    work->AppendMenu(MF_STRING, DEC_NUM, CString( getStringType()[DEC_NUM] ) );
-	work->AppendMenu(MF_STRING, STRING, CString( getStringType()[STRING]) );
-	work->AppendMenu(MF_STRING, HEX_STRING, CString( getStringType()[HEX_STRING]) );
-	work->AppendMenu(MF_STRING, DOUBLE_NUM, CString( getStringType()[DOUBLE_NUM]) );
-	work->AppendMenu(MF_STRING, FLOAT_NUM, CString( getStringType()[FLOAT_NUM]) );
-	return work;
+  work->AppendMenu(d_savePointerMenuItemState, ID_APP_EXIT, CString("Save value") );
+  work->AppendMenu(d_clearPointersMenuItemState, ID_APP_EXIT, CString("Clear TextBox") );
+  work->AppendMenu(d_convertToMenuItemState, ID_APP_EXIT, CString("Convert to...") );
+  work->AppendMenu(MF_STRING, HEX_NUM, CString( getStringType()[HEX_NUM] ) );
+  work->AppendMenu(MF_STRING, DEC_NUM, CString( getStringType()[DEC_NUM] ) );
+  work->AppendMenu(MF_STRING, STRING, CString( getStringType()[STRING]) );
+  work->AppendMenu(MF_STRING, HEX_STRING, CString( getStringType()[HEX_STRING]) );
+  work->AppendMenu(MF_STRING, DOUBLE_NUM, CString( getStringType()[DOUBLE_NUM]) );
+  work->AppendMenu(MF_STRING, FLOAT_NUM, CString( getStringType()[FLOAT_NUM]) );
+  return work;
 }
 
 BOOL InputGroupBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,

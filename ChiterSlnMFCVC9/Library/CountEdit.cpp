@@ -15,9 +15,9 @@ extern HINSTANCE hInstance;
 //---------------------------------------------------------------------------
 unsigned long TCountEdit::Instance=0;
 
-IMPLEMENT_DYNAMIC(TCountEdit, TCountEditBaseClase)
+IMPLEMENT_DYNAMIC(TCountEdit, CMyBaseForm)
 
-BEGIN_MESSAGE_MAP(TCountEdit, TCountEditBaseClase)
+BEGIN_MESSAGE_MAP(TCountEdit, CMyBaseForm)
     ON_WM_VSCROLL()
     ON_WM_SIZE()
 END_MESSAGE_MAP()
@@ -25,44 +25,13 @@ END_MESSAGE_MAP()
 
 //----------------------------------------------------------------------------
 TCountEdit::TCountEdit(CWnd* pParent/* = NULL*/):
+CMyBaseForm(pParent),
 EditField(0),
 UpDownField(0)
 
 {
-VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(TCountEdit::IDD)), pParent ) );
 
 }
-HGLOBAL TCountEdit::initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName )
-{
-    d_hModule = hinst;
-
-
-    d_hDialogInit = NULL;
-    HRSRC hDlgInit = ::FindResource( hinst, lpszTemplateName, RT_DLGINIT);
-    if( hDlgInit )
-    {
-        // load it
-        d_hDialogInit = LoadResource( hinst, hDlgInit );
-        if( d_hDialogInit == NULL )
-        {
-            TRACE0("Warning: Load of RT_DLGINIT failed during dialog init.\n");
-        }
-        else
-        {
-            // lock it
-            m_lpDialogInit = LockResource(d_hDialogInit);
-            ASSERT(m_lpDialogInit != NULL);
-        }
-    }
-
-    // load dialog
-    HRSRC hrsrc = FindResource( hinst, lpszTemplateName, RT_DIALOG );
-    if( hrsrc != 0 )
-        return LoadResource( hinst, hrsrc );
-    else
-        return 0;
-}
-
 //---------------------------------------------------------------------------
  TCountEdit::~TCountEdit(void)
 {
@@ -146,7 +115,7 @@ void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
     }
     //AllowChange=false;
-    TCountEditBaseClase::OnVScroll(nSBCode, nPos, pScrollBar);
+    CMyBaseForm::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 void TCountEdit::OnSize(UINT nType, int cx, int cy)

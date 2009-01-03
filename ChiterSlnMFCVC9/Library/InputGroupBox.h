@@ -35,7 +35,7 @@ public:
 	std::vector<std::string>  getStrings();
 	CMenu*  CreatePopupMenu(void);
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
     HGLOBAL initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName );
 
     virtual BOOL OnInitDialog();
