@@ -55,7 +55,7 @@ int CChiterAppView::OnCreate(LPCREATESTRUCT lpcs)
     CRect valueRect;
     d_valueBox.GetClientRect(valueRect);
     d_countEdit.Create (this);
-    d_countEdit.SetWindowPos (&d_valueBox, valueRect.right, valueRect.bottom, 100, 50, SWP_NOZORDER | SWP_NOSIZE);
+    d_countEdit.SetWindowPos (&d_valueBox, valueRect.left, valueRect.bottom, 100, 50, SWP_NOZORDER | SWP_NOSIZE);
     d_countEdit.ShowWindow(SW_SHOW);
 
     

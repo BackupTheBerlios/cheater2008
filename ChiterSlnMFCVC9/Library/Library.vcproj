@@ -69,7 +69,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\debug\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\debug\link-static\threading-multi&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\debug\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\debug\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\filesystem\build\msvc-9.0\debug\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\filesystem\build\msvc-9.0\debug\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\system\build\msvc-9.0\debug\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\system\build\msvc-9.0\debug\threading-multi&quot;"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Library.def"
 				GenerateDebugInformation="true"
@@ -152,7 +152,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName)_d.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\release\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\release\link-static\threading-multi&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\release\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\release\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\filesystem\build\msvc-9.0\release\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\filesystem\build\msvc-9.0\release\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\system\build\msvc-9.0\release\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\system\build\msvc-9.0\release\threading-multi&quot;"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Library.def"
 				GenerateDebugInformation="true"
@@ -233,7 +233,6 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -243,20 +242,12 @@
 			<File
 				RelativePath=".\searcher.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\SearcherProperties.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

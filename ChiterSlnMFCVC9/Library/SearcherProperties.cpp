@@ -4,7 +4,6 @@
 #include <stdexcept>
 #pragma hdrstop
 #include "SearcherProperties.h"
-#pragma package(smart_init)
 //---------------------------------------------------------------------------
 // ValidCtrCheck is used to assure that the components created do not have
 // any pure virtual functions.

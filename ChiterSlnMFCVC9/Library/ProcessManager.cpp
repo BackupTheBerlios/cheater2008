@@ -96,13 +96,13 @@ int ProcessStreamBuf::overflow ( int c /*= EOF */)
 
 bool  ProcessStreamBuf::createProcess(const std::string& i_process)
 {
-    AnsiString CommandLine;	//  command line string
-    SECURITY_ATTRIBUTES ProcessAttributes;	//  process security attributes
-    SECURITY_ATTRIBUTES ThreadAttributes;	// security attributes
-    BOOL bInheritHandles;	// handle inheritance flag
-    DWORD dwCreationFlags;	// creation flags
-    LPVOID lpEnvironment;	// pointer to new environment block
-    STARTUPINFO StartupInfo;	// pointer to STARTUPINFO
+  std::string CommandLine;	//  command line string
+  SECURITY_ATTRIBUTES ProcessAttributes;	//  process security attributes
+  SECURITY_ATTRIBUTES ThreadAttributes;	// security attributes
+  BOOL bInheritHandles;	// handle inheritance flag
+  DWORD dwCreationFlags;	// creation flags
+  LPVOID lpEnvironment;	// pointer to new environment block
+  STARTUPINFO StartupInfo;	// pointer to STARTUPINFO
 
 CommandLine="";
 bInheritHandles=TRUE;
@@ -131,15 +131,18 @@ std::string CurrentDirectory= boost::filesystem::path(i_process).parent_path().s
    FPosition=0;
    FStart=0x01000000;
    FSize=0x7fff0000;
+   CString cmdLine(CommandLine.c_str());
+   CString::PXSTR cmdBuff = cmdLine.GetBuffer();
+   // convertions to-from CString takes care of char_t and wchar_t strings
   return ::CreateProcess(
-    i_process.c_str(),	// pointer to name of executable module
-    CommandLine.c_str(),	// pointer to command line string
+    CString(i_process.c_str()),	// pointer to name of executable module
+    cmdBuff,	// pointer to command line string
     &ProcessAttributes,	// pointer to process security attributes
     &ThreadAttributes,	// pointer to thread security attributes
     bInheritHandles,	// handle inheritance flag
     dwCreationFlags,	// creation flags
     lpEnvironment,	// pointer to new environment block
-    CurrentDirectory.c_str(),	// pointer to current directory name
+    CString(CurrentDirectory.c_str()),	// pointer to current directory name
     &StartupInfo,	// pointer to STARTUPINFO
     &ProcessInformation 	// pointer to PROCESS_INFORMATION
    )==TRUE;
@@ -200,7 +203,7 @@ DWORD work;
 
 int  ProcessStreamBuf::seek(int Offset, Word Origin)
 {
- if(Origin==soFromEnd) FPosition=FSize-(DWORD)Offset;
+/* if(Origin==soFromEnd) FPosition=FSize-(DWORD)Offset;
   else
     if(Origin==soFromCurrent) FPosition=(DWORD)Offset+FPosition;
      else
@@ -209,6 +212,11 @@ int  ProcessStreamBuf::seek(int Offset, Word Origin)
   else
  if(FPosition>FSize) FPosition=FSize;
  return (int)FPosition;
+*/
+  std::stringstream msg;
+  msg << __FUNCTION__ << " is not implemented. Have a look at source code: "<< std::endl << std::endl
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+ return 0;
 
 }
 void ProcessStreamBuf::setStart(DWORD value)
