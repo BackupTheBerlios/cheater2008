@@ -24,7 +24,7 @@ static unsigned long Instance;
         DWORD FMin;
         DWORD FMax;
 public:
-    enum{IDD = IDD_EMPTY_DIALOG};
+    enum{IDD = IDD_MYBASEFORM};
     	void Create( CWnd* pParentWnd );
         void  setText(const std::string& value);
         std::string  getText();

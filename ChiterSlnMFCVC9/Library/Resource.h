@@ -6,8 +6,7 @@
 #define IDC_COMBO_TYPE                  2000
 #define IDR_MENU1                       2000
 #define IDC_COMBO_VALUE                 2001
-#define IDD_DIALOG1                     2001
-#define IDD_EMPTY_DIALOG                2001
+#define IDD_MYBASEFORM                  2001
 #define IDD_MEMORYINFOEDIT              2002
 #define IDC_EDIT_MEMO                   2002
 #define IDC_SCROLLBAR1                  2003
