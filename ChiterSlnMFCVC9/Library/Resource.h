@@ -7,12 +7,12 @@
 #define IDR_MENU1                       2000
 #define IDC_COMBO_VALUE                 2001
 #define IDD_DIALOG1                     2001
+#define IDD_EMPTY_DIALOG                2001
 #define IDD_MEMORYINFOEDIT              2002
 #define IDC_EDIT_MEMO                   2002
 #define IDC_SCROLLBAR1                  2003
 #define IDC_TCOUNTEDIT_EDITFIELD        2004
 #define IDC_TCOUNTEDIT_UPDOWNFIELD      2005
-
 #define ID_SAVEVALUE                    32771
 #define ID_CLEARTEXTBOX                 32772
 #define ID_CONVERTTO                    32773

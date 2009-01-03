@@ -10,23 +10,59 @@
 #include "CountEdit.h"
 #include "Standart/Ansi_stream.h"
 
+extern HINSTANCE hInstance;
 
 //---------------------------------------------------------------------------
 unsigned long TCountEdit::Instance=0;
 
-IMPLEMENT_DYNAMIC(TCountEdit, CDialog)
+IMPLEMENT_DYNAMIC(TCountEdit, TCountEditBaseClase)
 
-BEGIN_MESSAGE_MAP(TCountEdit, CDialog)
+BEGIN_MESSAGE_MAP(TCountEdit, TCountEditBaseClase)
     ON_WM_VSCROLL()
     ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
 //----------------------------------------------------------------------------
- TCountEdit::TCountEdit(CWnd* pParent/* = NULL*/)
+TCountEdit::TCountEdit(CWnd* pParent/* = NULL*/):
+EditField(0),
+UpDownField(0)
+
 {
-CreateInstance();
+VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(TCountEdit::IDD)), pParent ) );
+
 }
+HGLOBAL TCountEdit::initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName )
+{
+    d_hModule = hinst;
+
+
+    d_hDialogInit = NULL;
+    HRSRC hDlgInit = ::FindResource( hinst, lpszTemplateName, RT_DLGINIT);
+    if( hDlgInit )
+    {
+        // load it
+        d_hDialogInit = LoadResource( hinst, hDlgInit );
+        if( d_hDialogInit == NULL )
+        {
+            TRACE0("Warning: Load of RT_DLGINIT failed during dialog init.\n");
+        }
+        else
+        {
+            // lock it
+            m_lpDialogInit = LockResource(d_hDialogInit);
+            ASSERT(m_lpDialogInit != NULL);
+        }
+    }
+
+    // load dialog
+    HRSRC hrsrc = FindResource( hinst, lpszTemplateName, RT_DIALOG );
+    if( hrsrc != 0 )
+        return LoadResource( hinst, hrsrc );
+    else
+        return 0;
+}
+
 //---------------------------------------------------------------------------
  TCountEdit::~TCountEdit(void)
 {
@@ -35,15 +71,20 @@ CreateInstance();
 
 void TCountEdit::CreateInstance(void)
 {
+    CRect crect;
+    this->GetWindowRect(&crect);
+    crect.right = crect.left + 80;
+    crect.bottom = crect.top + 24;
+    this->MoveWindow(crect);
     //TODO: Add your source code here
  EditField=new CEdit();
     RECT editRect;
     editRect.top=2;
-    editRect.left=15;
-    editRect.right=editRect.left + 30;
-    editRect.bottom=editRect.top + 50;
+    editRect.left=5;
+    editRect.right=editRect.left + 55;
+    editRect.bottom=editRect.top + 20;
  EditField->Create(ES_LEFT | ES_MULTILINE ,editRect,this,IDC_TCOUNTEDIT_EDITFIELD);
-
+ EditField->ShowWindow(TRUE);
  UpDownField=new TUpDown();
     SCROLLINFO scrollInfo;
     scrollInfo.cbSize = sizeof(SCROLLINFO);     
@@ -57,11 +98,11 @@ void TCountEdit::CreateInstance(void)
     RECT UpDownFieldRect;
     UpDownFieldRect.top=editRect.top;
     UpDownFieldRect.left=editRect.right + 1;
-    UpDownFieldRect.right=editRect.left + 10;
+    UpDownFieldRect.right=editRect.right + 15;
     UpDownFieldRect.bottom=editRect.top + (editRect.bottom - editRect.top);
-  UpDownField->Create(ES_LEFT | ES_MULTILINE ,UpDownFieldRect,this,IDC_TCOUNTEDIT_UPDOWNFIELD);
+  UpDownField->Create(SBS_VERT ,UpDownFieldRect,this,IDC_TCOUNTEDIT_UPDOWNFIELD);
   UpDownField->SetScrollInfo(&scrollInfo);
- 
+  UpDownField->ShowWindow(TRUE);
   //UpDownField->OnChangingEx=UpDownFieldChangingEventEx;
 
  OnChangeEvent=NULL;
@@ -105,7 +146,7 @@ void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
     }
     //AllowChange=false;
-    CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
+    TCountEditBaseClase::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 void TCountEdit::OnSize(UINT nType, int cx, int cy)
@@ -119,28 +160,37 @@ void  TCountEdit::OnResizeEvent()
     CRect editRect;
     editRect.top=15;
     editRect.left=2;
+if(EditField && UpDownField)
+{
+    CRect UpDownFieldRect;
+    UpDownFieldRect.top=editRect.top;
+    UpDownFieldRect.left=editRect.right + 1;
+    UpDownFieldRect.right=editRect.left + 10;
+    CRect rect;
+    this->GetClientRect(rect);
+    // UpDownField->Width=10;
+    int UpDownFieldWidth = 10;
+    editRect.right=editRect.left + rect.Width()-UpDownFieldWidth-2;
+    editRect.bottom=editRect.top + rect.Height()-editRect.top-2;
+
+    editRect.right=editRect.left + 30;
+    editRect.bottom=editRect.top + 50;
+
+    UpDownFieldRect.top=editRect.top;
+    UpDownFieldRect.left=editRect.left+editRect.Width()+1;
+    UpDownFieldRect.bottom=UpDownFieldRect.top + editRect.Height();
+
+    EditField->MoveWindow(&editRect,TRUE);
+    UpDownField->MoveWindow(&UpDownFieldRect,TRUE);
+}
 
 
- CRect UpDownFieldRect;
- UpDownFieldRect.top=editRect.top;
- UpDownFieldRect.left=editRect.right + 1;
- UpDownFieldRect.right=editRect.left + 10;
-CRect rect;
- this->GetClientRect(rect);
-// UpDownField->Width=10;
-int UpDownFieldWidth = 10;
- editRect.right=editRect.left + rect.Width()-UpDownFieldWidth-2;
- editRect.bottom=editRect.top + rect.Height()-editRect.top-2;
+}
 
- editRect.right=editRect.left + 30;
- editRect.bottom=editRect.top + 50;
-
- UpDownFieldRect.top=editRect.top;
- UpDownFieldRect.left=editRect.left+editRect.Width()+1;
- UpDownFieldRect.bottom=UpDownFieldRect.top + editRect.Height();
-
- EditField->MoveWindow(&editRect,TRUE);
- UpDownField->MoveWindow(&UpDownFieldRect,TRUE);
+void TCountEdit::Create( CWnd* pParentWnd )
+{
+CreateIndirect( initDialog(hInstance,MAKEINTRESOURCE(TCountEdit::IDD)), pParentWnd );
+CreateInstance();
 }
 
 void  TCountEdit::setText(const std::string & value)
