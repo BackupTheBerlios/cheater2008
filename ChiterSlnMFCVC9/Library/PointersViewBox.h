@@ -10,56 +10,67 @@
 #include "Standart/Ansi_Stream.h"
 #include "AuxiliaryTypedefs.h"
 #include "Resource.h"
+#include "MyBaseForm.h"
+#include "Command.h"
 #include "august2002Fwd.h"
 extern std::vector< boost::shared_ptr<std::vector<PointerType> > > PoitersDB;
 
 typedef void  ( *TPointerSelectEvent)(int);
 
+enum SubMenus
+{
+  TPointersViewBox_DELETE_SUBMENU_ITEM,
+  TPointersViewBox_COPTY_SUBMENU_ITEM,
+  TPointersViewBox_PASTEFROM_SUBMENU_ITEM, 
+  TPointersViewBox_ADDPOINTERTOLIST_SUBMENU_ITEM
+};
+
 
 //---------------------------------------------------------------------------
-class AUGUST2002_EXPORT TPointersViewBox : public CDialog
+class AUGUST2002_EXPORT TPointersViewBox : public CMyBaseForm
 {
     	DECLARE_DYNAMIC(TPointersViewBox)
 private:
-        CScrollBar *ScrollBar;
-        CListBox *PointersBox;
+        enum {LISTBOXFILED=1000,SCROLLBARFILED};
+        CScrollBar *d_scrollBar;
+        CListBox *d_pointersBox;
         TPopupMenu* PopupMenu;
 
+        Container d_menuCommands;
         //enum { IDD = IDD_MEMORYINFOEDIT };
-        CMenuItem *CopyMenuItem;
-        CMenuItem *PasteMenuItem;
         CMenuItem *CopytoMenuItem;
         CMenuItem *PasteFromMenuItem;
         CMenuItem *DeleteMenuItem;
-        CMenuItem *ClearClipBoardMenuItem;
         CMenuItem *AddPointerToLisCMenuItem;
         CMenuItem *DeletePointerMenuItem;
-        void  ScrollBarScroll(TObject *Sender,
-          TScrollCode ScrollCode, int &ScrollPos);
-        void  PointersBoxDblClick(TObject *Sender);
+        
+        void  PointersBoxDblClick(UINT nFlags, CPoint point);
         boost::shared_ptr< std::vector<PointerType> > FList;
         void  Init(void);
-        void  PopupMenuOnPopup(TObject *Sender);
-        void  WritePointersToFile(TObject*);
-        void  LoadPointersFromFile(TObject*);
+        void  PopupMenuOnPopup();
+        void  WritePointersToFile();
+        void  LoadPointersFromFile();
 
+        void  CopyMenuItemClick();
+        void  PasteMenuItemClick();
+        void  ClearClipBoardMenuItemClick();
+        void  DeletePointerMenuItemClick();
 
-        void  DeleteSubMenuClick(TObject *Sender);
-        void  CopytoMenuClick(TObject *Sender);
-        void  PasteFromMenuClick(TObject *Sender);
-
-        void  CopyMenuItemClick(TObject*);
-        void  PasteMenuItemClick(TObject*);
-        void  ClearClipBoardMenuItemClick(TObject*);
-        void  AddPointerToLisCMenuItemClick(TObject *Sender);
-        void  DeletePointerMenuItemClick(TObject *Sender);
+        void  DeleteSubMenuClick(unsigned int idx);
+        void  CopytoMenuClick(unsigned int idx);
+        void  PasteFromMenuClick(unsigned int idx);
+        void  AddPointerToLisCMenuItemClick(unsigned int idx);
 
         void  DeleteSelectedPointers(void);
-
+        afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
         afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
         //void  KeyDown(TObject *Sender,WORD &Key, TShiftState Shift);
 
-        void  Reload(int);	// User declarations
+        afx_msg void OnInitMenu(CMenu* pMenu);
+        afx_msg void OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu);
+        
+
+        void  Reload(unsigned int);	// User declarations
         void  Update();        
 public:		// User declarations
         void  SetList(boost::shared_ptr< std::vector<PointerType> > value);
@@ -67,7 +78,12 @@ public:		// User declarations
          TPointersViewBox(CWnd* pParent = NULL);
 //        __property TList* List  = { read=FList, write=SetList };
 protected:
+  virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
+    AFX_CMDHANDLERINFO* pHandlerInfo);
+
     	DECLARE_MESSAGE_MAP()
+public:
+  afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 };
 //---------------------------------------------------------------------------
 #endif

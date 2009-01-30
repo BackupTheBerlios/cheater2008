@@ -1,8 +1,9 @@
 //---------------------------------------------------------------------------
-#include <vcl.h>
+#include "stdafx.h"
+#pragma hdrstop
 #include <sstream>
 #include <stdexcept>
-#pragma hdrstop
+
 #include "SearcherProperties.h"
 //---------------------------------------------------------------------------
 // ValidCtrCheck is used to assure that the components created do not have

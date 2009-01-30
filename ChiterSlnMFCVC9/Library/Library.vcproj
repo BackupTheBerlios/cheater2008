@@ -193,6 +193,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Command.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CountEdit.cpp"
 				>
 			</File>
@@ -219,25 +223,10 @@
 			<File
 				RelativePath=".\PointersViewBox.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ProcessManager.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\searcher.cpp"
@@ -248,6 +237,7 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -298,6 +288,10 @@
 			</File>
 			<File
 				RelativePath=".\AuxiliaryTypedefs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Command.h"
 				>
 			</File>
 			<File

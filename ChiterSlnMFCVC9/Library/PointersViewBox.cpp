@@ -4,27 +4,29 @@
 #pragma hdrstop
 #include <algorithm>
 #include <fstream>
-
+#include <boost/bind.hpp>
 #include "PointersViewBox.h"
-//---------------------------------------------------------------------------
-// ValidCtrCheck is used to assure that the components created do not have
-// any pure virtual functions.
-//
+
 std::vector< boost::shared_ptr<std::vector<PointerType> > > PoitersDB;
 
-IMPLEMENT_DYNAMIC(TPointersViewBox, CDialog)
+IMPLEMENT_DYNAMIC(TPointersViewBox, CMyBaseForm)
 
-BEGIN_MESSAGE_MAP(TPointersViewBox, CDialog)
+BEGIN_MESSAGE_MAP(TPointersViewBox, CMyBaseForm)
   ON_WM_KEYDOWN()
+  ON_WM_LBUTTONDBLCLK()
+  ON_WM_INITMENU()
+  ON_WM_INITMENUPOPUP()
+  ON_WM_VSCROLL()
 END_MESSAGE_MAP()
 
 //---------------------------------------------------------------------------
 TPointersViewBox::TPointersViewBox(CWnd* pParent /*= NULL*/)
+: CMyBaseForm(pParent)
 {
   Init();
   NotifyDblClick=NULL;
   SetList(boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0));
-  PointersBox->OnKeyDown=KeyDown;
+//  d_pointersBox->OnKeyDown=KeyDown; ---> OnKeyDown
 }
 //---------------------------------------------------------------------------
 
@@ -37,179 +39,192 @@ void  TPointersViewBox::SetList(boost::shared_ptr<std::vector<PointerType> > val
 
 void  TPointersViewBox::Update()
 {
-  ScrollBar->Min=0;
-  ScrollBar->Position=0;
+  INT MinPos,MaxPos,Position;
+  
+
+  MinPos=0;
+  Position=0;
   if(FList)
-    if(FList->size()>0)
-    {ScrollBar->Max=FList->size()-1;ScrollBar->Enabled=true;Reload(0);return;}
-    ScrollBar->Max=0;ScrollBar->Enabled=false;
-    Reload(0);
+    if(! FList->empty())
+    {
+      MaxPos=FList->size()-1;
+      d_scrollBar->EnableWindow(TRUE);
+      d_scrollBar->SetScrollRange(MinPos, MaxPos);
+      Reload(0);
+      return;
+    }
+  MaxPos=0;
+  d_scrollBar->EnableWindow(TRUE);
+  d_scrollBar->SetScrollRange(MinPos, MaxPos);
+  Reload(0);
 }
 
-void  TPointersViewBox::ScrollBarScroll(TObject *Sender,
-                                        TScrollCode ScrollCode, int &ScrollPos)
-{
-  Reload(ScrollPos);
-}
 //---------------------------------------------------------------------------
 
 
-void  TPointersViewBox::PointersBoxDblClick(TObject *Sender)
+void  TPointersViewBox::PointersBoxDblClick(UINT nFlags, CPoint point)
 {
-  //
+  int locSel = d_pointersBox->GetCurSel();
+  int globPage = d_scrollBar->GetScrollPos();
   if(NotifyDblClick!=NULL)
     if(FList)
       if(FList->size()>0)
-        NotifyDblClick((int)((*FList)[PointersBox->ItemIndex+ScrollBar->Position]));
+        NotifyDblClick((int)((*FList)[locSel+globPage]));
 }
 //---------------------------------------------------------------------------
 
 void  TPointersViewBox::Init(void)
 {
-  CMenuItem* work;
-  PointersBox=new TListBox(this);
-  PointersBox->Align=alClient;
-  PointersBox->OnDblClick=PointersBoxDblClick;
-  this->InsertControl(PointersBox);
-  ScrollBar=new TScrollBar(this);
-  ScrollBar->Align=alRight;
-  ScrollBar->OnScroll=ScrollBarScroll;
-  ScrollBar->Kind=sbVertical;
-  this->InsertControl(ScrollBar);
-  PopupMenu=new TPopupMenu(PointersBox);
-  PointersBox->PopupMenu=PopupMenu;
-  PopupMenu->OnPopup=PopupMenuOnPopup;
-  PopupMenu->AutoHotkeys=maManual;
-  CMenuItem* menu=new CMenuItem(PopupMenu);
-  menu->Caption=AnsiString("Load");
-  menu->OnClick=LoadPointersFromFile;
-  PopupMenu->Items->Add(menu);
-  menu=new CMenuItem(PopupMenu);
-  menu->Caption=AnsiString("Save");
-  menu->OnClick=WritePointersToFile;
-  PopupMenu->Items->Add(menu);
+  d_pointersBox=new CListBox();
+  CRect pbRect;
+  this->GetWindowRect(&pbRect);
+  pbRect.DeflateRect(5,5);
+  pbRect.right = pbRect.right-15;
+  //d_pointersBox->Align=alClient;
+  if ( d_pointersBox->Create(LBS_EXTENDEDSEL | LBS_NOTIFY, pbRect, this, LISTBOXFILED) ==FALSE)
+    throw std::runtime_error("Can't create PointersBox ");
+//  d_pointersBox->OnDblClick=PointersBoxDblClick;
+  CRect scRect;
+  scRect.top = pbRect.top;
+  scRect.bottom = pbRect.bottom;
+  scRect.left = pbRect.right;
+  scRect.right = scRect.left+15;
+  d_scrollBar=new CScrollBar();
+  if ( d_scrollBar->Create(SBS_VERT, scRect, this, SCROLLBARFILED) ==FALSE)
+    throw std::runtime_error("Can't create ScrollBar");
+  d_scrollBar->ShowScrollBar();
+  d_scrollBar->EnableWindow(FALSE);
 
+  PopupMenu=new TPopupMenu();
+  PopupMenu->CreatePopupMenu();
+
+  d_pointersBox->SetMenu(PopupMenu);
+
+  UINT LoadMenuItem = d_menuCommands.createCommand( CommandPtr(new Command(boost::bind(&TPointersViewBox::LoadPointersFromFile,this) ) ) );
+  PopupMenu->AppendMenu(MF_STRING, LoadMenuItem, CString( "Load" ) ); //0
+  UINT SaveMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::WritePointersToFile,this)) ));
+  PopupMenu->AppendMenu(MF_STRING, SaveMenuItem, CString( "Save" ) ); //1
 
   //---------------------------------------
-  work=new CMenuItem(PopupMenu);
-  work->Caption=AnsiString("-");
-  PopupMenu->Items->Add(work);
+  PopupMenu->AppendMenu(MF_SEPARATOR, 0, CString( "-" ) ); //2
   //--------------------------------------------------
-  CopyMenuItem=new CMenuItem(PopupMenu);
-  CopyMenuItem->Caption=AnsiString("Copy All");
-  CopyMenuItem->OnClick=CopyMenuItemClick;
-  PopupMenu->Items->Add(CopyMenuItem);
+  UINT CopyAllMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::CopyMenuItemClick,this)) ));
+  PopupMenu->AppendMenu(MF_STRING, CopyAllMenuItem, CString( "Copy all" ) ); //3
+  
   //-------------------------------------------
-  PasteMenuItem=new CMenuItem(PopupMenu);
-  PasteMenuItem->Caption=AnsiString("Paste");
-  PasteMenuItem->OnClick=PasteMenuItemClick;
-  PopupMenu->Items->Add(PasteMenuItem);
+  UINT PasteMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::PasteMenuItemClick,this)) ));
+  PopupMenu->AppendMenu(MF_STRING, PasteMenuItem, CString( "Paste" ) ); //4
+
   //---------------------------------------
-  work=new CMenuItem(PopupMenu);
-  work->Caption=AnsiString("-");
-  PopupMenu->Items->Add(work);
+  PopupMenu->AppendMenu(MF_SEPARATOR, 0, CString( "-" ) ); //5
   //--------------------------------------------------
-  CopytoMenuItem=new CMenuItem(PopupMenu);
-  CopytoMenuItem->Caption=AnsiString("Copyto All");
-  PopupMenu->Items->Add(CopytoMenuItem);
+  CopytoMenuItem->CreatePopupMenu();
+  PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)CopytoMenuItem->m_hMenu, CString( "Coptyto..." ) ); //6
   //----------------------------------------------
-  PasteFromMenuItem=new CMenuItem(PopupMenu);
-  PasteFromMenuItem->Caption=AnsiString("Paste from");
-  PopupMenu->Items->Add(PasteFromMenuItem);
+  PasteFromMenuItem->CreatePopupMenu();
+  PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)PasteFromMenuItem->m_hMenu, CString( "Paste from" ) ); //7
   //----------------------------------------------
-  DeleteMenuItem=new CMenuItem(PopupMenu);
-  DeleteMenuItem->Caption=AnsiString("Delete");
-  PopupMenu->Items->Add(DeleteMenuItem);
+  DeleteMenuItem->CreatePopupMenu();
+  PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)DeleteMenuItem->m_hMenu,CString( "Delete" ) ); //8
   //--------------------------------------------
-  ClearClipBoardMenuItem=new CMenuItem(PopupMenu);
-  ClearClipBoardMenuItem->Caption=AnsiString("Clear ClipBoard");
-  ClearClipBoardMenuItem->OnClick=ClearClipBoardMenuItemClick;
-  PopupMenu->Items->Add(ClearClipBoardMenuItem);
+  UINT ClearClipBoardMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::ClearClipBoardMenuItemClick,this)) ));
+  PopupMenu->AppendMenu(MF_STRING, ClearClipBoardMenuItem, CString( "Clear ClipBoard" ) ); //9
+
   //---------------------------------------
-  work=new CMenuItem(PopupMenu);
-  work->Caption=AnsiString("-");
-  PopupMenu->Items->Add(work);
+  PopupMenu->AppendMenu(MF_SEPARATOR, 0, CString( "-" ) ); //10
   //--------------------------------------------------
-  AddPointerToLisCMenuItem=new CMenuItem(PopupMenu);
-  AddPointerToLisCMenuItem->Caption=AnsiString("Add Pointers To List");
-  PopupMenu->Items->Add(AddPointerToLisCMenuItem);
+  AddPointerToLisCMenuItem->CreatePopupMenu();
+  PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)AddPointerToLisCMenuItem->m_hMenu, CString( "Add Pointers To List" ) ); //11
   //--------------------------------------------------
-  DeletePointerMenuItem=new CMenuItem(PopupMenu);
-  DeletePointerMenuItem->Caption=AnsiString("Delete Pointer");
-  DeletePointerMenuItem->OnClick=DeletePointerMenuItemClick;
-  PopupMenu->Items->Add(DeletePointerMenuItem);
+  UINT DeletePointerMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::DeletePointerMenuItemClick,this)) ));
+  PopupMenu->AppendMenu(MF_STRING, DeletePointerMenuItem, CString( "Delete pointer" ) );//12
 }
 
-
-void  TPointersViewBox::PopupMenuOnPopup(TObject *Sender)
+void clearMenu(CMenu& io_menu,Container& io_container)
 {
-  int i;
-  int len;
-  CMenuItem* menu;
-  AnsiString caption;
-  CopytoMenuItem->Clear();
-  PasteFromMenuItem->Clear();
-  DeleteMenuItem->Clear();
-  AddPointerToLisCMenuItem->Clear();
-  DeleteMenuItem->Enabled=(PoitersDB.size()!=0);
-  PasteFromMenuItem->Enabled=(PoitersDB.size()!=0);
-  PasteMenuItem->Enabled=(PoitersDB.size()!=0);
-  CopytoMenuItem->Enabled=((PoitersDB.size()!=0)&&(FList->size()!=0));
-  ClearClipBoardMenuItem->Enabled=(PoitersDB.size()!=0);
-  CopyMenuItem->Enabled=(FList->size()!=0);
-  AddPointerToLisCMenuItem->Enabled=(PointersBox->Count>0);
+  while(io_menu.GetMenuItemCount() >0)
+  {
+    io_container.removeCommand(io_menu.GetMenuItemID(0));
+    io_menu.DeleteMenu(0,MF_BYPOSITION);
+  }
+}
+
+void  TPointersViewBox::PopupMenuOnPopup()
+{
+  unsigned int i;
+  clearMenu(*CopytoMenuItem,d_menuCommands);
+  clearMenu(*PasteFromMenuItem,d_menuCommands);
+  clearMenu(*DeleteMenuItem,d_menuCommands);
+  clearMenu(*AddPointerToLisCMenuItem,d_menuCommands);
+
+  //DeleteMenuItem
+  PopupMenu->EnableMenuItem (12,MF_BYPOSITION   | (PoitersDB.size()!=0 ? MF_ENABLED : MF_GRAYED));
+  
+  //PasteFromMenuItem
+  PopupMenu->EnableMenuItem (7,MF_BYPOSITION   | (PoitersDB.size()!=0 ? MF_ENABLED : MF_GRAYED));
+  
+  //PasteMenuItem
+  PopupMenu->EnableMenuItem (4,MF_BYPOSITION   | (PoitersDB.size()!=0 ? MF_ENABLED : MF_GRAYED));
+
+  //CopytoMenuItem
+  PopupMenu->EnableMenuItem (6,MF_BYPOSITION   | (((PoitersDB.size()!=0)&&(FList->size()!=0))? MF_ENABLED : MF_GRAYED));
+
+
+  //ClearClipBoardMenuItem
+  PopupMenu->EnableMenuItem (9,MF_BYPOSITION   | (PoitersDB.size()!=0 ? MF_ENABLED : MF_GRAYED));
+
+  //CopyMenuItem
+  PopupMenu->EnableMenuItem (3,MF_BYPOSITION   | ( (FList->size()!=0) ? MF_ENABLED : MF_GRAYED));
+
+  //AddPointerToLisCMenuItem
+  UINT PointersCount = d_pointersBox->GetCount();
+  PopupMenu->EnableMenuItem (11,MF_BYPOSITION   | ( (PointersCount>0) ? MF_ENABLED : MF_GRAYED));
+
   for(i=0;i<PoitersDB.size();i++)
   {
-    caption=ulongToAnsi(i).c_str();
-    menu= new CMenuItem(DeleteMenuItem);
-    menu->Caption=caption;
-    menu->OnClick=DeleteSubMenuClick;
-    DeleteMenuItem->Add(menu);
+    const char* caption = ulongToAnsi(i).c_str();
 
-    menu= new CMenuItem(CopytoMenuItem);
-    menu->Caption=caption;
-    menu->OnClick=CopytoMenuClick;
-    CopytoMenuItem->Add(menu);
+    UINT DeleteEntryMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::DeleteSubMenuClick,this,(unsigned int)i)) ));
+    DeleteMenuItem->AppendMenu(MF_STRING, DeleteEntryMenuItemID, CString( caption ) );
 
-    menu= new CMenuItem(PasteFromMenuItem);
-    menu->Caption=caption;
-    menu->OnClick=PasteFromMenuClick;
-    PasteFromMenuItem->Add(menu);
+    UINT CopyToMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::CopytoMenuClick,this,(unsigned int)i)) ));
+    CopytoMenuItem->AppendMenu(MF_STRING, CopyToMenuItemID, CString( caption ) );
 
-    menu= new CMenuItem(AddPointerToLisCMenuItem);
-    menu->Caption=caption;
-    menu->OnClick=AddPointerToLisCMenuItemClick;
-    AddPointerToLisCMenuItem->Add(menu);
+    UINT PasteFromMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::PasteFromMenuClick,this,(unsigned int)i)) ));
+    PasteFromMenuItem->AppendMenu(MF_STRING, PasteFromMenuItemID, CString( caption ) );
+
+    UINT AddPointerToLisMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::AddPointerToLisCMenuItemClick,this,(unsigned int)i)) ));
+    AddPointerToLisCMenuItem->AppendMenu(MF_STRING, AddPointerToLisMenuItemID , CString( caption ) );
 
 
   }
 
 }
-void  TPointersViewBox::WritePointersToFile(TObject*)
+void  TPointersViewBox::WritePointersToFile()
 {
   if(FList)
     if(FList->size()>0)
     {
-      TSaveDialog* dialog=new TSaveDialog(NULL);
-      if(dialog->Execute())
+      CFileDialog fileSaveDialog(FALSE);
+      if(IDOK == fileSaveDialog.DoModal())
       {
-        FileClose(FileCreate(dialog->FileName));
-        std::ofstream file(dialog->FileName.c_str());
+        std::string filename = std::string (  CT2CA(fileSaveDialog.GetPathName())  );
+        std::ofstream file(filename.c_str());
         WriteTListToStream(*FList,file);
 
       }
-      delete dialog;
     }
 }
 
-void  TPointersViewBox::LoadPointersFromFile(TObject*)
+void  TPointersViewBox::LoadPointersFromFile()
 {
   if(FList)
   {
-    boost::shared_ptr<TOpenDialog> dialog=boost::shared_ptr<TOpenDialog>(new TOpenDialog(NULL));
-    if(dialog->Execute())
+    CFileDialog fileOpenDialog(TRUE);
+    if(IDOK == fileOpenDialog.DoModal())
     {
-      boost::shared_ptr<std::ifstream> file=boost::shared_ptr<std::ifstream>(new std::ifstream(dialog->FileName.c_str()));
+      std::string filename = std::string (  CT2CA(fileOpenDialog.GetPathName())  );
+      boost::shared_ptr<std::ifstream> file=boost::shared_ptr<std::ifstream>(new std::ifstream(filename.c_str()));
       boost::shared_ptr< std::vector<PointerType> > list(new std::vector<PointerType>());
       ReadTListFromStream(*list,*file);
       SetList(list);
@@ -218,7 +233,7 @@ void  TPointersViewBox::LoadPointersFromFile(TObject*)
 }
 
 
-void  TPointersViewBox::CopyMenuItemClick(TObject*)
+void  TPointersViewBox::CopyMenuItemClick()
 {
   if(FList)
     if(FList->size()>0)
@@ -233,7 +248,7 @@ void  TPointersViewBox::CopyMenuItemClick(TObject*)
     }
 }
 
-void  TPointersViewBox::PasteMenuItemClick(TObject*)
+void  TPointersViewBox::PasteMenuItemClick()
 {
   if(FList)
     if((FList->size()>0)&&(PoitersDB.size()>0))
@@ -249,26 +264,24 @@ void  TPointersViewBox::PasteMenuItemClick(TObject*)
 
 
 
-void  TPointersViewBox::DeleteSubMenuClick(TObject *Sender)
+void  TPointersViewBox::DeleteSubMenuClick(unsigned int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
+  unsigned int num=idx;
   if(num < PoitersDB.size())
   {
     PoitersDB.erase(PoitersDB.begin() + num );
   }
 }
 //---------------------------------------------------------------------------
-void  TPointersViewBox::CopytoMenuClick(TObject *Sender)
+void  TPointersViewBox::CopytoMenuClick(unsigned int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
+  unsigned int num = idx;
 
   if(FList)
     if((FList->size()>0)&&(PoitersDB.size()>0)&&(num<PoitersDB.size()))
     {
       boost::shared_ptr< std::vector<PointerType> > destList = PoitersDB[num];
-      for(int i=0;i<FList->size();i++)
+      for(unsigned int i=0;i<FList->size();i++)
       {
         destList->push_back((*FList)[i]);
       }
@@ -276,10 +289,9 @@ void  TPointersViewBox::CopytoMenuClick(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
-void  TPointersViewBox::PasteFromMenuClick(TObject *Sender)
+void  TPointersViewBox::PasteFromMenuClick(unsigned int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
+  unsigned int num = idx;
 
   if(FList)
     if((PoitersDB.size()>0)&&(num<PoitersDB.size()))
@@ -292,53 +304,60 @@ void  TPointersViewBox::PasteFromMenuClick(TObject *Sender)
     }
 }
 
-void  TPointersViewBox::ClearClipBoardMenuItemClick(TObject* Sender)
+void  TPointersViewBox::ClearClipBoardMenuItemClick()
 {
   PoitersDB.clear();
 }
 
 
-void  TPointersViewBox::AddPointerToLisCMenuItemClick (TObject* Sender)
+void  TPointersViewBox::AddPointerToLisCMenuItemClick (unsigned int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
+  unsigned int num = idx;
 
   if(FList)
     if((PoitersDB.size()>0)&&(num<PoitersDB.size()))
     {
 
       std::vector<PointerType>& destList=*(PoitersDB[num]);
-      for(int i=0;i<PointersBox->Count;i++)
+      int itemCount = d_pointersBox->GetCount();
+      for(int i=0;i<itemCount;i++)
       {
-        if(PointersBox->Selected[i])
-          destList.push_back((HexAnsiToulong(PointersBox->Items->Strings[i].c_str())));
+        if(d_pointersBox->GetSel( i ) > 0 )
+        {
+          CString str;
+          d_pointersBox->GetText(i,str);
+          destList.push_back((HexAnsiToulong(std::string( CT2CA(str)) )));
+        }
       }
     }
 }
 
-void  TPointersViewBox::DeletePointerMenuItemClick (TObject* Sender)
+void  TPointersViewBox::DeletePointerMenuItemClick ()
 {
   DeleteSelectedPointers();
 }
 
-void  TPointersViewBox::Reload(int pos)
+void  TPointersViewBox::Reload(unsigned int pos)
 {
-  if(Showing)
+#pragma message("What is that?")
+  /*if(Showing)*/
   {
-    PointersBox->Items->BeginUpdate();
-    PointersBox->Items->Clear();
-    PointersBox->MultiSelect=true;
+    d_pointersBox->ResetContent();
+//    d_pointersBox->MultiSelect=true;
     if(pos<FList->size())
     {
-      int itemCount=abs(PointersBox->Height/(abs(PointersBox->Font->Height)+2));
+      CRect rect;
+      d_pointersBox->GetClientRect( &rect );
+      CFont* font = d_pointersBox->GetFont( );
+      LOGFONT logFont;
+      font->GetLogFont(&logFont);
+      unsigned int itemCount = abs(rect.Height()/(abs(logFont.lfHeight)+2));
       if (itemCount>FList->size()-pos) itemCount=FList->size()-pos;
-      for(int i=0;i<itemCount;i++)
+      for(unsigned int i=0;i<itemCount;i++)
       {
-        PointersBox->Items->Add(ulongToHexAnsi((unsigned long)((*FList)[pos+i]),8).c_str());
+        d_pointersBox->AddString( CString ( ulongToHexAnsi((unsigned long)((*FList)[pos+i]),8).c_str())  );
       }
     }
-    PointersBox->Items->EndUpdate();
-
   }
 }
 
@@ -348,17 +367,24 @@ void  TPointersViewBox::DeleteSelectedPointers(void)
   if(FList)
   {
 
-    for(int i=0;i<PointersBox->Count;i++)
+    for(int i=0;i<d_pointersBox->GetCount();i++)
     {
-      if(PointersBox->Selected[i])
+      if(d_pointersBox->GetSel(i))
       {
-        FList->erase(std::remove(FList->begin(),FList->end(),(HexAnsiToulong(PointersBox->Items->Strings[i].c_str()))));
+        CString str;
+        d_pointersBox->GetText(i,str);
+        FList->erase(std::remove(FList->begin(),FList->end(),( HexAnsiToulong( std::string(CT2CA(str)) ))    ));
       }
     }
 
     Update();
   }
 
+}
+void TPointersViewBox::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+  Reload(nPos);  
+  CDialog::OnVScroll(nSBCode,nPos,pScrollBar);
 }
 
 void TPointersViewBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -372,4 +398,43 @@ void TPointersViewBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
   }
   else
     CDialog::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void TPointersViewBox::OnInitMenu(CMenu* pMenu)
+{
+ PopupMenuOnPopup();
+}
+
+void TPointersViewBox::OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu)
+{
+ PopupMenuOnPopup();
+}
+
+BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,
+                             AFX_CMDHANDLERINFO* pHandlerInfo)
+{
+
+  if (nCode== CN_COMMAND)
+  { // pop-up menu sent CN_COMMAND
+    
+    // execute command
+    if(d_menuCommands.hasCommand(nID))
+      d_menuCommands.getCommand(nID)();
+    return TRUE;
+  }
+  // If the object(s) in the extended command route don't handle
+  // the command, then let the base class OnCmdMsg handle it.
+  return CDialog::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+}
+
+
+void TPointersViewBox::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+  // TODO: Add your message handler code here and/or call default
+  CRect pbRect;
+  d_pointersBox->GetWindowRect(&pbRect);
+  if(pbRect.PtInRect(point) == TRUE)
+    PointersBoxDblClick(nFlags,point);
+  else
+    CMyBaseForm::OnLButtonDblClk(nFlags, point);
 }
