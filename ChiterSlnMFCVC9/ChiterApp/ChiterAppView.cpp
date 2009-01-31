@@ -54,13 +54,32 @@ int CChiterAppView::OnCreate(LPCREATESTRUCT lpcs)
     d_valueBox.ShowWindow( SW_SHOW );
     CRect valueRect;
     d_valueBox.GetClientRect( valueRect );
+    d_valueBox.MapWindowPoints(this,valueRect);
+    valueRect.MoveToY(valueRect.bottom);
     d_countEdit.Create ( this );
-    d_countEdit.SetWindowPos ( &d_valueBox, valueRect.left, valueRect.bottom, 100, 50, SWP_NOZORDER | SWP_NOSIZE );
+    d_countEdit.SetWindowPos ( 0, valueRect.left, valueRect.top, 100, 50, SWP_NOZORDER | SWP_NOSIZE);
     d_countEdit.ShowWindow( SW_SHOW );
 
     d_ponterViewBox.Create( this );
-    d_ponterViewBox.SetWindowPos ( &d_ponterViewBox, valueRect.left+100, valueRect.bottom, 200, 300, SWP_NOZORDER | SWP_NOSIZE );
+    CRect ponterViewBoxRect;
+    d_countEdit.GetClientRect(ponterViewBoxRect);
+    d_countEdit.MapWindowPoints(this,ponterViewBoxRect);
+    ponterViewBoxRect.MoveToY(ponterViewBoxRect.bottom + 4);
+    ponterViewBoxRect.right = ponterViewBoxRect.left + 400;
+    ponterViewBoxRect.bottom = ponterViewBoxRect.top + 400;
+    d_ponterViewBox.SetWindowPos ( 0, ponterViewBoxRect.left, ponterViewBoxRect.top, ponterViewBoxRect.Width(), ponterViewBoxRect.Height(), SWP_NOZORDER );
     d_ponterViewBox.ShowWindow( SW_SHOW );
+
+    CRect searcherRect;
+    d_ponterViewBox.GetClientRect( searcherRect );
+    d_ponterViewBox.MapWindowPoints(this,searcherRect);
+    searcherRect.MoveToX( searcherRect.right );
+    searcherRect.right = searcherRect.left + 700;
+    searcherRect.top = 10;
+    searcherRect.bottom =900;
+    d_searcherProperties.Create(this);
+    d_searcherProperties.SetWindowPos ( 0, searcherRect.left, searcherRect.top, searcherRect.Width(), searcherRect.Height(), SWP_NOZORDER  );
+    d_searcherProperties.ShowWindow( SW_SHOW );
 
     return 0;
 

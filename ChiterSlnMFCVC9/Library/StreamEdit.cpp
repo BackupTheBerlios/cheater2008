@@ -21,13 +21,22 @@
 int NumberOfCopies=0;
 char* WhatFind="Search query";
 std::vector< boost::shared_ptr<std::stringstream> > ClipBoard;     // clipboard for selections
-static inline void ValidCtrCheck(TStreamEdit *)
-{
-        new TStreamEdit(NULL);
-}
+
+IMPLEMENT_DYNAMIC(TStreamEdit, CMyBaseForm)
+
+BEGIN_MESSAGE_MAP(TStreamEdit, CMyBaseForm)
+  ON_WM_KEYDOWN()
+  ON_WM_LBUTTONDBLCLK()
+  ON_WM_INITMENU()
+  ON_WM_INITMENUPOPUP()
+  ON_WM_VSCROLL()
+  ON_WM_RBUTTONDOWN()
+  ON_WM_VKEYTOITEM()
+END_MESSAGE_MAP()
 
 //---------------------------------------------------------------------------
- TStreamEdit::TStreamEdit()
+ TStreamEdit::TStreamEdit(CWnd* pParent /*= NULL*/):
+CMyBaseForm(pParent)
 {
 InitInterface();
 if(NumberOfCopies==0)
@@ -47,7 +56,7 @@ SearcherProperties->OnSelectPointer=PointersNotifyEvent;
 NumberOfCopies++;
 }
 //---------------------------------------------------------------------------
-void  TStreamEdit::InitInterface(void)
+void  TStreamEdit::initialize(void)
 {
 BottomPanel=new TPanel(this);
 BottomPanel->Align=alBottom;
@@ -226,17 +235,22 @@ GroupBox2->InsertControl(GotoInputGroupBox);
 InsertControl(GroupBox2);
 //-----------------GROUP BOX 2-------------------------------------
 // throwException("Sergey3");
-Splitter1=new TSplitter(this);
-Splitter1->Align=alRight;
-InsertControl(Splitter1);
-//-----------------GROUP BOX 1-------------------------------------
-GroupBox1=new TGroupBox(this);
-GroupBox1->Align=alClient;
-GroupBox2->Width=280;
+GroupBox1=new TGroupBox();
+CRect clientRect;
+GetClientRect(&clientRect);
+  if ( GroupBox1->Create(
+   this,
+   1,
+   3,
+   CSize(200, 200),
+   CCreateContext* pContext,
+   DWORD dwStyle = WS_CHILD | WS_VISIBLE | SPLS_DYNAMIC_SPLIT,
+    ) ==FALSE)
+    throw std::runtime_error("Can't create PointersBox ");
 
    StringMemo=new TMemo(GroupBox1);
-   StringMemo->OnKeyDown=StringRichEditKeyDown;
-   StringMemo->OnKeyPress=StringRichEditKeyPress;
+//   StringMemo->OnKeyDown=StringRichEditKeyDown;
+//   StringMemo->OnKeyPress=StringRichEditKeyPress;
    StringMemo->OnMouseMove=StringRichEditMouseMove;
    StringMemo->Align=alRight;
    StringMemo->Width=150;
@@ -259,8 +273,8 @@ GroupBox2->Width=280;
    GroupBox1->InsertControl(Splitter4);
 
    HexMemo=new TMemo(GroupBox1);
-   HexMemo->OnKeyDown=HexRichEditKeyDown;
-   HexMemo->OnKeyPress=HexRichEditKeyPress;
+//   HexMemo->OnKeyDown=HexRichEditKeyDown;
+//   HexMemo->OnKeyPress=HexRichEditKeyPress;
    HexMemo->OnMouseMove=HexRichEditMouseMove;
    HexMemo->Align=alClient;
    HexMemo->Width=550;
@@ -386,8 +400,7 @@ res+=StringLen*(value/(3*StringLen+1))+(value%(3*StringLen+1))/3;
 return res;
 }
 
-void  TStreamEdit::HexRichEditKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
+void  TStreamEdit::HexRichEditKeyDown(UINT Key)
 {
 /*
 ssShift	The Shift key is held down.
@@ -954,8 +967,7 @@ int  TStreamEdit::ConvertStringPosToGlobal(int value)
   return res;
 }
 
-void  TStreamEdit::StringRichEditKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
+void  TStreamEdit::StringRichEditKeyDown(UINT Key)
 {
       if(Key==0x27)//right
        {
@@ -1070,8 +1082,7 @@ stream->write(ch,1);
 ShiftIfWrongStringSelStart();
 }
 
-void  TStreamEdit::StringRichEditKeyPress(TObject *Sender,
-      char &Key)
+void  TStreamEdit::StringRichEditKeyPress(unsigned char Key)
 {
 if(Key!=0x9)// not tab
  StringRichEditKeyPres(Key);
@@ -1276,5 +1287,127 @@ InfoEdit->SelStart=0;
 boost::shared_ptr<TSearcher>  TStreamEdit::GetSearcher(void)
 {
 return SearcherProperties->Searcher;
+}
+
+
+void TStreamEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+  Reload(nPos);  
+  CMyBaseForm::OnVScroll(nSBCode,nPos,pScrollBar);
+}
+
+void TStreamEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+  WORD Key = nChar;
+  // TODO: Add your message handler code here and/or call default
+  if(Key==0x2E) //delete key
+  {
+    DeleteSelectedPointers();
+    Key=0;
+  }
+  else
+    CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void TStreamEdit::OnInitMenu(CMenu* pMenu)
+{
+  CMyBaseForm::OnInitMenu(pMenu);
+}
+
+void TStreamEdit::OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu)
+{
+CMyBaseForm::OnInitMenuPopup(pPopupMenu,nIndex,bSysMenu);
+}
+
+void TStreamEdit::OnRButtonDown(UINT nFlags, CPoint point)
+{
+  // TODO: Add your message handler code here and/or call default
+
+  CMyBaseForm::OnRButtonDown(nFlags, point);
+  CMenu* menu_bar = AfxGetMainWnd()->GetMenu();
+  //boost::scoped_ptr<CMenu> myMenu(CreatePopupMenu());    
+  //ASSERT(myMenu.get());
+  CPoint screen(point);
+  this->ClientToScreen(&screen);
+  PopupMenu.TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, screen.x, 
+    screen.y, this);
+
+}
+
+void TStreamEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+  // TODO: Add your message handler code here and/or call default
+  CRect pbRect;
+  d_pointersBox->GetWindowRect(&pbRect);
+  if(pbRect.PtInRect(point) == TRUE)
+    PointersBoxDblClick(nFlags,point);
+  else
+    CMyBaseForm::OnLButtonDblClk(nFlags, point);
+}
+
+unsigned char getCharacter(UINT nKey)
+{
+  return nKey;
+}
+
+int TStreamEdit::OnVKeyToItem(UINT nKey,CListBox* pListBox,UINT nIndex)
+{
+if(!pListBox)
+{
+    std::stringstream msg;
+    msg << "Corrupted pListBox!!!"  << std::endl << std::endl
+        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+    throw std::runtime_error( msg.str() );
+}
+unsigned char ch = getCharacter(nKey);
+
+if(pListBox.m_hWnd==HexMemo.m_hWnd)
+{
+  if(ch)
+    HexRichEditKeyPress(ch);
+  else
+    HexRichEditKeyDown(nKey);
+}
+else if(pListBox.m_hWnd==StringMemo.m_hWnd)
+{
+  if(ch)
+    StringRichEditKeyPress(ch);
+  else
+    StringRichEditKeyDown(nKey);
+}
+else
+{
+    std::stringstream msg;
+    msg << "Neither HexMemo nor StringMemo"  << std::endl << std::endl
+        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+    throw std::runtime_error( msg.str() );
+
+}
+//http://msdn.microsoft.com/en-us/library/02z9kdt8.aspx
+CMyBaseForm::OnVKeyToItem(nKey, pListBox,nIndex);
+return -2;
+}
+
+BOOL TStreamEdit::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
+{
+
+  if (nCode== CN_COMMAND)
+  { // pop-up menu sent CN_COMMAND
+    
+    // execute command
+    if(d_menuCommands.hasCommand(nID))
+      d_menuCommands.getCommand(nID)();
+    return TRUE;
+  }
+  // If the object(s) in the extended command route don't handle
+  // the command, then let the base class OnCmdMsg handle it.
+  return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+}
+
+BOOL TStreamEdit::OnInitDialog()
+{
+  CMyBaseForm::OnInitDialog();
+  initialize();
+  return TRUE;
 }
 

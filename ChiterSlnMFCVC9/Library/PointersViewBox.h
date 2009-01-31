@@ -59,13 +59,8 @@ private:
         void  AddPointerToLisCMenuItemClick(unsigned int idx);
 
         void  DeleteSelectedPointers(void);
-        afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-        afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-        //void  KeyDown(TObject *Sender,WORD &Key, TShiftState Shift);
 
-        afx_msg void OnInitMenu(CMenu* pMenu);
-        afx_msg void OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu);
-        afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+///////////////////////////////////////////////////////////
 
         void  Reload(unsigned int);	// User declarations
         void  Update();        
@@ -75,12 +70,23 @@ public:		// User declarations
          TPointersViewBox(CWnd* pParent = NULL);
 //        __property TList* List  = { read=FList, write=SetList };
 protected:
-  virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
-    AFX_CMDHANDLERINFO* pHandlerInfo);
+
+  //Windows events
+  afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+  afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+  //void  KeyDown(TObject *Sender,WORD &Key, TShiftState Shift);
+
+  afx_msg void OnInitMenu(CMenu* pMenu);
+  afx_msg void OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu);
+  afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+  afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+
+
+
+  virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo);
   virtual BOOL OnInitDialog();
     	DECLARE_MESSAGE_MAP()
-public:
-  afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+
 };
 //---------------------------------------------------------------------------
 #endif

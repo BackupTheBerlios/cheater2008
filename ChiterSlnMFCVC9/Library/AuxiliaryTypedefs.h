@@ -1,6 +1,8 @@
 #ifndef AuxiliaryTypedefs_h
 #define  AuxiliaryTypedefs_h
 
+typedef CSplitterWnd TGroupBox;
+
 typedef CMenu TPopupMenu;
 
 typedef CMenu CMenuItem;

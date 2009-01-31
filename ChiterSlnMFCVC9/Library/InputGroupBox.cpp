@@ -517,8 +517,10 @@ void InputGroupBox::OnRButtonDown(UINT nFlags, CPoint point)
 	CMenu* menu_bar = AfxGetMainWnd()->GetMenu();
 	boost::scoped_ptr<CMenu> myMenu(CreatePopupMenu());    
 	ASSERT(myMenu.get());
-	myMenu->TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, point.x, 
-		point.y, this);
+  CPoint screen(point);
+  this->ClientToScreen(&screen);
+	myMenu->TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, screen.x, 
+		screen.y, this);
 
 
 }

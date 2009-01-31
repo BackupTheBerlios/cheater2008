@@ -6,7 +6,7 @@
 #include "Library/InputGroupBox.h"
 #include "Library/CountEdit.h"
 #include "Library/PointersViewBox.h"
-
+#include "Library/SearcherProperties.h"
 
 class CChiterAppView : public CView
 {
@@ -17,6 +17,8 @@ protected: // create from serialization only
   InputGroupBox d_valueBox;
   TCountEdit d_countEdit;
   TPointersViewBox d_ponterViewBox;
+
+  TSearcherProperties d_searcherProperties;
 // Attributes
 public:
 	CChiterAppDoc* GetDocument() const;

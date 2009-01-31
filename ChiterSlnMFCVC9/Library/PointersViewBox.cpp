@@ -79,7 +79,7 @@ void  TPointersViewBox::Init(void)
   d_pointersBox=new MyListBox();
   CRect pbRect;
   this->GetClientRect(&pbRect);
-  pbRect.DeflateRect(5,5);
+  pbRect.DeflateRect(1,1);
   pbRect.right = pbRect.right - 15;
   //d_pointersBox->Align=alClient;
   if ( d_pointersBox->Create(LBS_EXTENDEDSEL | LBS_NOTIFY, pbRect, this, LISTBOXFILED) ==FALSE)
@@ -389,10 +389,11 @@ void  TPointersViewBox::DeleteSelectedPointers(void)
   }
 
 }
+
 void TPointersViewBox::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   Reload(nPos);  
-  CDialog::OnVScroll(nSBCode,nPos,pScrollBar);
+  CMyBaseForm::OnVScroll(nSBCode,nPos,pScrollBar);
 }
 
 void TPointersViewBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -405,7 +406,7 @@ void TPointersViewBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     Key=0;
   }
   else
-    CDialog::OnKeyDown(nChar, nRepCnt, nFlags);
+    CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void TPointersViewBox::OnInitMenu(CMenu* pMenu)
@@ -433,8 +434,19 @@ void TPointersViewBox::OnRButtonDown(UINT nFlags, CPoint point)
 
 }
 
-BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,
-                             AFX_CMDHANDLERINFO* pHandlerInfo)
+void TPointersViewBox::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+  // TODO: Add your message handler code here and/or call default
+  CRect pbRect;
+  d_pointersBox->GetWindowRect(&pbRect);
+  if(pbRect.PtInRect(point) == TRUE)
+    PointersBoxDblClick(nFlags,point);
+  else
+    CMyBaseForm::OnLButtonDblClk(nFlags, point);
+}
+
+
+BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
 {
 
   if (nCode== CN_COMMAND)
@@ -447,7 +459,7 @@ BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,
   }
   // If the object(s) in the extended command route don't handle
   // the command, then let the base class OnCmdMsg handle it.
-  return CDialog::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+  return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
 }
 
 BOOL TPointersViewBox::OnInitDialog()
@@ -455,15 +467,4 @@ BOOL TPointersViewBox::OnInitDialog()
   CMyBaseForm::OnInitDialog();
   Init();
 	return TRUE;
-}
-
-void TPointersViewBox::OnLButtonDblClk(UINT nFlags, CPoint point)
-{
-  // TODO: Add your message handler code here and/or call default
-  CRect pbRect;
-  d_pointersBox->GetWindowRect(&pbRect);
-  if(pbRect.PtInRect(point) == TRUE)
-    PointersBoxDblClick(nFlags,point);
-  else
-    CMyBaseForm::OnLButtonDblClk(nFlags, point);
 }
