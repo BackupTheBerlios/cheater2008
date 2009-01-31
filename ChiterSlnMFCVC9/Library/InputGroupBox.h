@@ -3,19 +3,19 @@
 #include <string>
 #include <vector>
 #include "Standart/Ansilib.h"
-#include "august2002Fwd.h"
-#include "resource.h"
+#include "Library/august2002Fwd.h"
+#include "Library/resource.h"
+#include "Library/MyBaseForm.h"
 #include "afxwin.h"
 // InputGroupBox dialog
 
-class AUGUST2002_EXPORT InputGroupBox : public CDialog
+class AUGUST2002_EXPORT InputGroupBox : public CMyBaseForm
 {
 	DECLARE_DYNAMIC(InputGroupBox)
 	void BoxesChange();
 public:
 	InputGroupBox(CWnd* pParent = NULL);   // standard constructor
 	virtual ~InputGroupBox();
-	void Create( CWnd* pParentWnd );
 // Dialog Data
 	enum { IDD = IDD_INPUTGROUPBOX };
 
@@ -36,11 +36,8 @@ public:
 	CMenu*  CreatePopupMenu(void);
 protected:
 	  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-    HGLOBAL initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName );
 
     virtual BOOL OnInitDialog();
-    HMODULE d_hModule;
-    HGLOBAL d_hDialogInit; 
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnValueValue();

@@ -1,7 +1,4 @@
 //---------------------------------------------------------------------------
-
-
-
 #ifndef PointersViewBoxH
 #define PointersViewBoxH
 //---------------------------------------------------------------------------
@@ -34,15 +31,15 @@ private:
         enum {LISTBOXFILED=1000,SCROLLBARFILED};
         CScrollBar *d_scrollBar;
         CListBox *d_pointersBox;
-        TPopupMenu* PopupMenu;
+        TPopupMenu PopupMenu;
 
         Container d_menuCommands;
         //enum { IDD = IDD_MEMORYINFOEDIT };
-        CMenuItem *CopytoMenuItem;
-        CMenuItem *PasteFromMenuItem;
-        CMenuItem *DeleteMenuItem;
-        CMenuItem *AddPointerToLisCMenuItem;
-        CMenuItem *DeletePointerMenuItem;
+        CMenuItem CopytoMenuItem;
+        CMenuItem PasteFromMenuItem;
+        CMenuItem DeleteMenuItem;
+        CMenuItem AddPointerToLisCMenuItem;
+        CMenuItem DeletePointerMenuItem;
         
         void  PointersBoxDblClick(UINT nFlags, CPoint point);
         boost::shared_ptr< std::vector<PointerType> > FList;
@@ -68,7 +65,7 @@ private:
 
         afx_msg void OnInitMenu(CMenu* pMenu);
         afx_msg void OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu);
-        
+        afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 
         void  Reload(unsigned int);	// User declarations
         void  Update();        
@@ -80,7 +77,7 @@ public:		// User declarations
 protected:
   virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
     AFX_CMDHANDLERINFO* pHandlerInfo);
-
+  virtual BOOL OnInitDialog();
     	DECLARE_MESSAGE_MAP()
 public:
   afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);

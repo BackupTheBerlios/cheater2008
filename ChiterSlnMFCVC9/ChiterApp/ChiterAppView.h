@@ -5,14 +5,18 @@
 #pragma once
 #include "Library/InputGroupBox.h"
 #include "Library/CountEdit.h"
+#include "Library/PointersViewBox.h"
+
 
 class CChiterAppView : public CView
 {
 protected: // create from serialization only
 	CChiterAppView();
 	DECLARE_DYNCREATE(CChiterAppView)
-	InputGroupBox d_valueBox;
-    TCountEdit d_countEdit;
+	
+  InputGroupBox d_valueBox;
+  TCountEdit d_countEdit;
+  TPointersViewBox d_ponterViewBox;
 // Attributes
 public:
 	CChiterAppDoc* GetDocument() const;

@@ -14,9 +14,9 @@ extern HINSTANCE  hInstance;
 
 // InputGroupBox dialog
 
-IMPLEMENT_DYNAMIC(InputGroupBox, CDialog)
+IMPLEMENT_DYNAMIC(InputGroupBox, CMyBaseForm)
 
-BEGIN_MESSAGE_MAP(InputGroupBox, CDialog)
+BEGIN_MESSAGE_MAP(InputGroupBox, CMyBaseForm)
     ON_CBN_EDITCHANGE(IDC_COMBO_VALUE, &InputGroupBox::OnValueValue)
     ON_CBN_EDITCHANGE(IDC_COMBO_TYPE, &InputGroupBox::OnTypeValue)
     ON_WM_RBUTTONDOWN()
@@ -26,9 +26,9 @@ END_MESSAGE_MAP()
 
 
 InputGroupBox::InputGroupBox(CWnd* pParent /*=NULL*/)
-:d_hDialogInit(0) //CDialog(CMemoryInfoEdit::IDD, pParent)
+:CMyBaseForm(pParent,InputGroupBox::IDD) //CDialog(CMemoryInfoEdit::IDD, pParent)
 {
-    VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(InputGroupBox::IDD)), pParent ) );
+    //VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(InputGroupBox::IDD)), pParent ) );
 
 	d_savePointerMenuItemState = (MF_DISABLED|MF_STRING);
 	d_convertToMenuItemState = (MF_DISABLED|MF_STRING);
@@ -38,43 +38,7 @@ InputGroupBox::InputGroupBox(CWnd* pParent /*=NULL*/)
 InputGroupBox::~InputGroupBox()
 {
 }
-void InputGroupBox::Create( CWnd* pParentWnd )
-{
-    CreateIndirect( initDialog(hInstance,MAKEINTRESOURCE(InputGroupBox::IDD)), pParentWnd );
 
-    //CDialog::Create( MAKEINTRESOURCE(CMemoryInfoEdit::IDD), wnd );
-}
-
-HGLOBAL InputGroupBox::initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName )
-{
-    d_hModule = hinst;
-
-
-    d_hDialogInit = NULL;
-    HRSRC hDlgInit = ::FindResource( hinst, lpszTemplateName, RT_DLGINIT);
-    if( hDlgInit )
-    {
-        // load it
-        d_hDialogInit = LoadResource( hinst, hDlgInit );
-        if( d_hDialogInit == NULL )
-        {
-            TRACE0("Warning: Load of RT_DLGINIT failed during dialog init.\n");
-        }
-        else
-        {
-            // lock it
-            m_lpDialogInit = LockResource(d_hDialogInit);
-            ASSERT(m_lpDialogInit != NULL);
-        }
-    }
-
-    // load dialog
-    HRSRC hrsrc = FindResource( hinst, lpszTemplateName, RT_DIALOG );
-    if( hrsrc != 0 )
-        return LoadResource( hinst, hrsrc );
-    else
-        return 0;
-}
 BOOL InputGroupBox::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -549,7 +513,7 @@ void InputGroupBox::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
 
-	CDialog::OnRButtonDown(nFlags, point);
+	CMyBaseForm::OnRButtonDown(nFlags, point);
 	CMenu* menu_bar = AfxGetMainWnd()->GetMenu();
 	boost::scoped_ptr<CMenu> myMenu(CreatePopupMenu());    
 	ASSERT(myMenu.get());

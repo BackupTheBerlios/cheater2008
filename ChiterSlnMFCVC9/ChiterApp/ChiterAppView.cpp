@@ -49,16 +49,18 @@ int CChiterAppView::OnCreate(LPCREATESTRUCT lpcs)
     if(CView::OnCreate( lpcs) == -1 )
         return -1;
 
-    d_valueBox.Create (this);
+    d_valueBox.Create ( this );
     d_valueBox.SetWindowPos (NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-    d_valueBox.ShowWindow(SW_SHOW);
+    d_valueBox.ShowWindow( SW_SHOW );
     CRect valueRect;
-    d_valueBox.GetClientRect(valueRect);
-    d_countEdit.Create (this);
-    d_countEdit.SetWindowPos (&d_valueBox, valueRect.left, valueRect.bottom, 100, 50, SWP_NOZORDER | SWP_NOSIZE);
-    d_countEdit.ShowWindow(SW_SHOW);
+    d_valueBox.GetClientRect( valueRect );
+    d_countEdit.Create ( this );
+    d_countEdit.SetWindowPos ( &d_valueBox, valueRect.left, valueRect.bottom, 100, 50, SWP_NOZORDER | SWP_NOSIZE );
+    d_countEdit.ShowWindow( SW_SHOW );
 
-    
+    d_ponterViewBox.Create( this );
+    d_ponterViewBox.SetWindowPos ( &d_ponterViewBox, valueRect.left+100, valueRect.bottom, 200, 300, SWP_NOZORDER | SWP_NOSIZE );
+    d_ponterViewBox.ShowWindow( SW_SHOW );
 
     return 0;
 

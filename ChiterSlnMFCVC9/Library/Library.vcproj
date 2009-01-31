@@ -221,6 +221,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyListBox.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PointersViewBox.cpp"
 				>
 			</File>
@@ -312,6 +316,10 @@
 			</File>
 			<File
 				RelativePath=".\MyBaseForm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyListBox.h"
 				>
 			</File>
 			<File
