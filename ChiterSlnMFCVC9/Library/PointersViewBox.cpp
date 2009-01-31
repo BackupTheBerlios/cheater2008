@@ -190,19 +190,19 @@ void  TPointersViewBox::PopupMenuOnPopup()
 
   for(i=0;i<PoitersDB.size();i++)
   {
-    const char* caption = ulongToAnsi(i).c_str();
+    std::string caption = ulongToAnsi(i);
 
     UINT DeleteEntryMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::DeleteSubMenuClick,this,(unsigned int)i)) ));
-    DeleteMenuItem.AppendMenu(MF_STRING, DeleteEntryMenuItemID, CString( caption ) );
+    DeleteMenuItem.AppendMenu(MF_STRING, DeleteEntryMenuItemID, CString( caption.c_str() ) );
 
     UINT CopyToMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::CopytoMenuClick,this,(unsigned int)i)) ));
-    CopytoMenuItem.AppendMenu(MF_STRING, CopyToMenuItemID, CString( caption ) );
+    CopytoMenuItem.AppendMenu(MF_STRING, CopyToMenuItemID, CString( caption.c_str()  ) );
 
     UINT PasteFromMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::PasteFromMenuClick,this,(unsigned int)i)) ));
-    PasteFromMenuItem.AppendMenu(MF_STRING, PasteFromMenuItemID, CString( caption ) );
+    PasteFromMenuItem.AppendMenu(MF_STRING, PasteFromMenuItemID, CString( caption.c_str()  ) );
 
     UINT AddPointerToLisMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::AddPointerToLisCMenuItemClick,this,(unsigned int)i)) ));
-    AddPointerToLisCMenuItem.AppendMenu(MF_STRING, AddPointerToLisMenuItemID , CString( caption ) );
+    AddPointerToLisCMenuItem.AppendMenu(MF_STRING, AddPointerToLisMenuItemID , CString( caption.c_str()  ) );
 
 
   }
