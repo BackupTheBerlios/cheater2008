@@ -255,6 +255,15 @@ std::vector<std::string>  InputGroupBox::getStrings()
 	return ret;
 }
 
+void InputGroupBox::setCaption(const std::string& i_caption)
+{
+    CWnd* pWnd = dynamic_cast<CWnd*>(this->GetDlgItem(IDC_INPUTGROUPBOX_BOX));
+    assert(pWnd);
+    CStatic* wndType = dynamic_cast<CStatic*>( pWnd );
+    assert(wndType);
+    pWnd->SetWindowText( CString(i_caption.c_str() ) );
+}
+
 CMenu*  InputGroupBox::CreatePopupMenu(void)
 {
 	

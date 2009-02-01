@@ -28,10 +28,7 @@ class TStreamEdit : public CMyBaseForm
 public:
         TGroupBox *GroupBox1;
         TPopupMenu *PopupMenu1;
-        TSplitter *Splitter1;
-        TSplitter *Splitter2;
         TGroupBox *GroupBox2;
-        TSplitter *Splitter3;
 
         CMenuItem *SearchMenuItem;
         CMenuItem *LoadFromStreamMenuitem;

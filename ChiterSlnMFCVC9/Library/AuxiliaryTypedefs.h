@@ -1,6 +1,8 @@
 #ifndef AuxiliaryTypedefs_h
 #define  AuxiliaryTypedefs_h
 
+typedef CProgressCtrl TProgressBar;
+
 typedef CSplitterWnd TGroupBox;
 
 typedef CMenu TPopupMenu;

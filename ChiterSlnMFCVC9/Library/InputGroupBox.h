@@ -33,18 +33,16 @@ public:
 	void  setText(const std::string& str);
 	std::string  getText() const;
 	std::vector<std::string>  getStrings();
-	CMenu*  CreatePopupMenu(void);
-protected:
-	  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-    virtual BOOL OnInitDialog();
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnValueValue();
-	afx_msg void OnTypeValue();
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
-	afx_msg void  OnResizeBox();
-	afx_msg void  OnCleartextbox();
+  void setCaption(const std::string& i_caption);
+
+
+private:
+  DWORD d_savePointerMenuItemState;
+  DWORD d_convertToMenuItemState;
+  DWORD d_clearPointersMenuItemState;
+	CMenu*  CreatePopupMenu(void);
+
 protected:
     virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
         AFX_CMDHANDLERINFO* pHandlerInfo);
@@ -61,16 +59,22 @@ protected:
 
 	void  loadPointers(const std::vector<DWORD>&   list);
 
-	
-private:
-	DWORD d_savePointerMenuItemState;
-	DWORD d_convertToMenuItemState;
-	DWORD d_clearPointersMenuItemState;
-public:
-    CComboBox d_valueBox;
-    CComboBox d_typeCombo;
-    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-    afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+  CComboBox d_valueBox;
+  CComboBox d_typeCombo;
+  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+  afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+  afx_msg void OnValueValue();
+  afx_msg void OnTypeValue();
+  afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+  afx_msg void  OnResizeBox();
+  afx_msg void  OnCleartextbox();
+
+  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+  virtual BOOL OnInitDialog();
+  DECLARE_MESSAGE_MAP()
+
+
 };
 
 
