@@ -26,7 +26,7 @@ CMyBaseForm::~CMyBaseForm()
 
 void CMyBaseForm::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CBase::DoDataExchange(pDX);
 }
 
 CMyBaseForm::CMyBaseForm(CWnd* pParent):

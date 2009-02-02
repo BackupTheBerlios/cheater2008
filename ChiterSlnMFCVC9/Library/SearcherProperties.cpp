@@ -15,6 +15,7 @@ BEGIN_MESSAGE_MAP(TSearcherProperties, CMyBaseForm)
   ON_WM_INITMENU()
   ON_WM_INITMENUPOPUP()
   ON_WM_VSCROLL()
+  ON_WM_CREATE()
   ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
@@ -344,6 +345,16 @@ void TSearcherProperties::OnLButtonDblClk(UINT nFlags, CPoint point)
   CMyBaseForm::OnLButtonDblClk(nFlags, point);
 }
 
+int TSearcherProperties::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+  if (CMyBaseForm::OnCreate(lpCreateStruct) == -1)
+    return -1;
+  initialize();
+  // TODO:  Add your specialized creation code here
+
+  return 0;
+}
+
 
 BOOL TSearcherProperties::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
 {
@@ -356,11 +367,4 @@ BOOL TSearcherProperties::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHAND
     return TRUE;
   }
   return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
-}
-
-BOOL TSearcherProperties::OnInitDialog()
-{
-  CMyBaseForm::OnInitDialog();
-  initialize();
-  return TRUE;
 }

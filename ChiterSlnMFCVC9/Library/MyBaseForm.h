@@ -5,6 +5,7 @@
 #include "august2002Fwd.h"
 
 // CMyBaseForm dialog
+//typedef CFrameWnd CBase ;
 typedef CDialog CBase ;
 class AUGUST2002_EXPORT CMyBaseForm : public CBase
 {
