@@ -11,7 +11,8 @@
 
 class AUGUST2002_EXPORT InputGroupBox : public CMyBaseForm
 {
-	DECLARE_DYNAMIC(InputGroupBox)
+  // imposes DECLARE_DYNAMIC and enables dynamic consruction
+  DECLARE_DYNCREATE(InputGroupBox)
 	void BoxesChange();
 public:
 	InputGroupBox(CWnd* pParent = NULL);   // standard constructor

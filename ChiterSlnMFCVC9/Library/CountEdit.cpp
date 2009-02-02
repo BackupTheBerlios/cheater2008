@@ -158,7 +158,7 @@ if(EditField && UpDownField)
 
 void TCountEdit::Create( CWnd* pParentWnd )
 {
-CreateIndirect( initDialog(hInstance,MAKEINTRESOURCE(TCountEdit::IDD)), pParentWnd );
+CMyBaseForm::Create(pParentWnd);
 CreateInstance();
 }
 

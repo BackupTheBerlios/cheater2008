@@ -27,10 +27,38 @@ void TSearcherProperties::initialize()
   CRect clientRect;
   GetClientRect(&clientRect);
 
+/*
+  CSplitterWnd* splitter = new CSplitterWnd();
+  CCreateContext context;
+  context.m_pNewViewClass = RUNTIME_CLASS(InputGroupBox);
+  //splitter->Create(this, 2, 1,CSize(500,500),&context);
+  splitter->CreateStatic(this, 2, 1);
+  BOOL is = splitter->CreateView(0, 0,
+    RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
+
+  is = splitter->CreateView(1, 0,
+    RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
+
+  splitter->ShowWindow(SW_SHOW);
+  CWnd * pChild  = splitter->GetPane(0,0);
+  pChild->ShowWindow(SW_SHOW);
+  pChild->SetActiveWindow();
+
+  pChild  = splitter->GetPane(1,0);
+  pChild->ShowWindow(SW_SHOW);
+  pChild->SetActiveWindow();
+
+
+  splitter->MoveWindow(clientRect);
+  CRect childRect(clientRect);
+  childRect.DeflateRect(5,5,5,5);
+  pChild->MoveWindow(childRect);
+*/
+ 
   FFind=new InputGroupBox(this);
   FFind->Create ( this );
   //FFind->Top=13;Find->Left=5;
-  FFind->SetWindowText(CString("String to Find"));
+  FFind->setCaption( "String to Find" );
   FFind->SetWindowPos ( 0, 5, 0, 100, 50, SWP_NOZORDER | SWP_NOSIZE );
   FFind->ShowWindow( SW_SHOW );
 
@@ -44,8 +72,9 @@ void TSearcherProperties::initialize()
   FReplaceRect.left = 5;
   FReplace->SetWindowPos ( 0, FReplaceRect.left, FReplaceRect.top, FReplaceRect.Width(), FReplaceRect.Height(), SWP_NOZORDER | SWP_NOSIZE );
   //FReplace->Top=Find->Top+Find->Height+4;Replace->Left=5;
-  FReplace->SetWindowText(CString("String to Replace"));
+  FReplace->setCaption("String to Replace");
   FReplace->ShowWindow( SW_SHOW );
+  
 
   CRect SetFindRect(FReplaceRect);
   SetFindRect.MoveToY(SetFindRect.bottom);
@@ -74,7 +103,7 @@ void TSearcherProperties::initialize()
   
   PageSize=new InputGroupBox(this);
   PageSize->Create ( this );
-  PageSize->SetWindowText(CString("Page Size") );
+  PageSize->setCaption( "Page Size" );
   CRect PageSizeRect;
   PageSize->GetClientRect( PageSizeRect );
   PageSize->MapWindowPoints(this,PageSizeRect);
@@ -105,7 +134,6 @@ void TSearcherProperties::initialize()
   PointersRect.bottom = PointersRect.top + 400;
   Pointers->SetWindowPos ( 0, PointersRect.left, PointersRect.right, PointersRect.Width(), PointersRect.Height(), SWP_NOZORDER );
   Pointers->ShowWindow( SW_SHOW );
-
 }
 
 void  TSearcherProperties::setSearcher(boost::shared_ptr<TSearcher> value)

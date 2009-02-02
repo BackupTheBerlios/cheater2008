@@ -8,9 +8,9 @@
 extern HINSTANCE hInstance;
 // CMyBaseForm dialog
 
-IMPLEMENT_DYNAMIC(CMyBaseForm, CDialog)
+IMPLEMENT_DYNAMIC(CMyBaseForm, CBase)
 
-BEGIN_MESSAGE_MAP(CMyBaseForm, CDialog)
+BEGIN_MESSAGE_MAP(CMyBaseForm, CBase)
 END_MESSAGE_MAP()
 
 

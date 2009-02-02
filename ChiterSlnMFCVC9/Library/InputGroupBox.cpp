@@ -14,7 +14,8 @@ extern HINSTANCE  hInstance;
 
 // InputGroupBox dialog
 
-IMPLEMENT_DYNAMIC(InputGroupBox, CMyBaseForm)
+//IMPLEMENT_DYNAMIC
+IMPLEMENT_DYNCREATE(InputGroupBox, CMyBaseForm)
 
 BEGIN_MESSAGE_MAP(InputGroupBox, CMyBaseForm)
     ON_CBN_EDITCHANGE(IDC_COMBO_VALUE, &InputGroupBox::OnValueValue)
@@ -26,7 +27,7 @@ END_MESSAGE_MAP()
 
 
 InputGroupBox::InputGroupBox(CWnd* pParent /*=NULL*/)
-:CMyBaseForm(pParent,InputGroupBox::IDD) //CDialog(CMemoryInfoEdit::IDD, pParent)
+:CMyBaseForm(pParent,InputGroupBox::IDD) //CMyBaseForm(CMemoryInfoEdit::IDD, pParent)
 {
     //VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(InputGroupBox::IDD)), pParent ) );
 
@@ -41,7 +42,7 @@ InputGroupBox::~InputGroupBox()
 
 BOOL InputGroupBox::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CMyBaseForm::OnInitDialog();
     CWnd* wndType = GetDlgItem(IDC_COMBO_TYPE);
     CWnd* wndValue = GetDlgItem(IDC_COMBO_VALUE);
     CRuntimeClass* cl= wndType->GetRuntimeClass();
@@ -65,7 +66,7 @@ BOOL InputGroupBox::OnInitDialog()
 
 void InputGroupBox::DoDataExchange(CDataExchange* pDX)
 {
-    CDialog::DoDataExchange(pDX);
+    CMyBaseForm::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_COMBO_VALUE, d_valueBox);
     DDX_Control(pDX, IDC_COMBO_TYPE, d_typeCombo);
 }
@@ -259,8 +260,8 @@ void InputGroupBox::setCaption(const std::string& i_caption)
 {
     CWnd* pWnd = dynamic_cast<CWnd*>(this->GetDlgItem(IDC_INPUTGROUPBOX_BOX));
     assert(pWnd);
-    CStatic* wndType = dynamic_cast<CStatic*>( pWnd );
-    assert(wndType);
+    //CStatic* wndType = dynamic_cast<CStatic*>( pWnd );
+    //assert(wndType);
     pWnd->SetWindowText( CString(i_caption.c_str() ) );
 }
 
@@ -383,7 +384,7 @@ BOOL InputGroupBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,
     }
     // If the object(s) in the extended command route don't handle
     // the command, then let the base class OnCmdMsg handle it.
-    return CDialog::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+    return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
 }
 
 
@@ -536,7 +537,7 @@ void InputGroupBox::OnRButtonDown(UINT nFlags, CPoint point)
 
 int InputGroupBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-    if (CDialog::OnCreate(lpCreateStruct) == -1)
+    if (CMyBaseForm::OnCreate(lpCreateStruct) == -1)
         return -1;
 
     // TODO:  Add your specialized creation code here
@@ -548,5 +549,5 @@ void InputGroupBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
     // TODO: Add your message handler code here and/or call default
 
-    CDialog::OnKeyDown(nChar, nRepCnt, nFlags);
+    CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
 }

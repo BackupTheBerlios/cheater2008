@@ -5,8 +5,8 @@
 #include "august2002Fwd.h"
 
 // CMyBaseForm dialog
-
-class AUGUST2002_EXPORT CMyBaseForm : public CDialog
+typedef CDialog CBase ;
+class AUGUST2002_EXPORT CMyBaseForm : public CBase
 {
 	DECLARE_DYNAMIC(CMyBaseForm)
 
