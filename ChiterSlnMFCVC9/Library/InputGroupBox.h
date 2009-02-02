@@ -6,6 +6,7 @@
 #include "Library/august2002Fwd.h"
 #include "Library/resource.h"
 #include "Library/MyBaseForm.h"
+#include "Library/Command.h"
 #include "afxwin.h"
 // InputGroupBox dialog
 
@@ -39,6 +40,7 @@ public:
 
 
 private:
+  Container d_menuCommands;
   CStatic d_staticFrame;
   CStatic d_valueStaticText;
   CStatic d_typeStaticText;
@@ -73,7 +75,7 @@ protected:
   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
   afx_msg void  OnResizeBox();
   afx_msg void  OnCleartextbox();
-
+  
   virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
   DECLARE_MESSAGE_MAP()

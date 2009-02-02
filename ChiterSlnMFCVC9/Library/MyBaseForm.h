@@ -5,8 +5,15 @@
 #include "august2002Fwd.h"
 
 // CMyBaseForm dialog
-//typedef CFrameWnd CBase ;
-typedef CDialog CBase ;
+//#define CBase_CFrameWnd
+#define CBase_CDialog
+#ifdef CBase_CFrameWnd
+  typedef CFrameWnd CBase ;
+#else
+  typedef CDialog CBase ;
+#endif
+
+//typedef CDialog CBase ;
 class AUGUST2002_EXPORT CMyBaseForm : public CBase
 {
 	DECLARE_DYNAMIC(CMyBaseForm)
@@ -24,7 +31,9 @@ public:
   void Create( CWnd* pParentWnd );
 
 protected:
-  HGLOBAL initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName );
+  #ifdef CBase_CDialog
+    HGLOBAL initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName );
+  #endif
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
   UINT d_IDD;

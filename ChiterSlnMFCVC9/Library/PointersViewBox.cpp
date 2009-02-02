@@ -18,6 +18,7 @@ BEGIN_MESSAGE_MAP(TPointersViewBox, CMyBaseForm)
   ON_WM_INITMENU()
   ON_WM_INITMENUPOPUP()
   ON_WM_VSCROLL()
+  ON_WM_CREATE()
   ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
@@ -445,7 +446,12 @@ void TPointersViewBox::OnLButtonDblClk(UINT nFlags, CPoint point)
     CMyBaseForm::OnLButtonDblClk(nFlags, point);
 }
 
-
+int TPointersViewBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+    CMyBaseForm::OnCreate(lpCreateStruct);
+    Init();
+    return 0;
+}
 BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
 {
 
@@ -460,11 +466,4 @@ BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLER
   // If the object(s) in the extended command route don't handle
   // the command, then let the base class OnCmdMsg handle it.
   return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
-}
-
-BOOL TPointersViewBox::OnInitDialog()
-{
-  CMyBaseForm::OnInitDialog();
-  Init();
-	return TRUE;
 }

@@ -18,8 +18,12 @@ CMyBaseForm::CMyBaseForm(CWnd* pParent):
 d_hDialogInit(0),
 d_hModule(0)
 {
-  d_IDD = IDD;
-  VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParent ) );
+#ifdef CBase_CDialog
+    d_IDD = IDD;
+    VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParent ) );
+#else
+
+#endif
 
 }
 
@@ -48,11 +52,15 @@ void CMyBaseForm::DoDataExchange(CDataExchange* pDX)
 
 void CMyBaseForm::Create( CWnd* pParentWnd )
 {
-  CreateIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParentWnd );
+#ifdef CBase_CDialog
+    CreateIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParentWnd );
+#else
+    CFrameWnd::Create(NULL,CString("CFrameWnd"));
+#endif
 
   //CDialog::Create( MAKEINTRESOURCE(CMemoryInfoEdit::IDD), wnd );
 }
-
+#ifdef CBase_CDialog
 HGLOBAL CMyBaseForm::initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName )
 {
   d_hModule = hinst;
@@ -84,7 +92,7 @@ HGLOBAL CMyBaseForm::initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName )
     return 0;
 }
 
-
+#endif
 
 
 // CMyBaseForm message handlers

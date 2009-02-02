@@ -80,11 +80,10 @@ protected:
   afx_msg void OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu);
   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
   afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-
+  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 
   virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo);
-  virtual BOOL OnInitDialog();
     	DECLARE_MESSAGE_MAP()
 
 };

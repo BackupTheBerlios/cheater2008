@@ -290,7 +290,7 @@ int  TSearcherProperties::SlowSearch(boost::shared_ptr<std::iostream> stream,Aft
     {
       if(getSearcher()->getPointers()->size()<200)
       {
-        for(int i=0;i<getSearcher()->getPointers()->size();i++)
+        for(unsigned int i=0;i<getSearcher()->getPointers()->size();i++)
         {
           vi.ul=(*(getSearcher()->getPointers()))[i];
           //       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));

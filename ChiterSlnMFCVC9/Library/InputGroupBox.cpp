@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
+#include <boost/bind.hpp>
 #include "Library.h"
 #include "Standart/Ansi_Stream.h"
 #include "InputGroupBox.h"
@@ -248,15 +249,40 @@ CMenu*  InputGroupBox::CreatePopupMenu(void)
 	CMenu* work=new CMenu();
 	work->CreatePopupMenu();
 
-  work->AppendMenu(d_savePointerMenuItemState, ID_APP_EXIT, CString("Save value") );
-  work->AppendMenu(d_clearPointersMenuItemState, ID_APP_EXIT, CString("Clear TextBox") );
+  work->AppendMenu(d_savePointerMenuItemState, 
+    d_menuCommands.createCommand( 
+      CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxSavePointerMenuItemOnClick,this)) )), 
+      CString("Save value") );
+  work->AppendMenu(d_clearPointersMenuItemState,  
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxClearPointersMenuItemOnClick,this)) )), 
+      CString("Clear TextBox") );
+
   work->AppendMenu(d_convertToMenuItemState, ID_APP_EXIT, CString("Convert to...") );
-  work->AppendMenu(MF_STRING, HEX_NUM, CString( getStringType()[HEX_NUM] ) );
-  work->AppendMenu(MF_STRING, DEC_NUM, CString( getStringType()[DEC_NUM] ) );
-  work->AppendMenu(MF_STRING, STRING, CString( getStringType()[STRING]) );
-  work->AppendMenu(MF_STRING, HEX_STRING, CString( getStringType()[HEX_STRING]) );
-  work->AppendMenu(MF_STRING, DOUBLE_NUM, CString( getStringType()[DOUBLE_NUM]) );
-  work->AppendMenu(MF_STRING, FLOAT_NUM, CString( getStringType()[FLOAT_NUM]) );
+  work->AppendMenu(MF_STRING,   
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToHexNumMenuItemOnClick,this)) )), 
+    CString( getStringType()[HEX_NUM] ) );
+  work->AppendMenu(MF_STRING,    
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToDecNumMenuItemOnClick,this)) )), 
+      CString( getStringType()[DEC_NUM] ) );
+  work->AppendMenu(MF_STRING,     
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToStringMenuItemOnClick,this)) )), 
+      CString( getStringType()[STRING]) );
+  work->AppendMenu(MF_STRING,      
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToHexStringMenuItemOnClick,this)) )), 
+     CString( getStringType()[HEX_STRING]) );
+  work->AppendMenu(MF_STRING,      
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToDoubleNumMenuItemOnClick,this)) )), 
+     CString( getStringType()[DOUBLE_NUM]) );
+  work->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToFloatNumMenuItemOnClick,this)) )), 
+     CString( getStringType()[FLOAT_NUM]) );
   return work;
 }
 
@@ -314,35 +340,18 @@ BOOL InputGroupBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,
                        AFX_CMDHANDLERINFO* pHandlerInfo)
 {
 
-    if (nCode== CN_COMMAND)
-    { // pop-up menu sent CN_COMMAND
-        switch (nID)
-        {
-        case HEX_NUM:
-            InputGroupBoxConvertToHexNumMenuItemOnClick();
-            break;
-        case DEC_NUM:
-            InputGroupBoxConvertToDecNumMenuItemOnClick();
-            break;
-        case STRING:
-            InputGroupBoxConvertToStringMenuItemOnClick();
-            break;
-        case HEX_STRING:
-            InputGroupBoxConvertToHexStringMenuItemOnClick();
-            break;
-        case DOUBLE_NUM:
-            InputGroupBoxConvertToDoubleNumMenuItemOnClick();
-            break;
-        case FLOAT_NUM:
-            InputGroupBoxConvertToFloatNumMenuItemOnClick();
-            break;
+  if (nCode== CN_COMMAND)
+  { // pop-up menu sent CN_COMMAND
 
-        }
-        return TRUE;
-    }
-    // If the object(s) in the extended command route don't handle
-    // the command, then let the base class OnCmdMsg handle it.
-    return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+    // execute command
+    if(d_menuCommands.hasCommand(nID))
+      d_menuCommands.getCommand(nID)();
+    return TRUE;
+  }
+  // If the object(s) in the extended command route don't handle
+  // the command, then let the base class OnCmdMsg handle it.
+  return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+
 }
 
 
