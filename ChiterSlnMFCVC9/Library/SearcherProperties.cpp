@@ -28,17 +28,17 @@ void TSearcherProperties::initialize()
   CRect clientRect;
   GetClientRect(&clientRect);
 
-/*
+  /*
   CSplitterWnd* splitter = new CSplitterWnd();
   CCreateContext context;
   context.m_pNewViewClass = RUNTIME_CLASS(InputGroupBox);
   //splitter->Create(this, 2, 1,CSize(500,500),&context);
   splitter->CreateStatic(this, 2, 1);
   BOOL is = splitter->CreateView(0, 0,
-    RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
+  RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
 
   is = splitter->CreateView(1, 0,
-    RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
+  RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
 
   splitter->ShowWindow(SW_SHOW);
   CWnd * pChild  = splitter->GetPane(0,0);
@@ -54,8 +54,8 @@ void TSearcherProperties::initialize()
   CRect childRect(clientRect);
   childRect.DeflateRect(5,5,5,5);
   pChild->MoveWindow(childRect);
-*/
- 
+  */
+
   FFind=new InputGroupBox(this);
   FFind->Create ( this );
   //FFind->Top=13;Find->Left=5;
@@ -75,7 +75,7 @@ void TSearcherProperties::initialize()
   //FReplace->Top=Find->Top+Find->Height+4;Replace->Left=5;
   FReplace->setCaption("String to Replace");
   FReplace->ShowWindow( SW_SHOW );
-  
+
 
   CRect SetFindRect(FReplaceRect);
   SetFindRect.MoveToY(SetFindRect.bottom);
@@ -86,7 +86,7 @@ void TSearcherProperties::initialize()
   SetFind=new CButton();
   SetFind->Create(CString("Set Find"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetFindRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::SetFindClick,this) ))));
   SetFind->ShowWindow( SW_SHOW );
-  
+
 
   CRect SetReplaceRect(SetFindRect);
   SetReplaceRect.MoveToX(SetReplaceRect.right + 5);
@@ -101,7 +101,7 @@ void TSearcherProperties::initialize()
   ReloadProperties=new CButton();
   ReloadProperties->Create(CString("Reload Properties"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,ReloadPropertiesRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::ReloadClick,this) ))));
   ReloadProperties->ShowWindow( SW_SHOW );
-  
+
   PageSize=new InputGroupBox(this);
   PageSize->Create ( this );
   PageSize->setCaption( "Page Size" );
@@ -142,58 +142,58 @@ void  TSearcherProperties::setSearcher(boost::shared_ptr<TSearcher> value)
 {
   FSearcher=value;
   if(FSearcher)
-   Pointers->SetList(FSearcher->getPointers());
+    Pointers->SetList(FSearcher->getPointers());
   else
-   Pointers->SetList(boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0));
+    Pointers->SetList(boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0));
   Reload();
 }
 
 boost::shared_ptr<TSearcher>  TSearcherProperties::getSearcher(void)
 {
 
-   if(!FSearcher) FSearcher=boost::shared_ptr<TSearcher>(new TSearcher(boost::shared_ptr<std::iostream>((std::iostream*)0)));
-   return FSearcher;
+  if(!FSearcher) FSearcher=boost::shared_ptr<TSearcher>(new TSearcher(boost::shared_ptr<std::iostream>((std::iostream*)0)));
+  return FSearcher;
 
 }
 
 void  TSearcherProperties::Reload(void)
 {
-if((FSearcher!=NULL))
- { FFind->InitBox(ConvertStreamToHexAnsi(FSearcher->getFind()),HEX_STRING);
-   FReplace->InitBox(ConvertStreamToHexAnsi(FSearcher->getReplace()),HEX_STRING);
-   Pointers->SetList(FSearcher->getPointers());
-   PageSize->InitBox(IntToString(FSearcher->getPageSize()),DEC_NUM);
- }
+  if((FSearcher!=NULL))
+  { FFind->InitBox(ConvertStreamToHexAnsi(FSearcher->getFind()),HEX_STRING);
+  FReplace->InitBox(ConvertStreamToHexAnsi(FSearcher->getReplace()),HEX_STRING);
+  Pointers->SetList(FSearcher->getPointers());
+  PageSize->InitBox(IntToString(FSearcher->getPageSize()),DEC_NUM);
+  }
 }
 
 void  TSearcherProperties::SetFindClick()
 {
   if(FSearcher)
   {
-   FSearcher->getFind().str("");
-   FFind->writeDataToStream(FSearcher->getFind());
+    FSearcher->getFind().str("");
+    FFind->writeDataToStream(FSearcher->getFind());
   }
 }
 
 void  TSearcherProperties::SetReplaceClick()
 {
-if(FSearcher)
- {
-  FSearcher->getReplace().str("");
-  FReplace->writeDataToStream(FSearcher->getReplace());
- }
+  if(FSearcher)
+  {
+    FSearcher->getReplace().str("");
+    FReplace->writeDataToStream(FSearcher->getReplace());
+  }
 }
 
 void  TSearcherProperties::ReloadClick()
 {
- if(FSearcher)
+  if(FSearcher)
   {
-   Pointers->SetList(FSearcher->getPointers());
-   Reload();
+    Pointers->SetList(FSearcher->getPointers());
+    Reload();
   }
 }
 
- TSearcherProperties::~TSearcherProperties(void)
+TSearcherProperties::~TSearcherProperties(void)
 {
 
 }
@@ -204,115 +204,115 @@ void  TSearcherProperties::setOnSelectPointer(TPointerSelectEvent value)
 //----------------------------------------------------------------------------
 void  TSearcherProperties::setPageSizeClick()
 {
- if(getSearcher())
-  getSearcher()->setPageSize(PageSize->GetPointer());
+  if(getSearcher())
+    getSearcher()->setPageSize(PageSize->GetPointer());
 }
 
 //----------------------------------------------------------------------------
 int  TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress)
 {
-if(! getSearcher())
-{
-std::stringstream msg;
-msg << "Searcher is null" << std::endl << std::endl
-    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
-throw std::runtime_error( msg.str() );
-}
-CTime StartSearch=CTime::GetCurrentTime();
-CTime EndSearch;
+  if(! getSearcher())
+  {
+    std::stringstream msg;
+    msg << "Searcher is null" << std::endl << std::endl
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
+  CTime StartSearch=CTime::GetCurrentTime();
+  CTime EndSearch;
 
-bool SearchResult;
-VoidInt vi;
-getSearcher()->setStream(stream);
-getSearcher()->NotifyEvent=DoProgress;
-//ProgressBar->Max=stream->Size;
-//ProgressBar->Min=0;ProgressBar->Position=0;
+  bool SearchResult;
+  VoidInt vi;
+  getSearcher()->setStream(stream);
+  getSearcher()->NotifyEvent=DoProgress;
+  //ProgressBar->Max=stream->Size;
+  //ProgressBar->Min=0;ProgressBar->Position=0;
 
-if(!getFind()->IsEmpty())
- {
-  getSearcher()->getFind().str("");
-  getFind()->writeDataToStream(FSearcher->getFind());
-  if(IsNewSearch)
-   {
-//    ProgressBar->Max=Searcher->stream->Size;
-    SearchResult=getSearcher()->StartSearch();
-   }
-  else
-   {
-//    ProgressBar->Max=Searcher->Pointers->Count;
-    SearchResult=getSearcher()->ContinueSearch();
-   }
-if(SearchResult)
- {
-  if(getSearcher()->getPointers()->size()<200)
-   {
-     for(unsigned int i=0;i<getSearcher()->getPointers()->size();i++)
+  if(!getFind()->IsEmpty())
+  {
+    getSearcher()->getFind().str("");
+    getFind()->writeDataToStream(FSearcher->getFind());
+    if(IsNewSearch)
+    {
+      //    ProgressBar->Max=Searcher->stream->Size;
+      SearchResult=getSearcher()->StartSearch();
+    }
+    else
+    {
+      //    ProgressBar->Max=Searcher->Pointers->Count;
+      SearchResult=getSearcher()->ContinueSearch();
+    }
+    if(SearchResult)
+    {
+      if(getSearcher()->getPointers()->size()<200)
       {
-       vi.ul=(*(getSearcher()->getPointers()))[i];
-//       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
+        for(unsigned int i=0;i<getSearcher()->getPointers()->size();i++)
+        {
+          vi.ul=(*(getSearcher()->getPointers()))[i];
+          //       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
+        }
       }
-   }
- }
- }
-EndSearch=CTime::GetCurrentTime();
+    }
+  }
+  EndSearch=CTime::GetCurrentTime();
 
-Reload();
-return getSearcher()->getPointers()->size();
+  Reload();
+  return getSearcher()->getPointers()->size();
 }
 //----------------------------------------------------------------------------
 int  TSearcherProperties::SlowSearch(boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress)
 {
-if(!getSearcher())
-{
-std::stringstream msg;
-msg << "Searcher is null" << std::endl << std::endl
-    << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
-throw std::runtime_error( msg.str() );
-}
-CTime StartSearch=CTime::GetCurrentTime();;
-CTime EndSearch;
-bool SearchResult;
-VoidInt vi;
-getSearcher()->setStream(stream);
+  if(!getSearcher())
+  {
+    std::stringstream msg;
+    msg << "Searcher is null" << std::endl << std::endl
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
+  CTime StartSearch=CTime::GetCurrentTime();;
+  CTime EndSearch;
+  bool SearchResult;
+  VoidInt vi;
+  getSearcher()->setStream(stream);
 
-getSearcher()->NotifyEvent = DoProgress;
-//ProgressBar->Max=stream->Size;
-//ProgressBar->Min=0;ProgressBar->Position=0;
+  getSearcher()->NotifyEvent = DoProgress;
+  //ProgressBar->Max=stream->Size;
+  //ProgressBar->Min=0;ProgressBar->Position=0;
 
-if(!FFind->IsEmpty())
- {
-  getSearcher()->getFind().str("");
-  FFind->writeDataToStream(FSearcher->getFind());
-//    ProgressBar->Max=Searcher->stream->Size;
+  if(!FFind->IsEmpty())
+  {
+    getSearcher()->getFind().str("");
+    FFind->writeDataToStream(FSearcher->getFind());
+    //    ProgressBar->Max=Searcher->stream->Size;
     SearchResult=getSearcher()->SlowSearch();
 
-if(SearchResult)
- {
-  if(getSearcher()->getPointers()->size()<200)
-   {
-     for(int i=0;i<getSearcher()->getPointers()->size();i++)
+    if(SearchResult)
+    {
+      if(getSearcher()->getPointers()->size()<200)
       {
-       vi.ul=(*(getSearcher()->getPointers()))[i];
-//       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
+        for(int i=0;i<getSearcher()->getPointers()->size();i++)
+        {
+          vi.ul=(*(getSearcher()->getPointers()))[i];
+          //       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
+        }
       }
-   }
- }
- }
-EndSearch=CTime::GetCurrentTime();
+    }
+  }
+  EndSearch=CTime::GetCurrentTime();
 
-Reload();
-return getSearcher()->getPointers()->size();
+  Reload();
+  return getSearcher()->getPointers()->size();
 }
 
 //----------------------------------------------------------------------------
 void  TSearcherProperties::ReplaceAll(void)
 {
-if(!getReplace()->IsEmpty())
- {
-   getSearcher()->getReplace().str("");
-   FReplace->writeDataToStream(getSearcher()->getReplace());
-   getSearcher()->ReplaceAll();
- }
+  if(!getReplace()->IsEmpty())
+  {
+    getSearcher()->getReplace().str("");
+    FReplace->writeDataToStream(getSearcher()->getReplace());
+    getSearcher()->ReplaceAll();
+  }
 }
 
 
@@ -358,7 +358,7 @@ int TSearcherProperties::OnCreate(LPCREATESTRUCT lpCreateStruct)
     rect.bottom = rect.top + 500;
     parent->SetWindowPos(this,rect.left,rect.top,rect.Width(),rect.Height(),SWP_NOZORDER);
   }
-    
+
   initialize();
   // TODO:  Add your specialized creation code here
 
