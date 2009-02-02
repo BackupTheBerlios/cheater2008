@@ -39,6 +39,9 @@ public:
 
 
 private:
+  CStatic d_staticFrame;
+  CStatic d_valueStaticText;
+  CStatic d_typeStaticText;
   DWORD d_savePointerMenuItemState;
   DWORD d_convertToMenuItemState;
   DWORD d_clearPointersMenuItemState;

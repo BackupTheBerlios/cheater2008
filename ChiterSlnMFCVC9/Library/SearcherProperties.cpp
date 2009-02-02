@@ -60,7 +60,7 @@ void TSearcherProperties::initialize()
   FFind->Create ( this );
   //FFind->Top=13;Find->Left=5;
   FFind->setCaption( "String to Find" );
-  FFind->SetWindowPos ( 0, 5, 0, 100, 50, SWP_NOZORDER | SWP_NOSIZE );
+  FFind->SetWindowPos ( 0, 5, 0, 200, 100, SWP_NOZORDER  );
   FFind->ShowWindow( SW_SHOW );
 
   CRect FFindRect;
@@ -71,7 +71,7 @@ void TSearcherProperties::initialize()
   CRect FReplaceRect(FFindRect);
   FReplaceRect.MoveToY(FFindRect.top+FFindRect.Height()+4);
   FReplaceRect.left = 5;
-  FReplace->SetWindowPos ( 0, FReplaceRect.left, FReplaceRect.top, FReplaceRect.Width(), FReplaceRect.Height(), SWP_NOZORDER | SWP_NOSIZE );
+  FReplace->SetWindowPos ( 0, FReplaceRect.left, FReplaceRect.top, FReplaceRect.Width(), FReplaceRect.Height(), SWP_NOZORDER  );
   //FReplace->Top=Find->Top+Find->Height+4;Replace->Left=5;
   FReplace->setCaption("String to Replace");
   FReplace->ShowWindow( SW_SHOW );
@@ -117,6 +117,7 @@ void TSearcherProperties::initialize()
   CRect SetPageSizeRect(SetReplaceRect);
   SetPageSizeRect.top = SetReplaceRect.top;
   SetPageSizeRect.MoveToX(SetReplaceRect.right + 4);
+  SetPageSizeRect.right= SetPageSizeRect.right + 20;
   SetPageSize=new CButton();
   SetPageSize->Create ( CString("Set Page Size"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetPageSizeRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::setPageSizeClick,this) ))) );
   SetPageSize->ShowWindow( SW_SHOW );
@@ -139,14 +140,12 @@ void TSearcherProperties::initialize()
 
 void  TSearcherProperties::setSearcher(boost::shared_ptr<TSearcher> value)
 {
-// throw Exception("Sergey14");
   FSearcher=value;
   if(FSearcher)
    Pointers->SetList(FSearcher->getPointers());
   else
    Pointers->SetList(boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0));
   Reload();
-// throw Exception("Sergey15");
 }
 
 boost::shared_ptr<TSearcher>  TSearcherProperties::getSearcher(void)
@@ -349,6 +348,17 @@ int TSearcherProperties::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
   if (CMyBaseForm::OnCreate(lpCreateStruct) == -1)
     return -1;
+  CWnd * parent = this->GetOwner();
+  if (parent)
+  {
+    CRect rect;
+    this->GetWindowRect(&rect);
+    this->MapWindowPoints(parent, &rect);
+    rect.right = rect.left + 500;
+    rect.bottom = rect.top + 500;
+    parent->SetWindowPos(this,rect.left,rect.top,rect.Width(),rect.Height(),SWP_NOZORDER);
+  }
+    
   initialize();
   // TODO:  Add your specialized creation code here
 

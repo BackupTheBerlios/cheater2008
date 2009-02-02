@@ -14,9 +14,23 @@ BEGIN_MESSAGE_MAP(CMyBaseForm, CBase)
 END_MESSAGE_MAP()
 
 
-/*CMyBaseForm::CMyBaseForm(CWnd* pParent )
-	: CDialog(CMyBaseForm::IDD, pParent)
+CMyBaseForm::CMyBaseForm(CWnd* pParent):
+d_hDialogInit(0),
+d_hModule(0)
 {
+  d_IDD = IDD;
+  VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParent ) );
+
+}
+
+/*
+CMyBaseForm::CMyBaseForm(CWnd* pParent,UINT i_IDD):
+d_hDialogInit(0),
+d_hModule(0)
+{
+  if(i_IDD)
+    d_IDD = i_IDD;
+  VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParent ) );
 
 }
 */
@@ -29,25 +43,8 @@ void CMyBaseForm::DoDataExchange(CDataExchange* pDX)
 	CBase::DoDataExchange(pDX);
 }
 
-CMyBaseForm::CMyBaseForm(CWnd* pParent):
-d_hDialogInit(0),
-d_hModule(0)
-{
-  d_IDD = IDD;
-  VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParent ) );
-
-}
 
 
-CMyBaseForm::CMyBaseForm(CWnd* pParent,UINT i_IDD):
-d_hDialogInit(0),
-d_hModule(0)
-{
-  if(i_IDD)
-    d_IDD = i_IDD;
-  VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(d_IDD)), pParent ) );
-
-}
 
 void CMyBaseForm::Create( CWnd* pParentWnd )
 {

@@ -12,8 +12,11 @@ class AUGUST2002_EXPORT CMyBaseForm : public CBase
 	DECLARE_DYNAMIC(CMyBaseForm)
 
 public:
+  
   CMyBaseForm(CWnd* pParent);
+  /*
 	CMyBaseForm(CWnd* pParent,UINT i_IDD);   // standard constructor
+  */
 	virtual ~CMyBaseForm();
 
 // Dialog Data

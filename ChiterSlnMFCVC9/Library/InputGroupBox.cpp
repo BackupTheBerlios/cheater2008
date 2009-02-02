@@ -27,7 +27,7 @@ END_MESSAGE_MAP()
 
 
 InputGroupBox::InputGroupBox(CWnd* pParent /*=NULL*/)
-:CMyBaseForm(pParent,InputGroupBox::IDD) //CMyBaseForm(CMemoryInfoEdit::IDD, pParent)
+:CMyBaseForm(pParent) //CMyBaseForm(CMemoryInfoEdit::IDD, pParent)
 {
     //VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(InputGroupBox::IDD)), pParent ) );
 
@@ -262,12 +262,36 @@ CMenu*  InputGroupBox::CreatePopupMenu(void)
 
 void InputGroupBox::initialize()
 {
-  CRect valueRect(5,27,200,45);
+  CRect clientRect;
+  this->GetClientRect( clientRect );
+  CFont* font = new CFont();
+  font->CreatePointFont(90, CString("Arial"));
+
+  CRect staticFrameRect(clientRect);
+  staticFrameRect.DeflateRect(2,5,2,2);
+  d_staticFrame.Create(CString("Static"),SS_LEFT ,staticFrameRect,this,IDC_INPUTGROUPBOX_BOX);
+  d_staticFrame.SetFont(font);
+
+  
+  d_staticFrame.ShowWindow(SW_SHOW);
+  CRect valueStaticRect(5,20,50,35);
+  d_valueStaticText.Create(CString("Value"),SS_SIMPLE,valueStaticRect,this,IDC_STATIC);
+  d_valueStaticText.ShowWindow(SW_SHOW);
+  d_valueStaticText.SetFont(font);
+  CRect typeStaticRect(5,60,50,77);
+  d_typeStaticText.Create(CString("Type"),SS_SIMPLE,typeStaticRect,this,IDC_STATIC);
+  d_typeStaticText.ShowWindow(SW_SHOW);
+  d_typeStaticText.SetFont(font);
+
+  CRect valueRect(5,37,200,55);
   d_valueBox.Create(CBS_DROPDOWN |CBS_HASSTRINGS ,valueRect, this,IDC_COMBO_VALUE);
   d_valueBox.ShowWindow(SW_SHOW);
-  CRect typeRect(5,67,200,89);
+  d_valueBox.SetFont(font);
+  CRect typeRect(5,77,200,99);
   d_typeBox.Create(CBS_DROPDOWN |CBS_HASSTRINGS,typeRect , this,IDC_COMBO_TYPE);
   d_typeBox.ShowWindow(SW_SHOW);
+  d_typeBox.SetFont(font);
+
   CWnd* wndType = GetDlgItem(IDC_COMBO_TYPE);
   CWnd* wndValue = GetDlgItem(IDC_COMBO_VALUE);
   CRuntimeClass* cl= wndType->GetRuntimeClass();
@@ -473,6 +497,18 @@ int InputGroupBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CMyBaseForm::OnCreate(lpCreateStruct) == -1)
         return -1;
+
+    CWnd * parent = this->GetOwner();
+    if (parent)
+    {
+      CRect rect;
+      this->GetWindowRect(&rect);
+      this->MapWindowPoints(parent, &rect);
+      rect.right = rect.left + 200;
+      rect.bottom = rect.top + 100;
+      parent->SetWindowPos(this,rect.left,rect.top,rect.Width(),rect.Height(),SWP_NOZORDER);
+    }
+
     initialize();
     // TODO:  Add your specialized creation code here
 
