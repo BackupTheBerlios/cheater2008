@@ -43,6 +43,9 @@ private:
   DWORD d_convertToMenuItemState;
   DWORD d_clearPointersMenuItemState;
 	CMenu*  CreatePopupMenu(void);
+  void initialize();
+  CComboBox d_valueBox;
+  CComboBox d_typeBox;
 
 protected:
     virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
@@ -60,8 +63,6 @@ protected:
 
 	void  loadPointers(const std::vector<DWORD>&   list);
 
-  CComboBox d_valueBox;
-  CComboBox d_typeCombo;
   afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
   afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
   afx_msg void OnValueValue();
@@ -72,7 +73,6 @@ protected:
 
   virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-  virtual BOOL OnInitDialog();
   DECLARE_MESSAGE_MAP()
 
 

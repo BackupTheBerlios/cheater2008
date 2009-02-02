@@ -40,35 +40,11 @@ InputGroupBox::~InputGroupBox()
 {
 }
 
-BOOL InputGroupBox::OnInitDialog()
-{
-	CMyBaseForm::OnInitDialog();
-    CWnd* wndType = GetDlgItem(IDC_COMBO_TYPE);
-    CWnd* wndValue = GetDlgItem(IDC_COMBO_VALUE);
-    CRuntimeClass* cl= wndType->GetRuntimeClass();
-    CComboBox* pValue = &d_valueBox; 
-    CComboBox* pType= &d_typeCombo; 
-    
-	CComboBox* typeCombo = dynamic_cast<CComboBox*>((CComboBox *)wndType);
-	CComboBox* textCombo = dynamic_cast<CComboBox*>((CComboBox *)wndValue);
-	assert(typeCombo);
-	assert(textCombo);
-
-	typeCombo->AddString(LPCTSTR( getStringType()[HEX_NUM]) );
-	typeCombo->AddString(LPCTSTR( getStringType()[DEC_NUM]) );
-	typeCombo->AddString(LPCTSTR( getStringType()[STRING]) ) ;
-	typeCombo->AddString(LPCTSTR( getStringType()[HEX_STRING]) );
-	typeCombo->AddString(LPCTSTR( getStringType()[FLOAT_NUM]) );
-	typeCombo->AddString(LPCTSTR( getStringType()[DOUBLE_NUM]) );
-	return TRUE;
-}
-
-
 void InputGroupBox::DoDataExchange(CDataExchange* pDX)
 {
     CMyBaseForm::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_COMBO_VALUE, d_valueBox);
-    DDX_Control(pDX, IDC_COMBO_TYPE, d_typeCombo);
+    DDX_Control(pDX, IDC_COMBO_TYPE, d_typeBox);
 }
 
 
@@ -271,75 +247,7 @@ CMenu*  InputGroupBox::CreatePopupMenu(void)
 	//TODO: Add your source code here
 	CMenu* work=new CMenu();
 	work->CreatePopupMenu();
-/*
-	work->OnPopup=InputGroupBoxPopupMenuAppear;
-	TMenuItem* MenuItem;
-	MenuItem=new TMenuItem(work);
-	SavePointerMenuItem=MenuItem;
-	MenuItem->Caption="Save value";
-	SavePointerMenuItem->Enabled=false;
-	MenuItem->OnClick=InputGroupBoxSavePointerMenuItemOnClick;
-	work->Items->Add(MenuItem);
-	MenuItem=new TMenuItem(work);
-	ClearPointersMenuItem=MenuItem;
-	MenuItem->Caption="Clear TextBox";
-	ClearPointersMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxClearPointersMenuItemOnClick;
-	work->Items->Add(MenuItem);
 
-	MenuItem=new TMenuItem(work);
-	MenuItem->Caption="-";
-	MenuItem->Enabled=true;
-	work->Items->Add(MenuItem);
-
-	MenuItem=new TMenuItem(work);
-	ConvertToMenuItem=MenuItem;
-	MenuItem->Caption="Convert to...";
-	ConvertToMenuItem->Enabled=true;
-	work->Items->Add(MenuItem);
-
-	MenuItem=new TMenuItem(ConvertToMenuItem);
-	ConvertToDecNumMenuItem=MenuItem;
-	MenuItem->Caption=getStringType()[DEC_NUM];
-	ConvertToDecNumMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxConvertToDecNumMenuItemOnClick;
-	ConvertToMenuItem->Add(MenuItem);
-
-	MenuItem=new TMenuItem(ConvertToMenuItem);
-	ConvertToHexNumMenuItem=MenuItem;
-	MenuItem->Caption=getStringType()[HEX_NUM];
-	ConvertToHexNumMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxConvertToHexNumMenuItemOnClick;
-	ConvertToMenuItem->Add(MenuItem);
-
-	MenuItem=new TMenuItem(ConvertToMenuItem);
-	ConvertToStringMenuItem=MenuItem;
-	MenuItem->Caption=getStringType()[STRING];
-	ConvertToStringMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxConvertToStringMenuItemOnClick;
-	ConvertToMenuItem->Add(MenuItem);
-
-	MenuItem=new TMenuItem(ConvertToMenuItem);
-	ConvertToHexStringMenuItem=MenuItem;
-	MenuItem->Caption=getStringType()[HEX_STRING];
-	ConvertToHexStringMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxConvertToHexStringMenuItemOnClick;
-	ConvertToMenuItem->Add(MenuItem);
-
-	MenuItem=new TMenuItem(ConvertToMenuItem);
-	ConvertToDoubleNumMenuItem=MenuItem;
-	MenuItem->Caption=getStringType()[DOUBLE_NUM];
-	ConvertToDoubleNumMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxConvertToDoubleNumMenuItemOnClick;
-	ConvertToMenuItem->Add(MenuItem);
-
-	MenuItem=new TMenuItem(ConvertToMenuItem);
-	ConvertToFloatNumMenuItem=MenuItem;
-	MenuItem->Caption=getStringType()[FLOAT_NUM];
-	ConvertToFloatNumMenuItem->Enabled=true;
-	MenuItem->OnClick=InputGroupBoxConvertToFloatNumMenuItemOnClick;
-	ConvertToMenuItem->Add(MenuItem);
-*/
   work->AppendMenu(d_savePointerMenuItemState, ID_APP_EXIT, CString("Save value") );
   work->AppendMenu(d_clearPointersMenuItemState, ID_APP_EXIT, CString("Clear TextBox") );
   work->AppendMenu(d_convertToMenuItemState, ID_APP_EXIT, CString("Convert to...") );
@@ -350,6 +258,32 @@ CMenu*  InputGroupBox::CreatePopupMenu(void)
   work->AppendMenu(MF_STRING, DOUBLE_NUM, CString( getStringType()[DOUBLE_NUM]) );
   work->AppendMenu(MF_STRING, FLOAT_NUM, CString( getStringType()[FLOAT_NUM]) );
   return work;
+}
+
+void InputGroupBox::initialize()
+{
+  CRect valueRect(5,27,200,45);
+  d_valueBox.Create(CBS_DROPDOWN |CBS_HASSTRINGS ,valueRect, this,IDC_COMBO_VALUE);
+  d_valueBox.ShowWindow(SW_SHOW);
+  CRect typeRect(5,67,200,89);
+  d_typeBox.Create(CBS_DROPDOWN |CBS_HASSTRINGS,typeRect , this,IDC_COMBO_TYPE);
+  d_typeBox.ShowWindow(SW_SHOW);
+  CWnd* wndType = GetDlgItem(IDC_COMBO_TYPE);
+  CWnd* wndValue = GetDlgItem(IDC_COMBO_VALUE);
+  CRuntimeClass* cl= wndType->GetRuntimeClass();
+
+  CComboBox* typeCombo = dynamic_cast<CComboBox*>((CComboBox *)wndType);
+  CComboBox* textCombo = dynamic_cast<CComboBox*>((CComboBox *)wndValue);
+  assert(typeCombo);
+  assert(textCombo);
+
+  typeCombo->AddString(LPCTSTR( getStringType()[HEX_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringType()[DEC_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringType()[STRING]) ) ;
+  typeCombo->AddString(LPCTSTR( getStringType()[HEX_STRING]) );
+  typeCombo->AddString(LPCTSTR( getStringType()[FLOAT_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringType()[DOUBLE_NUM]) );
+
 }
 
 BOOL InputGroupBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,
@@ -539,7 +473,7 @@ int InputGroupBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (CMyBaseForm::OnCreate(lpCreateStruct) == -1)
         return -1;
-
+    initialize();
     // TODO:  Add your specialized creation code here
 
     return 0;
@@ -551,3 +485,5 @@ void InputGroupBox::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
     CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
 }
+
+
