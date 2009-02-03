@@ -19,6 +19,7 @@ BEGIN_MESSAGE_MAP(TPointersViewBox, CMyBaseForm)
   ON_WM_INITMENUPOPUP()
   ON_WM_VSCROLL()
   ON_WM_CREATE()
+  ON_WM_SIZE()
   ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
@@ -74,29 +75,16 @@ void  TPointersViewBox::PointersBoxDblClick(UINT nFlags, CPoint point)
         NotifyDblClick((int)((*FList)[locSel+globPage]));
 }
 //---------------------------------------------------------------------------
-
-void  TPointersViewBox::Init(void)
+void TPointersViewBox::create()
 {
   d_pointersBox=new MyListBox();
-  CRect pbRect;
-  this->GetClientRect(&pbRect);
-  pbRect.DeflateRect(1,1);
-  pbRect.right = pbRect.right - 15;
-  //d_pointersBox->Align=alClient;
-  if ( d_pointersBox->Create(LBS_EXTENDEDSEL | LBS_NOTIFY, pbRect, this, LISTBOXFILED) ==FALSE)
+  if ( d_pointersBox->Create(LBS_EXTENDEDSEL | LBS_NOTIFY, CRect(0,0,0,0), this, LISTBOXFILED) ==FALSE)
     throw std::runtime_error("Can't create PointersBox ");
-//  d_pointersBox->OnDblClick=PointersBoxDblClick;
-  CRect scRect;
-  scRect.top = pbRect.top;
-  scRect.bottom = pbRect.bottom;
-  scRect.left = pbRect.right;
-  scRect.right = scRect.left+15;
   d_scrollBar=new CScrollBar();
-  if ( d_scrollBar->Create(SBS_VERT, scRect, this, SCROLLBARFILED) ==FALSE)
+  if ( d_scrollBar->Create(SBS_VERT, CRect(0,0,0,0), this, SCROLLBARFILED) ==FALSE)
     throw std::runtime_error("Can't create ScrollBar");
   d_scrollBar->ShowScrollBar();
   d_scrollBar->EnableWindow(FALSE);
-
   PopupMenu.CreatePopupMenu();
 
   //d_pointersBox->SetMenu(&PopupMenu);
@@ -111,7 +99,7 @@ void  TPointersViewBox::Init(void)
   //--------------------------------------------------
   UINT CopyAllMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::CopyMenuItemClick,this)) ));
   PopupMenu.AppendMenu(MF_STRING, CopyAllMenuItem, CString( "Copy all" ) ); //3
-  
+
   //-------------------------------------------
   UINT PasteMenuItem = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TPointersViewBox::PasteMenuItemClick,this)) ));
   PopupMenu.AppendMenu(MF_STRING, PasteMenuItem, CString( "Paste" ) ); //4
@@ -141,6 +129,22 @@ void  TPointersViewBox::Init(void)
   PopupMenu.AppendMenu(MF_STRING, DeletePointerMenuItem, CString( "Delete pointer" ) );//12
 
   d_pointersBox->ShowWindow( SW_SHOW );
+}
+
+void  TPointersViewBox::updateSize(void)
+{
+  CRect pbRect;
+  this->GetClientRect(&pbRect);
+  pbRect.DeflateRect(1,1);
+  pbRect.right = pbRect.right - 15;
+  d_pointersBox->MoveWindow(pbRect);
+  
+  CRect scRect;
+  scRect.top = pbRect.top;
+  scRect.bottom = pbRect.bottom;
+  scRect.left = pbRect.right;
+  scRect.right = scRect.left+15;
+  d_scrollBar->MoveWindow(scRect);
 }
 
 void clearMenu(CMenu& io_menu,Container& io_container)
@@ -449,9 +453,17 @@ void TPointersViewBox::OnLButtonDblClk(UINT nFlags, CPoint point)
 int TPointersViewBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     CMyBaseForm::OnCreate(lpCreateStruct);
-    Init();
+    create();
+    updateSize();
     return 0;
 }
+void TPointersViewBox::OnSize(UINT nType, int cx, int cy)
+{
+  CMyBaseForm::OnSize(nType,cx,cy);
+  updateSize();
+
+}
+
 BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
 {
 
@@ -461,6 +473,8 @@ BOOL TPointersViewBox::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLER
     // execute command
     if(d_menuCommands.hasCommand(nID))
       d_menuCommands.getCommand(nID)();
+    else
+      return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
     return TRUE;
   }
   // If the object(s) in the extended command route don't handle

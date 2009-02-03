@@ -7,6 +7,7 @@
 #include "InputGroupBox.h"
 #include "AuxiliaryTypedefs.h"
 #include "MyBaseForm.h"
+#include "Library/Command.h"
 #include "searcher.h"
 #include "Standart/AnsiLib.h"
 #include "PointersViewBox.h"
@@ -26,8 +27,13 @@ class TStreamEdit : public CMyBaseForm
 {
       DECLARE_DYNAMIC(TStreamEdit)
 public:
+        Container d_menuCommands;
         TGroupBox *GroupBox1;
-        TPopupMenu *PopupMenu1;
+        
+        TPopupMenu* PopupMenu;
+        CMenuItem *CopytoMenuItem;
+        CMenuItem *PasteFromMenuItem;
+
         TGroupBox *GroupBox2;
 
         CMenuItem *SearchMenuItem;
@@ -37,8 +43,8 @@ public:
         CMenuItem *PasteMenuItem;
         CMenuItem *N1;
         CMenuItem *N2;
-        CMenuItem *CopytoMenuItem;
-        CMenuItem *PasteFromMenuItem;
+        
+        
         CMenuItem *ClearClipBoardMenuItem;
         CMenuItem *N3;
         CMenuItem *FonCMenuItem;
@@ -126,9 +132,10 @@ public:
         void  SlowSearchMenuItemClick(TObject *Sender);
         void  ReplaceAllMenuItemClick(TObject *Sender);
 private:
-   void  PointersNotifyEvent(int);
-   void  UpdateInfoString(void);
-   void  initialize(void);
+   void PointersNotifyEvent(int);
+   void UpdateInfoString(void);
+   void initializePopupMenu();
+   void initialize(void);
 void  StringsOptionChangedEvent(TObject *Sender,DWORD value);
 //        TMemoryStream* MemoryStream;
         int StringLen;

@@ -12,7 +12,11 @@
 #include "InputGroupBox.h"
 
 extern HINSTANCE  hInstance;
+enum InputGroupBox_IDS
+{
+IDC_INPUTGROUPBOX_BOX = 40000,
 
+};
 // InputGroupBox dialog
 
 //IMPLEMENT_DYNAMIC

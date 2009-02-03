@@ -22,6 +22,12 @@ int NumberOfCopies=0;
 char* WhatFind="Search query";
 std::vector< boost::shared_ptr<std::stringstream> > ClipBoard;     // clipboard for selections
 
+enum
+{
+  ProgressBar_ID = 0xF000,
+  InfoEdit_ID
+};
+
 IMPLEMENT_DYNAMIC(TStreamEdit, CMyBaseForm)
 
 BEGIN_MESSAGE_MAP(TStreamEdit, CMyBaseForm)
@@ -49,161 +55,193 @@ ViewedLen=0;
 NumberOfString=20;
 StringLen=16;
 IsProcessKeyDown=false;
-// throw Exception("Sergey12");
-// throw Exception("Sergey13");
+
 SearcherProperties->OnSelectPointer=PointersNotifyEvent;
-// throw Exception("Sergey11");
+
 NumberOfCopies++;
 }
 //---------------------------------------------------------------------------
+void TStreamEdit::initializePopupMenu()
+{
+  //-------------------Upper all OK--------------------------------------
+  PopupMenu=new TPopupMenu();
+  PopupMenu->CreatePopupMenu();
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::SlowSearchMenuItemClick,this)) )), 
+    CString( "Slow Search") );
+
+
+//  PopupMenu->OnPopup=PopupMenu1Popup;
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::SearchMenuItemClick,this)) )), 
+    CString( "Search") );
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::ContinueSearchMenuItemClick,this)) )), 
+    CString( "Continue Search") );
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::LoadFromStreamMenuitemClick,this)) )), 
+    CString( "ReLoad") );
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::GotoMenuItemClick,this)) )), 
+    CString( "Goto...") );
+
+
+  PopupMenu->AppendMenu(MF_SEPARATOR,0,"-" );
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::CopyMenuItemClick,this)) )), 
+    CString( "Copy") );
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
+    CString( "Paste") );
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
+    CString( "Paste") );
+
+  PopupMenu->AppendMenu(MF_SEPARATOR,0,"-" );
+
+  CopytoMenuItem=new CMenuItem();
+  CopytoMenuItem->CreatePopupMenu();
+  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)CopytoMenuItem->m_hMenu, CString( "Coptyto..." ) ); //6
+
+
+  PasteFromMenuItem=new CMenuItem();
+  PasteFromMenuItem->CreatePopupMenu();
+  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)PasteFromMenuItem->m_hMenu, CString( "Paste from" ) ); //6
+
+  EditBufMenuItem=new CMenuItem();
+  EditBufMenuItem->CreatePopupMenu();
+  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)EditBufMenuItem->m_hMenu, CString( "Edit buf" ) ); //6
+
+
+  DeleteMenuItem=new CMenuItem();
+  DeleteMenuItem->CreatePopupMenu();
+  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)DeleteMenuItem->m_hMenu, CString( "Delete" ) ); //6
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::ClearClipBoardMenuItemClick,this)) )), 
+    CString( "Clear ClipBoard") );
+
+  PopupMenu->AppendMenu(MF_SEPARATOR,0,"-" );
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::Color1Click,this)) )), 
+    CString( "Color") );
+
+
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::Font1Click,this)) )), 
+    CString( "Font") );
+
+
+
+  FonCMenuItem=new CMenuItem();
+  FonCMenuItem->CreatePopupMenu();
+  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)FonCMenuItem->m_hMenu, CString( "Font" ) ); //6
+
+  //--------------------------------------------------
+
+  FonCMenuItem->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::StringFonCMenuItemClick,this)) )), 
+    CString( "String") );
+
+
+  FonCMenuItem->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::HexFonCMenuItemClick,this)) )), 
+    CString( "Hex") );
+
+  FonCMenuItem->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::PointerFonCMenuItemClick,this)) )), 
+    CString( "Pointer") );
+
+  //--------------------------------------------------
+
+  ColorMenuItem=new CMenuItem();
+  ColorMenuItem->CreatePopupMenu();
+  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)ColorMenuItem->m_hMenu, CString( "Color" ) ); //6
+  
+  
+  ColorMenuItem->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::StringColorMenuItemClick,this)) )), 
+    CString( "String") );
+
+  ColorMenuItem->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::HexColorMenuItemClick,this)) )), 
+    CString( "Hex") );
+
+
+  ColorMenuItem->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::PointerColorMenuItemClick,this)) )), 
+    CString( "Pointer") );
+
+  //--------------------------------------------------
+  PopupMenu->AppendMenu(MF_SEPARATOR,0,"-" );
+  //---------------------------------------
+  PopupMenu->AppendMenu(MF_STRING, 
+    d_menuCommands.createCommand( 
+    CommandPtr(new Command(boost::bind(&TStreamEdit::ReplaceAllMenuItemClick,this)) )), 
+    CString( "Replace All") );
+  //------------------------------------------------------
+
+}
 void  TStreamEdit::initialize(void)
 {
-BottomPanel=new TPanel(this);
-BottomPanel->Align=alBottom;
-InsertControl(BottomPanel);
-ProgressBar=new TProgressBar(this);
-ProgressBar->Smooth=true;
-ProgressBar->Align=alRight;
-BottomPanel->InsertControl(ProgressBar);
-Splitter5=new TSplitter(this);
-Splitter5->Align=alRight;
-BottomPanel->InsertControl(Splitter5);
+  initializePopupMenu();
+  CRect BottomPanelRect;
+  GetClientRect(BottomPanelRect);
+  BottomPanelRect.top = BottomPanelRect.bottom - 25;
+  BottomPanel=new TPanel();
+  BottomPanel->Create(CString(""),SS_SIMPLE ,BottomPanelRect,this);
+  BottomPanel->ShowWindow( SW_SHOW );
 
-InfoEdit=new TRichEdit(this);
-InfoEdit->Align=alClient;
-InfoEdit->ScrollBars=ssBoth;
-BottomPanel->InsertControl(InfoEdit);
-//-------------------Upper all OK--------------------------------------
-PopupMenu1=new TPopupMenu(this);
-PopupMenu1->OnPopup=PopupMenu1Popup;
-PopupMenu1->AutoHotkeys=maManual;
-PopupMenu=PopupMenu1;
-SlowSearchMenuItem=new CMenuItem(PopupMenu1);
-SlowSearchMenuItem->Caption=AnsiString("Slow Search");
-SlowSearchMenuItem->OnClick=SlowSearchMenuItemClick;
-PopupMenu->Items->Add(SlowSearchMenuItem);
-//---------------------------------------
-SearchMenuItem=new CMenuItem(PopupMenu);
-SearchMenuItem->Caption=AnsiString("Search");
-SearchMenuItem->OnClick=SearchMenuItemClick;
-PopupMenu->Items->Add(SearchMenuItem);
-//----------------------------------
-ContinueSearchMenuItem=new CMenuItem(PopupMenu);
-ContinueSearchMenuItem->Caption=AnsiString("Continue Search");
-ContinueSearchMenuItem->OnClick=ContinueSearchMenuItemClick;
-PopupMenu->Items->Add(ContinueSearchMenuItem);
-//----------------------------------
-LoadFromStreamMenuitem=new CMenuItem(PopupMenu);
-LoadFromStreamMenuitem->Caption=AnsiString("ReLoad");
-LoadFromStreamMenuitem->OnClick=LoadFromStreamMenuitemClick;
-PopupMenu->Items->Add(LoadFromStreamMenuitem);
-//------------------------------------------
-GotoMenuItem=new CMenuItem(PopupMenu);
-GotoMenuItem->Caption=AnsiString("Goto...");
-GotoMenuItem->OnClick=GotoMenuItemClick;
-PopupMenu->Items->Add(GotoMenuItem);
-//----------------------------------
-CMenuItem* work=new CMenuItem(PopupMenu);
-work->Caption=AnsiString("-");
-PopupMenu->Items->Add(work);
-//-------------------------------------------
-CopyMenuItem=new CMenuItem(PopupMenu);
-CopyMenuItem->Caption=AnsiString("Copy");
-CopyMenuItem->OnClick=CopyMenuItemClick;
-PopupMenu->Items->Add(CopyMenuItem);
-//-------------------------------------------
-PasteMenuItem=new CMenuItem(PopupMenu);
-PasteMenuItem->Caption=AnsiString("Paste");
-PasteMenuItem->OnClick=PasteMenuItemClick;
-PopupMenu->Items->Add(PasteMenuItem);
-//---------------------------------------
-work=new CMenuItem(PopupMenu);
-work->Caption=AnsiString("-");
-PopupMenu->Items->Add(work);
-//--------------------------------------------------
-CopytoMenuItem=new CMenuItem(PopupMenu);
-CopytoMenuItem->Caption=AnsiString("Copyto");
-PopupMenu->Items->Add(CopytoMenuItem);
-//----------------------------------------------
-PasteFromMenuItem=new CMenuItem(PopupMenu);
-PasteFromMenuItem->Caption=AnsiString("Paste from");
-PopupMenu->Items->Add(PasteFromMenuItem);
-//----------------------------------------------
-EditBufMenuItem=new CMenuItem(PopupMenu);
-EditBufMenuItem->Caption=AnsiString("Edit buf");
-PopupMenu->Items->Add(EditBufMenuItem);
-//--------------------------------------------
-DeleteMenuItem=new CMenuItem(PopupMenu);
-DeleteMenuItem->Caption=AnsiString("Delete");
-PopupMenu->Items->Add(DeleteMenuItem);
-//--------------------------------------------
-ClearClipBoardMenuItem=new CMenuItem(PopupMenu);
-ClearClipBoardMenuItem->Caption=AnsiString("Clear ClipBoard");
-ClearClipBoardMenuItem->OnClick=ClearClipBoardMenuItemClick;
-PopupMenu->Items->Add(ClearClipBoardMenuItem);
-//--------------------------------------------------
-work=new CMenuItem(PopupMenu);
-work->Caption=AnsiString("-");
-PopupMenu->Items->Add(work);
-//---------------------------------------
-Color1=new CMenuItem(PopupMenu);
-Color1->Caption=AnsiString("Color");
-Color1->OnClick=Color1Click;
-PopupMenu->Items->Add(Color1);
-//---------------------------------------
-Font1=new CMenuItem(PopupMenu);
-Font1->Caption=AnsiString("Font");
-Font1->OnClick=Font1Click;
-PopupMenu->Items->Add(Font1);
-//--------------------------------------------------
-FonCMenuItem=new CMenuItem(PopupMenu);
-FonCMenuItem->Caption=AnsiString("Font");
-PopupMenu->Items->Add(FonCMenuItem);
- StringFonCMenuItem=new CMenuItem(FonCMenuItem);
- StringFonCMenuItem->Caption=AnsiString("String");
- StringFonCMenuItem->OnClick=StringFonCMenuItemClick;
- FonCMenuItem->Add(StringFonCMenuItem);
- HexFonCMenuItem=new CMenuItem(FonCMenuItem);
- HexFonCMenuItem->Caption=AnsiString("Hex");
- HexFonCMenuItem->OnClick=HexFonCMenuItemClick;
- FonCMenuItem->Add(HexFonCMenuItem);
- PointerFonCMenuItem=new CMenuItem(FonCMenuItem);
- PointerFonCMenuItem->Caption=AnsiString("Pointer");
- PointerFonCMenuItem->OnClick=PointerFonCMenuItemClick;
- FonCMenuItem->Add(PointerFonCMenuItem);
-//--------------------------------------------------
-ColorMenuItem=new CMenuItem(PopupMenu);
-ColorMenuItem->Caption=AnsiString("Color");
-PopupMenu->Items->Add(ColorMenuItem);
- StringColorMenuItem=new CMenuItem(ColorMenuItem);
- StringColorMenuItem->Caption=AnsiString("String");
- StringColorMenuItem->OnClick=StringColorMenuItemClick;
- ColorMenuItem->Add(StringColorMenuItem);
- HexColorMenuItem=new CMenuItem(ColorMenuItem);
- HexColorMenuItem->Caption=AnsiString("Hex");
- HexColorMenuItem->OnClick=HexColorMenuItemClick;
- ColorMenuItem->Add(HexColorMenuItem);
- PointerColorMenuItem=new CMenuItem(ColorMenuItem);
- PointerColorMenuItem->Caption=AnsiString("Pointer");
- PointerColorMenuItem->OnClick=PointerColorMenuItemClick;
- ColorMenuItem->Add(PointerColorMenuItem);
-//--------------------------------------------------
-work=new CMenuItem(PopupMenu);
-work->Caption=AnsiString("-");
-PopupMenu->Items->Add(work);
-//---------------------------------------
-ReplaceAllMenuItem=new CMenuItem(PopupMenu);
-ReplaceAllMenuItem->Caption=AnsiString("Replace All");
-ReplaceAllMenuItem->OnClick=ReplaceAllMenuItemClick;
-PopupMenu->Items->Add(ReplaceAllMenuItem);
-//------------------------------------------------------
-ColorDialog=new TColorDialog(this);
-FontDialog=new TFontDialog(this);
+  CRect ProgressBarRect(BottomPanelRect.Width()/2,0,BottomPanelRect.Width(),BottomPanelRect.Height());
+  ProgressBar=new TProgressBar();
+  ProgressBar->Create(PBS_SMOOTH , ProgressBarRect, BottomPanel, ProgressBar_ID);
+  ProgressBar->ShowWindow( SW_SHOW );
+
+  CRect ProgressBarRect(0,0,BottomPanelRect.Width()/2,BottomPanelRect.Height());
+  InfoEdit=new TRichEdit(this);
+  InfoEdit->Create(ES_MULTILINE,ProgressBarRect,BottomPanel,InfoEdit_ID);
+  InfoEdit->ShowWindow( SW_SHOW );
+
+ColorDialog=new TColorDialog();
+FontDialog=new TFontDialog();
 //--------------Upper all is ok-----------------------------------
 //-----------------GROUP BOX 2-------------------------------------
-GroupBox2=new TGroupBox(this);
+GroupBox2=new TGroupBox();
+GroupBox2->Create()
 GroupBox2->Align=alRight;
-GotoInputGroupBox=new TInputGroupBox(GroupBox2);
+GotoInputGroupBox=new InputGroupBox(GroupBox2);
 GotoInputGroupBox->Caption=AnsiString("Go to");
 GotoInputGroupBox->Top=10;GotoInputGroupBox->Left=5;
 GroupBox2->InsertControl(GotoInputGroupBox);

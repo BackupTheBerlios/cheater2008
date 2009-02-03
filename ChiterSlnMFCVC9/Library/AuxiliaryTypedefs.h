@@ -1,6 +1,10 @@
 #ifndef AuxiliaryTypedefs_h
 #define  AuxiliaryTypedefs_h
 
+typedef CStatic TPanel;
+
+typedef CEdit TRichEdit;
+
 typedef CProgressCtrl TProgressBar;
 
 typedef CSplitterWnd TGroupBox;
@@ -24,6 +28,11 @@ typedef WORD Word ;
 typedef CScrollBar TUpDown ;
 
 typedef WORD TUpDownDirection ;
+
+typedef CFontDialog TFontDialog ;
+
+typedef CColorDialog TColorDialog ;
+
 
 
 

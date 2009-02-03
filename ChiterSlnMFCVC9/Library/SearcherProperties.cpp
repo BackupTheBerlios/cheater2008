@@ -7,6 +7,10 @@
 
 #include "SearcherProperties.h"
 
+enum TSearcherPropertiesIDS
+{
+ SplitterWnd_ID =  0xA000
+};
 IMPLEMENT_DYNAMIC(TSearcherProperties, CMyBaseForm)
 
 BEGIN_MESSAGE_MAP(TSearcherProperties, CMyBaseForm)
@@ -28,36 +32,23 @@ void TSearcherProperties::initialize()
   CRect clientRect;
   GetClientRect(&clientRect);
 
-  /*
-  CSplitterWnd* splitter = new CSplitterWnd();
-  CCreateContext context;
-  context.m_pNewViewClass = RUNTIME_CLASS(InputGroupBox);
-  //splitter->Create(this, 2, 1,CSize(500,500),&context);
-  splitter->CreateStatic(this, 2, 1);
-  BOOL is = splitter->CreateView(0, 0,
-  RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
+  d_splitterWnd = new SplitterCtrl_NS::SplitterCtrlAggregate();
+  d_splitterWnd->Create(this, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWnd_ID);
 
-  is = splitter->CreateView(1, 0,
-  RUNTIME_CLASS(InputGroupBox), CSize(200, 50), &context);
+  CRect upperBoxRect(0,0,0,0);
+  d_upperBox = new CStatic();
+  d_upperBox->Create(CString(""),SS_LEFT ,upperBoxRect,d_splitterWnd);
+  d_upperBox->ShowWindow(SW_SHOW);
 
-  splitter->ShowWindow(SW_SHOW);
-  CWnd * pChild  = splitter->GetPane(0,0);
-  pChild->ShowWindow(SW_SHOW);
-  pChild->SetActiveWindow();
-
-  pChild  = splitter->GetPane(1,0);
-  pChild->ShowWindow(SW_SHOW);
-  pChild->SetActiveWindow();
+  CButton* c1 = new CButton();
+  CButton* c2 = new CButton();
+  c1->Create(CString("C1"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON ,CRect(0,0,0,0),d_splitterWnd,2222);
+  c2->Create(CString("C2"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,CRect(0,0,0,0),d_splitterWnd,3333);
 
 
-  splitter->MoveWindow(clientRect);
-  CRect childRect(clientRect);
-  childRect.DeflateRect(5,5,5,5);
-  pChild->MoveWindow(childRect);
-  */
 
-  FFind=new InputGroupBox(this);
-  FFind->Create ( this );
+  FFind=new InputGroupBox(d_upperBox);
+  FFind->Create ( d_upperBox );
   //FFind->Top=13;Find->Left=5;
   FFind->setCaption( "String to Find" );
   FFind->SetWindowPos ( 0, 5, 0, 200, 100, SWP_NOZORDER  );
@@ -65,9 +56,9 @@ void TSearcherProperties::initialize()
 
   CRect FFindRect;
   FFind->GetClientRect( FFindRect );
-  FFind->MapWindowPoints(this,FFindRect);
-  FReplace=new InputGroupBox(this);
-  FReplace->Create ( this );
+  FFind->MapWindowPoints(d_upperBox,FFindRect);
+  FReplace=new InputGroupBox(d_upperBox);
+  FReplace->Create ( d_upperBox );
   CRect FReplaceRect(FFindRect);
   FReplaceRect.MoveToY(FFindRect.top+FFindRect.Height()+4);
   FReplaceRect.left = 5;
@@ -84,7 +75,7 @@ void TSearcherProperties::initialize()
   SetFindRect.bottom = SetFindRect.top + 20;
   //SetFind->Top=Replace->Top+Replace->Height+4;SetFind->Left=10;
   SetFind=new CButton();
-  SetFind->Create(CString("Set Find"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetFindRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::SetFindClick,this) ))));
+  SetFind->Create(CString("Set Find"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetFindRect,d_upperBox,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::SetFindClick,this) ))));
   SetFind->ShowWindow( SW_SHOW );
 
 
@@ -92,18 +83,18 @@ void TSearcherProperties::initialize()
   SetReplaceRect.MoveToX(SetReplaceRect.right + 5);
   SetReplaceRect.right = SetReplaceRect.right + 25;
   SetReplace=new CButton();
-  SetReplace->Create(CString("Set Replace"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetReplaceRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::SetReplaceClick,this) ))));
+  SetReplace->Create(CString("Set Replace"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetReplaceRect,d_upperBox,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::SetReplaceClick,this) ))));
   SetReplace->ShowWindow( SW_SHOW );
 
   CRect ReloadPropertiesRect(SetReplaceRect);
   ReloadPropertiesRect.MoveToX(ReloadPropertiesRect.right + 5);
   ReloadPropertiesRect.right = ReloadPropertiesRect.right + 40;
   ReloadProperties=new CButton();
-  ReloadProperties->Create(CString("Reload Properties"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,ReloadPropertiesRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::ReloadClick,this) ))));
+  ReloadProperties->Create(CString("Reload Properties"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,ReloadPropertiesRect,d_upperBox,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::ReloadClick,this) ))));
   ReloadProperties->ShowWindow( SW_SHOW );
 
-  PageSize=new InputGroupBox(this);
-  PageSize->Create ( this );
+  PageSize=new InputGroupBox(d_upperBox);
+  PageSize->Create ( d_upperBox );
   PageSize->setCaption( "Page Size" );
   CRect PageSizeRect;
   PageSize->GetClientRect( PageSizeRect );
@@ -119,23 +110,33 @@ void TSearcherProperties::initialize()
   SetPageSizeRect.MoveToX(SetReplaceRect.right + 4);
   SetPageSizeRect.right= SetPageSizeRect.right + 20;
   SetPageSize=new CButton();
-  SetPageSize->Create ( CString("Set Page Size"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetPageSizeRect,this,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::setPageSizeClick,this) ))) );
+  SetPageSize->Create ( CString("Set Page Size"),WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,SetPageSizeRect,d_upperBox,d_controlCommands.createCommand(CommandPtr(new Command(boost::bind(&TSearcherProperties::setPageSizeClick,this) ))) );
   SetPageSize->ShowWindow( SW_SHOW );
 
   ReloadProperties->GetClientRect(ReloadPropertiesRect);
-  ReloadProperties->MapWindowPoints(this,ReloadPropertiesRect);
+  ReloadProperties->MapWindowPoints(d_upperBox,ReloadPropertiesRect);
   ReloadPropertiesRect.MoveToX(ReloadPropertiesRect.right+5);
   ReloadProperties->MoveWindow(ReloadPropertiesRect);
 
-  CRect PointersRect(SetPageSizeRect);
-  Pointers=new TPointersViewBox(this);
-  Pointers->Create( this );
-  PointersRect.MoveToX(5);
-  PointersRect.MoveToY(PointersRect.bottom+5);
-  PointersRect.right = PointersRect.left + 400;
-  PointersRect.bottom = PointersRect.top + 400;
-  Pointers->SetWindowPos ( 0, PointersRect.left, PointersRect.right, PointersRect.Width(), PointersRect.Height(), SWP_NOZORDER );
-  Pointers->ShowWindow( SW_SHOW );
+
+  Pointers=new TPointersViewBox(d_splitterWnd);
+  Pointers->Create( d_splitterWnd );
+  Pointers->ShowWindow(SW_SHOW);
+
+  d_splitterWnd->AddRow();
+  d_splitterWnd->AddRow();
+  d_splitterWnd->AddColumn();
+  d_splitterWnd->SetWindow(0,0,d_upperBox->m_hWnd);
+  d_splitterWnd->SetWindow(1,0,Pointers->m_hWnd);
+
+  //d_splitterWnd->SetWindow(0,0,c1->m_hWnd);
+  //d_splitterWnd->SetWindow(1,0,c2->m_hWnd);
+  
+  d_splitterWnd->Update();
+
+  d_splitterWnd->ShowWindow(SW_SHOW);
+
+
 }
 
 void  TSearcherProperties::setSearcher(boost::shared_ptr<TSearcher> value)
@@ -374,6 +375,8 @@ BOOL TSearcherProperties::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHAND
     // execute command
     if(d_controlCommands.hasCommand(nID))
       d_controlCommands.getCommand(nID)();
+    else
+      return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
     return TRUE;
   }
   return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);

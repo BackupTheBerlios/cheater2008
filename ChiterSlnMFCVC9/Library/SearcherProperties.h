@@ -5,6 +5,8 @@
 #include <boost/shared_ptr.hpp>
 #include "inputgroupbox.h"
 #include "Standart/ansi_stream.h"
+#include "SplitterCtrl/SplitterCtrl.h"
+
 #include "PointersViewBox.h"
 #include "searcher.h"
 #include "MyBaseForm.h"
@@ -21,11 +23,16 @@ private:
   Container d_controlCommands;
   //        TInputGroupBox* Find;
   //        TInputGroupBox* Replace;
+  SplitterCtrl_NS::SplitterCtrlAggregate* d_splitterWnd;
+  CStatic * d_upperBox;
+  TPointersViewBox* Pointers;
+
   CButton* SetFind;
   CButton* SetReplace;
   boost::shared_ptr<TSearcher> FSearcher;
   CButton* ReloadProperties;
-  TPointersViewBox* Pointers;
+
+
   InputGroupBox* FFind;
   InputGroupBox* FReplace;
   InputGroupBox* PageSize;

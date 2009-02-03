@@ -43,7 +43,8 @@ private:
         
         void  PointersBoxDblClick(UINT nFlags, CPoint point);
         boost::shared_ptr< std::vector<PointerType> > FList;
-        void  Init(void);
+        void  updateSize();
+        void  create();
         void  PopupMenuOnPopup();
         void  WritePointersToFile();
         void  LoadPointersFromFile();
@@ -81,7 +82,7 @@ protected:
   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
   afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
   afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-
+  afx_msg void OnSize(UINT nType, int cx, int cy);
 
   virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo);
     	DECLARE_MESSAGE_MAP()
