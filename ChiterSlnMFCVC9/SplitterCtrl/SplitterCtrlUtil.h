@@ -10,8 +10,10 @@
 // 
 #ifndef SplitterCtrl_SplitterCtrlUtil_h
 #define SplitterCtrl_SplitterCtrlUtil_h
+
 #include <vector>
 
+#include "SplitterCtrl/SplitterCtrlFwd.h"
 namespace SplitterCtrl_NS
 {
 
@@ -164,7 +166,7 @@ namespace SplitterCtrl_NS
   SPLITTERCTRL_DRAGGING_DYNAMIC
   };
   // 
-  struct SplitterCtrlDraw
+  struct SPLITTERCTRL_EXPORT SplitterCtrlDraw
   {	virtual void DrawBegin(CDC * /*pDC*/) {}
   virtual void DrawSplitter(CDC * /*pDC*/, bool /*horz*/, int /*idx*/, CRect const * /*pRect*/) {}
   virtual void DrawDragRect(CDC * /*pDC*/, bool /*horz*/, bool /*firstTime*/, CRect const * /*pRectOld*/, CRect const * /*pRectNew*/) {}
@@ -178,7 +180,7 @@ namespace SplitterCtrl_NS
   virtual int GetBorderWidth(ISplitterCtrlRecalc *base) const = 0;
   };
   // 
-  class SplitterCtrlBase : public CWnd
+  class SPLITTERCTRL_EXPORT SplitterCtrlBase : public CWnd
   {public:
   SplitterCtrlBase();
   ~SplitterCtrlBase();
@@ -357,6 +359,30 @@ namespace SplitterCtrl_NS
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
 
+
+
+  class SPLITTERCTRL_EXPORT SplitterCtrlCustom1 : virtual public SplitterCtrlBase, public SplitterCtrlDraw
+  {
+  protected:	// SplitterCtrlDraw.
+    virtual void DrawSplitter(CDC *pDC, bool horz, int idx, CRect const *pRect);
+    virtual void DrawDragRect(CDC *pDC, bool horz, bool firstTime, CRect const *pRectOld, CRect const *pRectNew);
+    virtual void DrawBorder(CDC *pDC, CRect const *pRect);
+  };
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  // 
+  class SPLITTERCTRL_EXPORT SplitterCtrlCustom2 : virtual public SplitterCtrlBase, public ISplitterCtrlRecalc, public SplitterCtrlDraw
+  {
+  protected:	// ISplitterCtrlRecalc.
+    virtual int GetSplitterWidth(ISplitterCtrlRecalc *base) const;
+    virtual int GetSplitterHeight(ISplitterCtrlRecalc *base) const;
+    virtual int GetBorderWidth(ISplitterCtrlRecalc *base) const;
+
+  protected:	// SplitterCtrlDraw.
+    virtual void DrawSplitter(CDC *pDC, bool horz, int idx, CRect const *pRect);
+    virtual void DrawDragRect(CDC *pDC, bool horz, bool firstTime, CRect const *pRectOld, CRect const *pRectNew);
+    virtual void DrawBorder(CDC *pDC, CRect const *pRect);
+  };
 
 
 

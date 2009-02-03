@@ -11,12 +11,13 @@
 #ifndef SplitterCtrl_SplitterCtrl_h
 #define SplitterCtrl_SplitterCtrl_h
 
-#include "SplitterCtrlUtil.h"
+#include "SplitterCtrl/SplitterCtrlFwd.h"
+#include "SplitterCtrl/SplitterCtrlUtil.h"
 
 namespace SplitterCtrl_NS
 {
 
-  class SplitterCtrl : virtual public SplitterCtrlBase, 
+  class SPLITTERCTRL_EXPORT SplitterCtrl : virtual public SplitterCtrlBase, 
     public ISplitterCtrlRecalc, public SplitterCtrlDraw
   {
   public:
@@ -43,6 +44,13 @@ namespace SplitterCtrl_NS
   };
 
 
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  // 
+  class SPLITTERCTRL_EXPORT SplitterCtrlAggregate : 
+    public SplitterCtrl, public SplitterCtrlCustom1, public SplitterCtrlCustom2
+  {	
+  };
 
 } // namespace SplitterCtrl_NS
 

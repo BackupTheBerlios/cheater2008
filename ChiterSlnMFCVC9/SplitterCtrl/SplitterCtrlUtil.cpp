@@ -120,17 +120,19 @@ namespace SplitterCtrl_NS
   /////////////////////////////////////////////////////////////////////////////
   // 
   BOOL SplitterCtrlBase::Create(LPCTSTR /*lpszClassName*/, LPCTSTR /*lpszWindowName*/, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* /*pContext*/)
-  {	return Create(pParentWnd,dwStyle,rect,nID)==true ? 1 : 0;
+  {	
+    return Create(pParentWnd,dwStyle,rect,nID)==true ? 1 : 0;
   }
   // 
   bool SplitterCtrlBase::Create(CWnd *pParentWnd, DWORD dwStyle, RECT const &rect, UINT uID)
-  {	CString classname = AfxRegisterWndClass(CS_DBLCLKS,::LoadCursor(NULL,IDC_ARROW),NULL,NULL);
-  if(CWnd::Create(classname,_T(""),dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,rect,pParentWnd,uID)==0) return false;
-  // 
-  SetCursors(::LoadCursor(NULL,IDC_SIZENS),::LoadCursor(NULL,IDC_SIZEWE),::LoadCursor(NULL,IDC_SIZEALL));
-  SetWindowPos(0, 0,0,0,0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOCOPYBITS);
-  // 
-  return true;
+  {	
+    CString classname = AfxRegisterWndClass(CS_DBLCLKS,::LoadCursor(NULL,IDC_ARROW),NULL,NULL);
+    if(CWnd::Create(classname,_T(""),dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,rect,pParentWnd,uID)==0) return false;
+    // 
+    SetCursors(::LoadCursor(NULL,IDC_SIZENS),::LoadCursor(NULL,IDC_SIZEWE),::LoadCursor(NULL,IDC_SIZEALL));
+    SetWindowPos(0, 0,0,0,0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOCOPYBITS);
+    // 
+    return true;
   }
   /////////////////////////////////////////////////////////////////////////////
   // 
@@ -329,34 +331,40 @@ namespace SplitterCtrl_NS
   /////////////////////////////////////////////////////////////////////////////
   // 
   void SplitterCtrlBase::OnPaint()
-  {	if(m_pDrawManager==NULL)
-  {	CPaintDC dc(this);
-  return;
-  }
-  // 
-  VirtualWindowClient virtwnd(this);
-  if(virtwnd.IsSuccess()==false)
-  {	CPaintDC dc(this);
-  return;
-  }
-  // 
-  m_pDrawManager->DrawBegin(&virtwnd);
-  // 
-  int row = GetCountRow();
-  int col = GetCountColumn();
-  if(row>0 && col>0)
-  {	CRect rc;
-  for(int r=0; r<row-1; ++r)
-  {	GetSplitterRect(true,r,&rc);
-  m_pDrawManager->DrawSplitter(&virtwnd,true,r,&rc);
-  }
-  for(int c=0; c<col-1; ++c)
-  {	GetSplitterRect(false,c,&rc);
-  m_pDrawManager->DrawSplitter(&virtwnd,false,c,&rc);
-  }
-  }
-  // 
-  m_pDrawManager->DrawEnd(&virtwnd);
+  {	
+    if(m_pDrawManager==NULL)
+    {	
+      CPaintDC dc(this);
+      return;
+    }
+    // 
+    VirtualWindowClient virtwnd(this);
+    if(virtwnd.IsSuccess()==false)
+    {	
+      CPaintDC dc(this);
+      return;
+    }
+    // 
+    m_pDrawManager->DrawBegin(&virtwnd);
+    // 
+    int row = GetCountRow();
+    int col = GetCountColumn();
+    if(row>0 && col>0)
+    {	
+      CRect rc;
+      for(int r=0; r<row-1; ++r)
+      {	
+        GetSplitterRect(true,r,&rc);
+        m_pDrawManager->DrawSplitter(&virtwnd,true,r,&rc);
+      }
+      for(int c=0; c<col-1; ++c)
+      {	
+        GetSplitterRect(false,c,&rc);
+        m_pDrawManager->DrawSplitter(&virtwnd,false,c,&rc);
+      }
+    }
+    // 
+    m_pDrawManager->DrawEnd(&virtwnd);
   }
   /////////////////////////////////////////////////////////////////////////////
   //
@@ -533,39 +541,43 @@ namespace SplitterCtrl_NS
   cy = max(cy,m_iMinHeight);
   // 
   for(c=0; c<iCountColumn; ++c)
-  {	p = GetCell(r,c);
-  p->real.rc.top = pos;
-  p->real.rc.bottom = pos+cy;
-  p->real.factorHeight = (double)cy/(double)m_iTotalHeight;
-  // 
-  if(p->hWnd!=NULL) MoveChangedWindow(p->hWnd,&p->real.rc);
+  {	
+    p = GetCell(r,c);
+    p->real.rc.top = pos;
+    p->real.rc.bottom = pos+cy;
+    p->real.factorHeight = (double)cy/(double)m_iTotalHeight;
+    // 
+    if(p->hWnd!=NULL) MoveChangedWindow(p->hWnd,&p->real.rc);
   }
   pos += (cy+iSplitterHeight);
   }
   }
   else	// SPLITTERCTRL_SNAP_LEFT_BOTTOM or SPLITTERCTRL_SNAP_RIGHT_BOTTOM.
-  {	pos = rc->bottom;
-  // 
-  for(r=0; r<iCountRow; ++r)
-  {	p = GetCell(r,0);
-  tail = max(0, pos-rc->top - (iCountRow-1-r)*(iSplitterHeight+m_iMinHeight));
-  // 
-  if(tail<p->real.height || r==iCountRow-1)
-    cy = tail;
-  else
-    cy = p->real.height;
-  cy = max(cy,m_iMinHeight);
-  // 
-  for(c=0; c<iCountColumn; ++c)
-  {	p = GetCell(r,c);
-  p->real.rc.top = pos-cy;
-  p->real.rc.bottom = pos;
-  p->real.factorHeight = (double)cy/(double)m_iTotalHeight;
-  // 
-  if(p->hWnd!=NULL) MoveChangedWindow(p->hWnd,&p->real.rc);
-  }
-  pos -= (cy+iSplitterHeight);
-  }
+  {	
+    pos = rc->bottom;
+    // 
+    for(r=0; r<iCountRow; ++r)
+    {	
+      p = GetCell(r,0);
+      tail = max(0, pos-rc->top - (iCountRow-1-r)*(iSplitterHeight+m_iMinHeight));
+      // 
+      if(tail<p->real.height || r==iCountRow-1)
+        cy = tail;
+      else
+        cy = p->real.height;
+      cy = max(cy,m_iMinHeight);
+      // 
+      for(c=0; c<iCountColumn; ++c)
+      {	
+        p = GetCell(r,c);
+        p->real.rc.top = pos-cy;
+        p->real.rc.bottom = pos;
+        p->real.factorHeight = (double)cy/(double)m_iTotalHeight;
+        // 
+        if(p->hWnd!=NULL) MoveChangedWindow(p->hWnd,&p->real.rc);
+      }
+      pos -= (cy+iSplitterHeight);
+    }
   }
   }
   // 
@@ -1906,5 +1918,78 @@ namespace SplitterCtrl_NS
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
+
+  void DrawGradient(CDC *pDC, CRect const *rc, bool horz, COLORREF clrTop, COLORREF clrBottom)
+  {	GRADIENT_RECT gRect = {0,1};
+  TRIVERTEX vert[2] = 
+  {	{rc->left,rc->top,(COLOR16)(GetRValue(clrTop)<<8),(COLOR16)(GetGValue(clrTop)<<8),(COLOR16)(GetBValue(clrTop)<<8),0},
+  {rc->right,rc->bottom,(COLOR16)(GetRValue(clrBottom)<<8),(COLOR16)(GetGValue(clrBottom)<<8),(COLOR16)(GetBValue(clrBottom)<<8),0}
+  };
+  ::GradientFill(pDC->m_hDC,vert,2,&gRect,1,(horz==true ? GRADIENT_FILL_RECT_H : GRADIENT_FILL_RECT_V));
+  }
+  // 
+  void SplitterCtrlCustom1::DrawSplitter(CDC *pDC, bool horz, int /*idx*/, CRect const *pRect)
+  {	DrawGradient(pDC,pRect,horz==false,RGB(245,245,245),RGB(160,165,170));
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  //
+  void SplitterCtrlCustom1::DrawDragRect(CDC *pDC, bool /*horz*/, bool firstTime, CRect const *pRectOld, CRect const *pRectNew)
+  {	pDC->DrawDragRect(pRectNew,CSize(pRectNew->Width(),pRectNew->Height()),
+  (firstTime==true ? NULL : pRectOld),CSize(pRectOld->Width(),pRectOld->Height()));
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  // 
+  void SplitterCtrlCustom1::DrawBorder(CDC *pDC, CRect const *pRect)
+  {	pDC->Draw3dRect(pRect,RGB(77,115,61),RGB(77,115,61));
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  // SplitterCtrlCustom2.
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  // 
+  int SplitterCtrlCustom2::GetBorderWidth(ISplitterCtrlRecalc * /*base*/) const
+  {	return 2;
+  }
+  // 
+  int SplitterCtrlCustom2::GetSplitterWidth(ISplitterCtrlRecalc *base) const
+  {	return base->GetSplitterWidth(NULL);
+  }
+  // 
+  int SplitterCtrlCustom2::GetSplitterHeight(ISplitterCtrlRecalc *base) const
+  {	return base->GetSplitterHeight(NULL);
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  // 
+  void SplitterCtrlCustom2::DrawSplitter(CDC *pDC, bool /*horz*/, int /*idx*/, CRect const *pRect)
+  {	pDC->DrawEdge((RECT *)pRect,EDGE_RAISED,BF_RECT);
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  //
+  void SplitterCtrlCustom2::DrawDragRect(CDC *pDC, bool horz, bool firstTime, CRect const *pRectOld, CRect const *pRectNew)
+  {	
+    CRect rcOld=*pRectOld, rcNew=*pRectNew;
+    if(horz==true)
+    {	
+      rcOld.DeflateRect(0,1);
+      rcNew.DeflateRect(0,1);
+    }
+    else
+    {	
+      rcOld.DeflateRect(1,0);
+      rcNew.DeflateRect(1,0);
+    }
+    CBrush brush(HS_DIAGCROSS,RGB(0,0,0));
+    pDC->DrawDragRect(&rcNew,CSize(rcNew.Width(),rcNew.Height()),
+      (firstTime==true ? NULL : &rcOld),CSize(rcOld.Width(),rcOld.Height()),
+      &brush,&brush);
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  // 
+  void SplitterCtrlCustom2::DrawBorder(CDC *pDC, CRect const *pRect)
+  {	
+    pDC->DrawEdge((RECT *)pRect,EDGE_SUNKEN,BF_RECT);
+  }
 
 } // namespace SplitterCtrl_NS
