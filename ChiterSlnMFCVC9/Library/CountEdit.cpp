@@ -74,7 +74,7 @@ void TCountEdit::CreateInstance(void)
   UpDownField->ShowWindow(TRUE);
   //UpDownField->OnChangingEx=UpDownFieldChangingEventEx;
 
- OnChangeEvent=NULL;
+ OnChangeEvent.reset();
  //OnResize=OnResizeEvent;
 
 setMin(1);
@@ -111,7 +111,7 @@ void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     {
         EditField->SetWindowText( CString(ulongToAnsi(value).c_str()) );
 
-        if(OnChangeEvent) OnChangeEvent(dynamic_cast<TObject *>(this),value);
+        if(OnChangeEvent) (*OnChangeEvent)();
 
     }
     //AllowChange=false;

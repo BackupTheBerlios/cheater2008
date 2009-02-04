@@ -12,7 +12,8 @@
 #include "august2002Fwd.h"
 extern std::vector< boost::shared_ptr<std::vector<PointerType> > > PoitersDB;
 
-typedef void  ( *TPointerSelectEvent)(int);
+typedef boost::function<void (int)> TPointerSelectEvent;
+typedef boost::shared_ptr<TPointerSelectEvent> TPointerSelectEventPtr;
 
 enum SubMenus
 {
@@ -67,7 +68,7 @@ private:
         void  Update();        
 public:		// User declarations
         void  SetList(boost::shared_ptr< std::vector<PointerType> > value);
-         TPointerSelectEvent NotifyDblClick;
+         TPointerSelectEventPtr NotifyDblClick;
          TPointersViewBox(CWnd* pParent = NULL);
 //        __property TList* List  = { read=FList, write=SetList };
 protected:

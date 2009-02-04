@@ -32,7 +32,7 @@ void TSearcherProperties::initialize()
   CRect clientRect;
   GetClientRect(&clientRect);
 
-  d_splitterWnd = new SplitterCtrl_NS::SplitterCtrlAggregate();
+  d_splitterWnd = new SplitterCtrl_NS::SplitterCtrl();
   d_splitterWnd->Create(this, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWnd_ID);
 
   CRect upperBoxRect(0,0,0,0);
@@ -198,7 +198,7 @@ TSearcherProperties::~TSearcherProperties(void)
 {
 
 }
-void  TSearcherProperties::setOnSelectPointer(TPointerSelectEvent value)
+void  TSearcherProperties::setOnSelectPointer(TPointerSelectEventPtr value)
 {
   Pointers->NotifyDblClick=value;
 }

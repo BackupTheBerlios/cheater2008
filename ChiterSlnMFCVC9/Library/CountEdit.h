@@ -11,7 +11,8 @@
 
 #include "Resource.h"
 #include "AuxiliaryTypedefs.h"
-typedef void  ( *TCountEditValueChangedEvent)(TObject *Sender,DWORD value);
+#include "Command.h"
+
 
 
 
@@ -48,7 +49,7 @@ public:
     afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
     afx_msg void OnSize(UINT, int, int);
      //void  UpDownFieldChangingEventEx(TObject* Sender, bool &AllowChange, short NewValue, TUpDownDirection Direction);
-        TCountEditValueChangedEvent OnChangeEvent;
+    CommandPtr OnChangeEvent;
 
 
 };

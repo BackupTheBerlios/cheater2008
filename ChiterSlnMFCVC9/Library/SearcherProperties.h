@@ -23,7 +23,7 @@ private:
   Container d_controlCommands;
   //        TInputGroupBox* Find;
   //        TInputGroupBox* Replace;
-  SplitterCtrl_NS::SplitterCtrlAggregate* d_splitterWnd;
+  SplitterCtrl_NS::SplitterCtrl* d_splitterWnd;
   CStatic * d_upperBox;
   TPointersViewBox* Pointers;
 
@@ -45,7 +45,7 @@ private:
 public:
   void  setSearcher(boost::shared_ptr<TSearcher> value);
   boost::shared_ptr<TSearcher>   getSearcher(void);
-  void  setOnSelectPointer(TPointerSelectEvent value);
+  void  setOnSelectPointer(TPointerSelectEventPtr value);
 
   TSearcherProperties(CWnd* pParent = NULL);
 

@@ -1,6 +1,10 @@
 #ifndef AuxiliaryTypedefs_h
 #define  AuxiliaryTypedefs_h
 
+enum TShiftState
+{
+
+};
 typedef CStatic TPanel;
 
 typedef CEdit TRichEdit;

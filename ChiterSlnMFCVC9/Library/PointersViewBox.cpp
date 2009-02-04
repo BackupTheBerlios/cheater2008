@@ -28,7 +28,7 @@ TPointersViewBox::TPointersViewBox(CWnd* pParent /*= NULL*/)
 : CMyBaseForm(pParent)
 {
   
-  NotifyDblClick=NULL;
+  NotifyDblClick.reset();
   FList = boost::shared_ptr< std::vector<PointerType> >((std::vector<PointerType>*)0);
 //  d_pointersBox->OnKeyDown=KeyDown; ---> OnKeyDown
 }
@@ -69,10 +69,10 @@ void  TPointersViewBox::PointersBoxDblClick(UINT nFlags, CPoint point)
 {
   int locSel = d_pointersBox->GetCurSel();
   int globPage = d_scrollBar->GetScrollPos();
-  if(NotifyDblClick!=NULL)
+  if(NotifyDblClick)
     if(FList)
       if(FList->size()>0)
-        NotifyDblClick((int)((*FList)[locSel+globPage]));
+        (*NotifyDblClick)((int)((*FList)[locSel+globPage]));
 }
 //---------------------------------------------------------------------------
 void TPointersViewBox::create()

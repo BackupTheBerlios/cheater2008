@@ -27,6 +27,13 @@ class TStreamEdit : public CMyBaseForm
 {
       DECLARE_DYNAMIC(TStreamEdit)
 public:
+
+        SplitterCtrl_NS::SplitterCtrl* d_splitterWnd;
+        SplitterCtrl_NS::SplitterCtrl* d_splitterWndTop;
+        SplitterCtrl_NS::SplitterCtrl* d_splitterWndTopLeft;
+        SplitterCtrl_NS::SplitterCtrl* d_splitterWndTopRight;
+        CStatic* d_splitterWndTopRightBox;
+        SplitterCtrl_NS::SplitterCtrl* d_splitterWndBottom;
         Container d_menuCommands;
         TGroupBox *GroupBox1;
         
@@ -78,9 +85,7 @@ public:
         CEdit *PointerMemo;
 
         CMenuItem *ContinueSearchMenuItem;
-        TPanel *BottomPanel;
         TProgressBar *ProgressBar;
-        TSplitter *Splitter5;
 /*
         TLabel *InfoLabel;
         TLabel *KeyLabel;
@@ -91,9 +96,9 @@ public:
         CMenuItem *ReplaceAllMenuItem;
         TSearcherProperties *SearcherProperties;
         InputGroupBox *GotoInputGroupBox;
-        TSplitter *Splitter4;
-        void  SearchMenuItemClick(TObject *Sender);
-        void  LoadFromStreamMenuitemClick(TObject *Sender);
+
+        void  SearchMenuItemClick();
+        void  LoadFromStreamMenuitemClick();
 
         void  HexRichEditKeyDown(UINT Key);
         void  HexRichEditKeyPress(unsigned char Key);
@@ -103,40 +108,39 @@ public:
         void  StringRichEditKeyPres(unsigned char);
         void  StringRichEditKeyDown(UINT Key);
 
-        void  GotoMenuItemClick(TObject *Sender);
+        void  GotoMenuItemClick();
         
-        void  CopyMenuItemClick(TObject *Sender);
-        void  PopupMenu1Popup(TObject *Sender);
-        void  PasteMenuItemClick(TObject *Sender);
-        void  DeleteSubMenuClick(TObject *Sender);
-        void  CopytoMenuClick(TObject *Sender);
-        void  PasteFromMenuClick(TObject *Sender);
-        void  EditBufMenuClick(TObject *Sender);
-        void  ClearClipBoardMenuItemClick(TObject *Sender);
-        void  Font1Click(TObject *Sender);
-        void  Color1Click(TObject *Sender);
-        void  ChangeColor(TObject *Sender);
-        void  StringFonCMenuItemClick(TObject *Sender);
-        void  PointerFonCMenuItemClick(TObject *Sender);
-        void  HexFonCMenuItemClick(TObject *Sender);
-        void  StringColorMenuItemClick(TObject *Sender);
-        void  PointerColorMenuItemClick(TObject *Sender);
-        void  HexColorMenuItemClick(TObject *Sender);
+        void  CopyMenuItemClick();
+        void  PopupMenu1Popup();
+        void  PasteMenuItemClick();
+        void  DeleteSubMenuClick();
+        void  CopytoMenuClick();
+        void  PasteFromMenuClick();
+        void  EditBufMenuClick();
+        void  ClearClipBoardMenuItemClick();
+        void  Font1Click();
+        void  Color1Click();
+        void  ChangeColor();
+        void  StringFonCMenuItemClick();
+        void  PointerFonCMenuItemClick();
+        void  HexFonCMenuItemClick();
+        void  StringColorMenuItemClick();
+        void  PointerColorMenuItemClick();
+        void  HexColorMenuItemClick();
 //        void  SetOptionButtonClick(TObject *Sender);
 
-        void  StringRichEditMouseMove(TObject *Sender,
-          TShiftState Shift, int X, int Y);
-        void  HexRichEditMouseMove(TObject *Sender,
-          TShiftState Shift, int X, int Y);
-        void  ContinueSearchMenuItemClick(TObject *Sender);
-        void  SlowSearchMenuItemClick(TObject *Sender);
-        void  ReplaceAllMenuItemClick(TObject *Sender);
+        void  StringRichEditMouseMove(TObject *Sender,TShiftState Shift, int X, int Y);
+        void  HexRichEditMouseMove(TObject *Sender,TShiftState Shift, int X, int Y);
+
+        void  ContinueSearchMenuItemClick();
+        void  SlowSearchMenuItemClick();
+        void  ReplaceAllMenuItemClick();
 private:
    void PointersNotifyEvent(int);
    void UpdateInfoString(void);
    void initializePopupMenu();
    void initialize(void);
-void  StringsOptionChangedEvent(TObject *Sender,DWORD value);
+void  StringsOptionChangedEvent();
 //        TMemoryStream* MemoryStream;
         int StringLen;
         int NumberOfString;
@@ -176,7 +180,7 @@ public:		// User declarations
         void setCurrentPos(int i_value);
 
         boost::shared_ptr<std::iostream>  getStream(){ return Fstream;}
-        void setStream(boost::shared_ptr<std::iostream>)
+        void setStream(boost::shared_ptr<std::iostream>);
 
         std::string    getKeyPressed() const {return FKeyPressed;}
         void   setKeyPressed(const std::string& i_value );
