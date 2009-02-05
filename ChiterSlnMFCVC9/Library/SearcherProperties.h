@@ -50,8 +50,8 @@ public:
   TSearcherProperties(CWnd* pParent = NULL);
 
 
-  int  Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress);
-  int  SlowSearch(boost::shared_ptr<std::iostream>,AfterReadNotify DoProgress);
+  int  Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,TSearcherAfterReadNotifyPtr DoProgress);
+  int  SlowSearch(boost::shared_ptr<std::iostream>,TSearcherAfterReadNotifyPtr DoProgress);
   void  Reload(void);
   void  ReplaceAll(void);
   virtual ~TSearcherProperties(void);

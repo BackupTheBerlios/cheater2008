@@ -7,9 +7,12 @@ typedef unsigned int PointerType;
 #include "august2002Fwd.h"
 #include <sstream>
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 //typedef TStream* TStrteamPtr;
 
-typedef void  ( *AfterReadNotify)(int);
+typedef boost::function<void (int)> TSearcherAfterReadNotify;
+typedef boost::shared_ptr<TSearcherAfterReadNotify> TSearcherAfterReadNotifyPtr;
+
 //---------------------------------------------------------------------------
 union AUGUST2002_EXPORT VoidInt
  {
@@ -17,6 +20,7 @@ union AUGUST2002_EXPORT VoidInt
   unsigned long ul;
   void* v;
  };
+
 class  AUGUST2002_EXPORT TSearcher
 {
 private:
@@ -36,7 +40,7 @@ public:
         virtual  ~TSearcher();
         bool  ContinueSearch(void);
 
-        AfterReadNotify NotifyEvent;
+        TSearcherAfterReadNotifyPtr NotifyEvent;
         bool  SlowSearch(void);
         bool  StartSearchDilim(void);
         void  ReplaceAll(void);

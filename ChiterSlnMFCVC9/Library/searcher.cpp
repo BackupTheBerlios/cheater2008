@@ -43,7 +43,7 @@ bool TSearcher::StartSearch(void)
         if(memcmp(Buffer+i,str,length)==0)
         {voidint.i=i+posBufInStream;FPointers->push_back(voidint.ul);}
       }
-      if(NotifyEvent!=NULL)NotifyEvent((int)(100 * (double)getStream()->tellg() / (double )streamSize)) ;
+      if(NotifyEvent) (*NotifyEvent)((int)(100 * (double)getStream()->tellg() / (double )streamSize)) ;
     }
     //  memcpy(Buffer,Buffer+FPageSize,length-1);
     //  i= 1-length;
@@ -138,7 +138,7 @@ bool  TSearcher::SlowSearch(void)
       }
       if(realBufferLength==FPageSize){i=0;CopyMemory(Buffer,Buffer+FPageSize,length-1);}
       else i=length-1;
-      if(NotifyEvent!=NULL)NotifyEvent((int)(100 * (double)getStream()->tellg() / (double )streamSize)) ;
+      if(NotifyEvent) (*NotifyEvent)((int)(100 * (double)getStream()->tellg() / (double )streamSize)) ;
     }while(*(getStream()));
     //  memcpy(Buffer,Buffer+FPageSize,length-1);
     //  i= 1-length;
@@ -179,7 +179,7 @@ bool  TSearcher::StartSearchDilim(void)
         if(memcmp(Buffer+i,str,length)==0)
         {voidint.i=i+posBufInStream;FPointers->push_back(voidint.ul);i+=length-1;}
       }
-      if(NotifyEvent!=NULL)NotifyEvent((int)(100 * (double)getStream()->tellg() / (double )streamSize)) ;
+      if(NotifyEvent)(*NotifyEvent)((int)(100 * (double)getStream()->tellg() / (double )streamSize)) ;
     }
     //  memcpy(Buffer,Buffer+FPageSize,length-1);
     //  i= 1-length;
@@ -243,7 +243,7 @@ void TSearcher::Init(void)
   Fstream=boost::shared_ptr<std::iostream>((std::iostream*)0);
   FPointers=boost::shared_ptr<std::vector<PointerType> >(new std::vector<PointerType>());
   FPointers->push_back(111);
-  NotifyEvent=NULL;
+  NotifyEvent.reset();
 }
 //--------------------------------------------------------------------------
 void  TSearcher::SetPageSize(int value)

@@ -12,12 +12,100 @@
 #include <iomanip>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 
+#include <map>
+#include <vector>
+
+#include "MessageReporterBase.h"
 #include "StreamEdit.h"
 
 int NumberOfCopies=0;
 char* WhatFind="Search query";
 std::vector< boost::shared_ptr<std::stringstream> > ClipBoard;     // clipboard for selections
+
+class WindowsMessageHandler
+{
+private:
+
+  struct cmp1 {
+    bool operator()( HWND s1, HWND s2 ) const {
+      return (LONG)s1 < (LONG)s2;
+    }
+  };
+
+  struct cmp2 {
+    bool operator()( TStreamEdit* s1, TStreamEdit* s2 ) const {
+      return (LONG)s1 < (LONG)s2;
+    }
+  };
+
+  std::map<HWND,WNDPROC_TYPE,cmp1> d_wndToOldProc;
+  std::map<HWND,TStreamEdit*,cmp1> d_wndToParentMap;
+  std::map<TStreamEdit*,HWND,cmp2> d_ParentToWndMap;
+public:
+ 
+  WindowsMessageHandler()
+  {
+
+  }
+  static WindowsMessageHandler& getWindowsMessageHandler()
+  {
+    static WindowsMessageHandler handler;
+    return handler;
+  }
+
+  ~WindowsMessageHandler()
+  {
+    revert();
+  }
+
+  void revert ()
+  {
+    typedef std::pair<HWND,WNDPROC_TYPE> wndProcPair;
+    BOOST_FOREACH(wndProcPair pair,d_wndToOldProc)
+    {
+      CWnd* wnd = CWnd::FromHandle((pair.first));
+      if(wnd)
+       replaceWndProc(*wnd,pair.second);
+    }
+    d_wndToOldProc.clear();
+    d_wndToParentMap.clear();
+    d_ParentToWndMap.clear();
+
+  }
+  static LRESULT CALLBACK myWndProc(HWND hWnd, UINT event, WPARAM wParam, LPARAM lParam)
+  {
+    WindowsMessageHandler& handler = getWindowsMessageHandler();
+    CWnd& child = getCWnd(hWnd);
+
+    std::stringstream msg;
+    msg << " child [" << std::string( CT2CA(CString(child.GetRuntimeClass()->m_lpszClassName)) ) << "]got " << "message\r\n";
+    ::OutputDebugString(CString(msg.str().c_str()));
+    WNDPROC_TYPE old = handler.d_wndToOldProc[hWnd];
+    return old(hWnd,event,wParam,lParam);
+  }
+
+  void append(CWnd* wnd, TStreamEdit* parent)
+  {
+    if(! wnd->m_hWnd)
+      throw std::runtime_error("Corrupted child window");
+    if(! parent->m_hWnd)
+      throw std::runtime_error("Corrupted parent window");
+    
+    std::map<HWND,WNDPROC_TYPE,cmp1>::iterator it = d_wndToOldProc.find(wnd->m_hWnd);
+     if(it!=d_wndToOldProc.end())
+      throw std::runtime_error("Can't redefine windows procedure twice");
+
+    
+    d_wndToParentMap.insert (std::pair<HWND,TStreamEdit*>(wnd->m_hWnd,parent) );
+    d_ParentToWndMap.insert ( std::pair<TStreamEdit*,HWND>(parent,wnd->m_hWnd) );
+    WNDPROC_TYPE old = replaceWndProc(*wnd,myWndProc);
+    d_wndToOldProc.insert( std::pair<HWND,WNDPROC_TYPE>(wnd->m_hWnd,old) );
+  }
+
+
+};
 
 enum
 {
@@ -25,7 +113,12 @@ enum
   InfoEdit_ID,
   StringMemo_ID,
   PointerMemo_ID,
-  HexMemo_ID
+  HexMemo_ID,
+  SplitterWnd_ID,
+  SplitterWndTop_ID,
+  SplitterWndBottom_ID,
+  SplitterWndTopLeft_ID,
+  SplitterWndTopRight_ID
 };
 
 IMPLEMENT_DYNAMIC(TStreamEdit, CMyBaseForm)
@@ -38,27 +131,48 @@ BEGIN_MESSAGE_MAP(TStreamEdit, CMyBaseForm)
   ON_WM_VSCROLL()
   ON_WM_RBUTTONDOWN()
   ON_WM_VKEYTOITEM()
+  ON_NOTIFY_EX_RANGE( BN_CLICKED, ProgressBar_ID, SplitterWndTopRight_ID, customOnNotify )
+  ON_NOTIFY_EX_RANGE( LVN_KEYDOWN, ProgressBar_ID, SplitterWndTopRight_ID, customOnNotify )
+  
 END_MESSAGE_MAP()
+void append(CRichEditCtrl& edit, const std::string& str)
+{
 
+  int lines = edit.GetLineCount();
+  if(lines<=0)
+  {
+    edit.SetWindowText(CString(str.c_str()));
+  }
+  {
+    int nBegin, nEnd;
+    // Replace the second line, if it exists, of the edit control
+    // with the text lpszmyString.
+    if ((nBegin=edit.LineIndex(lines-1)) != -1)
+    {
+      nBegin = nBegin + edit.LineLength(nBegin); 
+      edit.SetSel(nBegin+1, nBegin+1);
+      edit.ReplaceSel(CString(std::string("\r\n"+str).c_str()));
+    }
+  }
+
+}
 //---------------------------------------------------------------------------
- TStreamEdit::TStreamEdit(CWnd* pParent /*= NULL*/):
+TStreamEdit::TStreamEdit(CWnd* pParent /*= NULL*/):
 CMyBaseForm(pParent)
 {
 
-if(NumberOfCopies==0)
- {
-//  ClipBoard=new TList();
- }
-Fstream=boost::shared_ptr<std::iostream>((std::iostream*)0);
-FCurrentPos=0;
-ViewedLen=0;
-NumberOfString=20;
-StringLen=16;
-IsProcessKeyDown=false;
+  if(NumberOfCopies==0)
+  {
+    //  ClipBoard=new TList();
+  }
+  Fstream=boost::shared_ptr<std::iostream>((std::iostream*)0);
+  FCurrentPos=0;
+  ViewedLen=0;
+  NumberOfString=20;
+  StringLen=16;
+  IsProcessKeyDown=false;
 
-SearcherProperties->setOnSelectPointer( TPointerSelectEventPtr (new TPointerSelectEvent(boost::bind(&TStreamEdit::PointersNotifyEvent,this,_1)) ) );
-
-NumberOfCopies++;
+  NumberOfCopies++;
 }
 //---------------------------------------------------------------------------
 void TStreamEdit::initializePopupMenu()
@@ -66,101 +180,106 @@ void TStreamEdit::initializePopupMenu()
   //-------------------Upper all OK--------------------------------------
   PopupMenu=new TPopupMenu();
   PopupMenu->CreatePopupMenu();
-
+//0
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::SlowSearchMenuItemClick,this)) )), 
     CString( "Slow Search") );
 
-
-//  PopupMenu->OnPopup=PopupMenu1Popup;
-
-
+//1
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::SearchMenuItemClick,this)) )), 
     CString( "Search") );
 
-
+//2
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::ContinueSearchMenuItemClick,this)) )), 
     CString( "Continue Search") );
 
-
+//3
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::LoadFromStreamMenuitemClick,this)) )), 
     CString( "ReLoad") );
 
-
+//4
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::GotoMenuItemClick,this)) )), 
     CString( "Goto...") );
 
-
+//5
   PopupMenu->AppendMenu(MF_SEPARATOR,0,CString("-") );
 
-
+//6
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::CopyMenuItemClick,this)) )), 
     CString( "Copy") );
-
+  //7
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
     CString( "Paste") );
 
+//8
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
     CString( "Paste") );
 
+//9
   PopupMenu->AppendMenu(MF_SEPARATOR,0,CString("-"));
 
   CopytoMenuItem=new CMenuItem();
   CopytoMenuItem->CreatePopupMenu();
+
+//10
   PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)CopytoMenuItem->m_hMenu, CString( "Coptyto..." ) ); //6
 
 
   PasteFromMenuItem=new CMenuItem();
   PasteFromMenuItem->CreatePopupMenu();
+//11
   PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)PasteFromMenuItem->m_hMenu, CString( "Paste from" ) ); //6
 
   EditBufMenuItem=new CMenuItem();
   EditBufMenuItem->CreatePopupMenu();
+//12
   PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)EditBufMenuItem->m_hMenu, CString( "Edit buf" ) ); //6
 
 
   DeleteMenuItem=new CMenuItem();
   DeleteMenuItem->CreatePopupMenu();
+//13
   PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)DeleteMenuItem->m_hMenu, CString( "Delete" ) ); //6
 
-
+//14
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::ClearClipBoardMenuItemClick,this)) )), 
     CString( "Clear ClipBoard") );
 
+//15
   PopupMenu->AppendMenu(MF_SEPARATOR,0,CString("-"));
 
+//16
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::Color1Click,this)) )), 
     CString( "Color") );
 
-
+//17
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::Font1Click,this)) )), 
     CString( "Font") );
 
-
-
   FonCMenuItem=new CMenuItem();
   FonCMenuItem->CreatePopupMenu();
+//18
   PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)FonCMenuItem->m_hMenu, CString( "Font" ) ); //6
 
   //--------------------------------------------------
@@ -185,9 +304,10 @@ void TStreamEdit::initializePopupMenu()
 
   ColorMenuItem=new CMenuItem();
   ColorMenuItem->CreatePopupMenu();
+//19
   PopupMenu->AppendMenu(MF_POPUP, (UINT_PTR)ColorMenuItem->m_hMenu, CString( "Color" ) ); //6
-  
-  
+
+
   ColorMenuItem->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::StringColorMenuItemClick,this)) )), 
@@ -205,8 +325,10 @@ void TStreamEdit::initializePopupMenu()
     CString( "Pointer") );
 
   //--------------------------------------------------
+//20
   PopupMenu->AppendMenu(MF_SEPARATOR,0,CString("-") );
   //---------------------------------------
+//21
   PopupMenu->AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::ReplaceAllMenuItemClick,this)) )), 
@@ -222,77 +344,86 @@ void  TStreamEdit::initialize(void)
 
   d_splitterWndTopLeft = new SplitterCtrl_NS::SplitterCtrl();
   d_splitterWndTopRight = new SplitterCtrl_NS::SplitterCtrl();
+
+
+  d_splitterWnd->Create(this, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWnd_ID);
+  d_splitterWndTop->Create(d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndTop_ID);
+  d_splitterWndBottom->Create(d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndBottom_ID);
+  d_splitterWndTopLeft->Create(d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndTopLeft_ID);
+  d_splitterWndTopRight->Create(d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndTopRight_ID);
+
+
   d_splitterWndTopRightBox = new CStatic();
   d_splitterWndTopRightBox->Create(CString(""),SS_SIMPLE,CRect(0,0,0,0),d_splitterWndTopRight);
-  d_splitterWndTopRightBox->ShowWindow(SW_SHOW);
+
 
   initializePopupMenu();
-//-------------- Bottom pane --------------------------------
+  //-------------- Bottom pane --------------------------------
   ProgressBar=new TProgressBar();
   ProgressBar->Create(PBS_SMOOTH , CRect(0,0,0,0), d_splitterWndBottom, ProgressBar_ID);
-  ProgressBar->ShowWindow( SW_SHOW );
+  
 
-  InfoEdit=new TRichEdit(this);
-  InfoEdit->Create(ES_MULTILINE,CRect(0,0,0,0),d_splitterWndBottom,InfoEdit_ID);
-  InfoEdit->ShowWindow( SW_SHOW );
+  InfoEdit=new TRichEdit();
+  InfoEdit->Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),d_splitterWndBottom,InfoEdit_ID);
+
+
   d_splitterWndBottom->AddRow();
   d_splitterWndBottom->AddColumn();
   d_splitterWndBottom->AddColumn();
   d_splitterWndBottom->SetWindow(0,0,InfoEdit->m_hWnd);
-  d_splitterWndBottom->SetWindow(0,0,ProgressBar->m_hWnd);
+  d_splitterWndBottom->SetWindow(0,1,ProgressBar->m_hWnd);
   d_splitterWndBottom->Update();
 
-ColorDialog=new TColorDialog();
-FontDialog=new TFontDialog();
-//--------------Top right panel-----------------------------------
+
+  ColorDialog=new TColorDialog();
+  FontDialog=new TFontDialog();
+  //--------------Top right panel-----------------------------------
   GotoInputGroupBox=new InputGroupBox();
   GotoInputGroupBox->Create(d_splitterWndTopRightBox);
-  GotoInputGroupBox->ShowWindow(SW_SHOW);
 
   StringNumberEdit=new TCountEdit();
   StringNumberEdit->Create(d_splitterWndTopRightBox);
   StringNumberEdit->setText("Number of lines");
   StringNumberEdit->OnChangeEvent = CommandPtr(new Command(boost::bind(&TStreamEdit::StringsOptionChangedEvent,this) )); 
-  StringNumberEdit->ShowWindow(SW_SHOW);
 
   StringLengthEdit=new TCountEdit();
   StringLengthEdit->Create(d_splitterWndTopRightBox);
   StringLengthEdit->OnChangeEvent = CommandPtr(new Command(boost::bind(&TStreamEdit::StringsOptionChangedEvent,this) )); 
   StringLengthEdit->setText("Line's length");
-  StringLengthEdit->ShowWindow(SW_SHOW);
+
 
   SearcherProperties=new TSearcherProperties();
   SearcherProperties->Create(d_splitterWndTopRight);
-  SearcherProperties->ShowWindow(SW_SHOW);
+
 
   d_splitterWndTopRight->AddRow();
   d_splitterWndTopRight->AddRow();
   d_splitterWndTopRight->AddColumn();
 
   d_splitterWndTopRight->SetWindow(0,0,d_splitterWndTopRightBox->m_hWnd);
-  d_splitterWndTopRight->SetWindow(0,1,SearcherProperties->m_hWnd);
+  d_splitterWndTopRight->SetWindow(1,0,SearcherProperties->m_hWnd);
   d_splitterWndTopRight->Update();
 
-//--------------Top left panel-----------------------------------
-// throwException("Sergey3");
+  //--------------Top left panel-----------------------------------
+  // throwException("Sergey3");
 
-   StringMemo=new CEdit();
-   StringMemo->Create(ES_MULTILINE,CRect(0,0,0,0),d_splitterWndTopLeft,StringMemo_ID);
+  StringMemo=new CRichEditCtrl();
+  StringMemo->Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),d_splitterWndTopLeft,StringMemo_ID);
 #pragma message ("TODO: implement event handlers")
-//   StringMemo->OnKeyDown=StringRichEditKeyDown;
-//   StringMemo->OnKeyPress=StringRichEditKeyPress;
-// StringMemo->OnMouseMove=StringRichEditMouseMove;
+  //   StringMemo->OnKeyDown=StringRichEditKeyDown;
+  //   StringMemo->OnKeyPress=StringRichEditKeyPress;
+  // StringMemo->OnMouseMove=StringRichEditMouseMove;
 
 
-   PointerMemo=new CEdit();
-   PointerMemo->Create(ES_MULTILINE,CRect(0,0,0,0),d_splitterWndTopLeft,PointerMemo_ID);
+  PointerMemo=new CRichEditCtrl();
+  PointerMemo->Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),d_splitterWndTopLeft,PointerMemo_ID);
 
-   HexMemo=new CEdit();
-   HexMemo->Create(ES_MULTILINE,CRect(0,0,0,0),d_splitterWndTopLeft,HexMemo_ID);
+  HexMemo=new CRichEditCtrl();
+  HexMemo->Create(ES_MULTILINE| ES_WANTRETURN,CRect(0,0,0,0),d_splitterWndTopLeft,HexMemo_ID);
 #pragma message ("TODO: implement event handlers")
-   //   HexMemo->OnKeyDown=HexRichEditKeyDown;
-   //   HexMemo->OnKeyPress=HexRichEditKeyPress;
-   //   HexMemo->OnMouseMove=HexRichEditMouseMove;
+  //   HexMemo->OnKeyDown=HexRichEditKeyDown;
+  //   HexMemo->OnKeyPress=HexRichEditKeyPress;
+  //   HexMemo->OnMouseMove=HexRichEditMouseMove;
 
   d_splitterWndTopLeft->AddRow();
   d_splitterWndTopLeft->AddColumn();
@@ -303,7 +434,7 @@ FontDialog=new TFontDialog();
   d_splitterWndTopLeft->SetWindow(0,1,HexMemo->m_hWnd);
   d_splitterWndTopLeft->SetWindow(0,2,StringMemo->m_hWnd);
 
-//-------------------- Joining Top panes -----------------------
+  //-------------------- Joining Top panes -----------------------
   d_splitterWndTop->AddRow();
   d_splitterWndTop->AddColumn();
   d_splitterWndTop->AddColumn();
@@ -314,257 +445,279 @@ FontDialog=new TFontDialog();
   d_splitterWnd->AddRow();
   d_splitterWnd->AddColumn();
 
-  d_splitterWndTop->SetWindow(0,0,d_splitterWndTop->m_hWnd);
-  d_splitterWndTop->SetWindow(1,0,d_splitterWndBottom->m_hWnd);
+  d_splitterWnd->SetWindow(0,0,d_splitterWndTop->m_hWnd);
+  d_splitterWnd->SetWindow(1,0,d_splitterWndBottom->m_hWnd);
 
-//--------------- Joining Top and bottom ---------------------
+  //--------------- Joining Top and bottom ---------------------
 
-   d_splitterWnd->ShowWindow(SW_SHOW);
-   d_splitterWndTop->ShowWindow(SW_SHOW);
-   d_splitterWndBottom->ShowWindow(SW_SHOW);
+  ProgressBar->ShowWindow( SW_SHOW );
+  InfoEdit->ShowWindow( SW_SHOW );
+  GotoInputGroupBox->ShowWindow(SW_SHOW);
+  StringNumberEdit->ShowWindow(SW_SHOW);
+  StringLengthEdit->ShowWindow(SW_SHOW);
+  SearcherProperties->ShowWindow(SW_SHOW);
+  PointerMemo->ShowWindow(SW_SHOW);
+  HexMemo->ShowWindow(SW_SHOW);
+  StringMemo->ShowWindow(SW_SHOW);
 
-   d_splitterWndTopLeft->ShowWindow(SW_SHOW);
-   d_splitterWndTopRight->ShowWindow(SW_SHOW);
+  d_splitterWndTopRightBox->ShowWindow(SW_SHOW);
 
+  d_splitterWnd->ShowWindow(SW_SHOW);
+  d_splitterWndTop->ShowWindow(SW_SHOW);
+  d_splitterWndBottom->ShowWindow(SW_SHOW);
 
+  d_splitterWndTopLeft->ShowWindow(SW_SHOW);
+  d_splitterWndTopRight->ShowWindow(SW_SHOW);
+
+  d_splitterWnd->Update();
+  d_splitterWndTop->Update();
+  d_splitterWndBottom->Update();
+
+  d_splitterWndTopLeft->Update();
+  d_splitterWndTopRight->Update();
+
+  SearcherProperties->setOnSelectPointer( TPointerSelectEventPtr (new TPointerSelectEvent(boost::bind(&TStreamEdit::PointersNotifyEvent,this,_1)) ) );
+
+  WindowsMessageHandler::getWindowsMessageHandler().append(HexMemo,this);
 }
 
 //---------------------------------------------------------------------------
 void  TStreamEdit::SearchMenuItemClick()
 {
-Search(true);
+  Search(true);
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::SlowSearchMenuItemClick()
 {
-SlowSearch();
+  SlowSearch();
 }
 //---------------------------------------------------------------------------
- TStreamEdit::~TStreamEdit(void)
+TStreamEdit::~TStreamEdit(void)
 {
-//delete MemoryStream;
-NumberOfCopies--;
-if(NumberOfCopies==0)
- {
-/*  for(int i=0;i<ClipBoard->Count;i++)
-   {
+  //delete MemoryStream;
+  NumberOfCopies--;
+  if(NumberOfCopies==0)
+  {
+    /*  for(int i=0;i<ClipBoard->Count;i++)
+    {
     delete (TMemoryStream*)ClipBoard->Items[i];
-   }
-  delete ClipBoard;
-*/  
- }
+    }
+    delete ClipBoard;
+    */  
+  }
 }
 
 void  TStreamEdit::LoadFromStream(void)
 {
-if(Showing)
- {
   ViewedLen=0;
   int RealRead=StringLen;
   char* ch=new char[StringLen];
-  int HexMemoSelStart=HexMemo->SelStart;
-  int StringMemoSelStart=StringMemo->SelStart;
+  long HexMemoSelStart,HexMemoSelEnd;
+  long StringMemoSelStart,StringMemoSelEnd;
+  HexMemo->GetSel(HexMemoSelStart,HexMemoSelEnd);
+  StringMemo->GetSel(StringMemoSelStart,StringMemoSelEnd);
 
-  HexMemo->Lines->BeginUpdate();
-  StringMemo->Lines->BeginUpdate();
-  PointerMemo->Lines->BeginUpdate();
-  HexMemo->Lines->Clear();
-  StringMemo->Lines->Clear();
-  PointerMemo->Lines->Clear();
-try
- {
-  if(getStream())
-   {
-//
-std::string streamName;
-if(dynamic_cast<std::ifstream*>(getStream().get()))
-    streamName = "std::ifstream";
-else if(dynamic_cast<std::stringstream*>(getStream().get()))
-    streamName = "std::stringstream";
-else
-     streamName = "ProcessStream";
+  HexMemo->SetWindowText(CString(""));
+  StringMemo->SetWindowText(CString(""));
+  PointerMemo->SetWindowText(CString(""));
 
-     std::stringstream caption;
-     caption << "StreamObject "
-             << streamName
-             << ". Edit field size : "
-             << std::setfill('0') << std::setw(8) << getStream()->seekg(0,std::ios_base::end).tellg()
-             << " (hex), (dec) - " << getStream()->seekg(0,std::ios_base::end).tellg();
-     GroupBox1->Caption = caption.str().c_str();
-     getStream()->seekg(CurrentPos,std::ios_base::beg);
+  try
+  {
+    if(getStream())
+    {
+      //
+      std::string streamName;
+      if(dynamic_cast<std::ifstream*>(getStream().get()))
+        streamName = "std::ifstream";
+      else if(dynamic_cast<std::stringstream*>(getStream().get()))
+        streamName = "std::stringstream";
+      else
+        streamName = "ProcessStream";
 
-    for(int i=0;(i<NumberOfString)&&(RealRead!=0);i++)
+      std::stringstream caption;
+      caption << "StreamObject "
+        << streamName
+        << ". Edit field size : "
+        << std::setfill('0') << std::setw(8) << getStream()->seekg(0,std::ios_base::end).tellg()
+        << " (hex), (dec) - " << getStream()->seekg(0,std::ios_base::end).tellg();
+      //GroupBox1->Caption = caption.str().c_str();
+      getStream()->seekg(FCurrentPos,std::ios_base::beg);
+
+      std::stringstream pointerStream;
+      std::stringstream hexStream;
+      std::stringstream stringStream;
+      for(int i=0;(i<NumberOfString)&&(RealRead!=0);i++)
       {
-       if((RealRead=getStream()->read(ch,StringLen).gcount())>0)
+        if((RealRead=getStream()->read(ch,StringLen).gcount())>0)
         {
-           PointerMemo->Lines->Add(ulongTo8digitHexString(getStream()->tellg()-RealRead).c_str());
-		   HexMemo->Lines->Add(charptrToHexAnsiWithSpace(ch,RealRead).c_str());
-		   StringMemo->Lines->Add(ConvertToPrintString(ch,RealRead).c_str());
-           ViewedLen+=RealRead;
+          pointerStream << ulongTo8digitHexString((unsigned long)getStream()->tellg()-RealRead) << "\r\n";
+          hexStream << charptrToHexAnsiWithSpace(ch,RealRead)<< "\r\n";
+          stringStream << ConvertToPrintString(ch,RealRead)<< "\r\n";
+          ViewedLen+=RealRead;
         }
-       else
-        if(i==0)
-         if(getStream()->tellg()>FCurrentPos) FCurrentPos=getStream()->tellg();
+        else
+          if(i==0)
+            if(getStream()->tellg()>FCurrentPos) FCurrentPos=getStream()->tellg();
       }
-   }
- }
-catch(std::exception& e)
- {
-   ShowMessage()
-  Application->ShowException(&e);
- }
+      HexMemo->SetWindowText(CString(hexStream.str().c_str()));
+      StringMemo->SetWindowText(CString(stringStream.str().c_str()));
+      PointerMemo->SetWindowText(CString(pointerStream.str().c_str()));
+    }
+  }
+  catch(std::exception& e)
+  {
+    getReporter().showMessage(e.what(),MessageReporterBase::TYPE_EXCEPTION);
+  }
   delete ch;
-  HexMemo->Lines->EndUpdate();
-  StringMemo->Lines->EndUpdate();
-  PointerMemo->Lines->EndUpdate();
+
   StringNumberEdit->SetWindowText(CString(ulongToAnsi(NumberOfString).c_str()));
   StringLengthEdit->SetWindowText(CString(ulongToAnsi(StringLen).c_str()));
 
-  HexMemo->SelStart=HexMemoSelStart;
-  StringMemo->SelStart=StringMemoSelStart;
- }//enf if (Showing)
+  HexMemo->SetSel(HexMemoSelStart,HexMemoSelStart);
+  StringMemo->SetSel(StringMemoSelStart,StringMemoSelStart);
 }
 
 void  TStreamEdit::LoadFromStreamMenuitemClick()
 {
-LoadFromStream();
+  LoadFromStream();
 }
 //---------------------------------------------------------------------------
 
 int  TStreamEdit::ConvertHexPosToGlobal(int value)
 {
-//value=HexRichEdit->SelStart;
-int res=0;
-res+=StringLen*(value/(3*StringLen+1))+(value%(3*StringLen+1))/3;
-return res;
+  //value=HexRichEdit->SelStart;
+  int res=0;
+  res+=StringLen*(value/(3*StringLen+1))+(value%(3*StringLen+1))/3;
+  return res;
 }
 
 void  TStreamEdit::HexRichEditKeyDown(UINT Key)
 {
-/*
-ssShift	The Shift key is held down.
-ssAlt	The Alt key is held down.
-ssCtrl	The Ctrl key is held down.
-ssLeft	The left mouse button is held down.
-ssRight	The right mouse button is held down.
-ssMiddle	The middle mouse button is held down.
-ssDouble	The mouse was double-clicked.
-*/
-if((Key>=0x30)&&(Key<=0x39))       // '0'-'9'
- {
-  HexRichEditKeyPres(Key-0x30);
- }
-else
- {
-   if((Key>=0x41)&&(Key<=0x46))     // 'a' - 'f'
-     {
-       HexRichEditKeyPres(Key-0x41+0xa);
-     }
-   else
-     {
+  /*
+  ssShift	The Shift key is held down.
+  ssAlt	The Alt key is held down.
+  ssCtrl	The Ctrl key is held down.
+  ssLeft	The left mouse button is held down.
+  ssRight	The right mouse button is held down.
+  ssMiddle	The middle mouse button is held down.
+  ssDouble	The mouse was double-clicked.
+  */
+  if((Key>=0x30)&&(Key<=0x39))       // '0'-'9'
+  {
+    HexRichEditKeyPres(Key-0x30);
+  }
+  else
+  {
+    if((Key>=0x41)&&(Key<=0x46))     // 'a' - 'f'
+    {
+      HexRichEditKeyPres(Key-0x41+0xa);
+    }
+    else
+    {
       if(Key==0x27)//right
-       {
-         ShiftHexSelStart(1);
-       }
+      {
+        ShiftHexSelStart(1);
+      }
       else
-       {
+      {
         if(Key==0x25) //left
-         {
-           ShiftHexSelStart(-1);
-         }
+        {
+          ShiftHexSelStart(-1);
+        }
         else
-         {
+        {
           if(Key==0x26)//up
-           {
+          {
             ShiftHexSelStart(-StringLen*2);
-           }
+          }
           else
-           {
+          {
             if(Key==0x28)//down
-             {
-               ShiftHexSelStart(StringLen*2);
-             }
+            {
+              ShiftHexSelStart(StringLen*2);
+            }
             else
-             {
+            {
               if(Key==0x23)//end
-               {
+              {
 
-               }
+              }
               else
-               {
+              {
                 if(Key==0x22)//PgDown
-                 {
-                   ShiftHexSelStart(StringLen*NumberOfString*2);
-                 }
+                {
+                  ShiftHexSelStart(StringLen*NumberOfString*2);
+                }
                 else
-                 {
+                {
                   if(Key==0x21)//PgUp
-                   {
-                      ShiftHexSelStart(-StringLen*NumberOfString*2);
-                   }
+                  {
+                    ShiftHexSelStart(-StringLen*NumberOfString*2);
+                  }
                   else
-                   {
+                  {
                     if(Key==0x24)//Home
-                     {
+                    {
 
-                     }
+                    }
                     else
-                     {
+                    {
                       if(Key==0x9) //tab
-                       {
-                         int pos=ConvertHexPosToGlobal(HexMemo->SelStart);
-                         StringMemo->SelStart=ConvertGlobalToStringPos(pos);
-                         StringMemo->SetFocus();
-                       }
+                      {
+                        long hexStart,hexEnd;
+                        HexMemo->GetSel(hexStart,hexEnd);
+                        int pos=ConvertHexPosToGlobal(hexStart);
+                        StringMemo->SetSel(ConvertGlobalToStringPos(pos),ConvertGlobalToStringPos(pos));
+                      }
                       else
-                       {
+                      {
                         if(Key==0x1)   //??
-                         {
+                        {
 
-                         }
+                        }
                         else
-                         {
+                        {
 
-                         }
-                       }
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
-     }
- }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
-std::string _shift="";
-/*
-if(Shift.Contains(ssShift))
+  std::string _shift="";
+  /*
+  if(Shift.Contains(ssShift))
   _shift+=AnsiString("+Shift");
 
-if(Shift.Contains(ssAlt))
+  if(Shift.Contains(ssAlt))
   _shift+=AnsiString("+Alt");
 
-if(Shift.Contains(ssCtrl))
+  if(Shift.Contains(ssCtrl))
   _shift+=AnsiString("+Ctrl");
 
-if(Shift.Contains(ssLeft))
+  if(Shift.Contains(ssLeft))
   _shift+=AnsiString("+MouseLeft");
 
-if(Shift.Contains(ssRight))
+  if(Shift.Contains(ssRight))
   _shift+=AnsiString("+MouseRight");
 
 
 
-if(Shift.Contains(ssMiddle))
+  if(Shift.Contains(ssMiddle))
   _shift+=AnsiString("+MouseMiddle");
 
-if(Shift.Contains(ssDouble))
+  if(Shift.Contains(ssDouble))
   _shift+=AnsiString("+MouseDobleClick");
-*/
-InfoEdit->SetWindowText(  CString(std::string("Key: "+ulongToHexAnsi(Key).c_str()+" "+_shift).c_str()) );
-Key=0;
+  */
+  InfoEdit->SetWindowText(  CString(std::string("Key: "+ulongToHexAnsi(Key)+" "+_shift).c_str()) );
+  Key=0;
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::GotoMenuItemClick()
@@ -574,43 +727,42 @@ void  TStreamEdit::GotoMenuItemClick()
 //---------------------------------------------------------------------------
 void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
 {
-int hexStart,hexEnd;
-HexMemo->GetSel(hexStart,hexEnd);
-int pos=ConvertHexPosToGlobal(hexStart);
-int rem;
-int hexPos=ConvertGlobalToHexPos(pos);
-const char* ch;
-char print[2];
-print[1]=0;
-int StringPos=ConvertGlobalToStringPos(pos);
+  long hexStart,hexEnd;
+  HexMemo->GetSel(hexStart,hexEnd);
+  int pos=ConvertHexPosToGlobal(hexStart);
+  int rem;
+  int hexPos=ConvertGlobalToHexPos(pos);
+  const char* ch;
+  char print[2];
+  print[1]=0;
+  int StringPos=ConvertGlobalToStringPos(pos);
+  StringMemo->SetSel(StringPos,StringPos+1);
 
 
-StringMemo->SetSel(StringPos,StringPos+1);
+  getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
 
+  HexMemo->SetSel(hexStart,hexStart);
+  std::stringstream str;
+  str << std::hex << value;
+  HexMemo->ReplaceSel(CString(str.str().c_str()));
 
-getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
+  HexMemo->GetSel(hexStart,hexEnd);
+  rem=hexStart;
+  HexMemo->SetSel(hexPos,hexPos+1);
 
-StringMemo->SetSel(hexStart,hexStart+1);
-std::stringstream str;
-str << std::hex << value;
-HexMemo->ReplaceSel(CString(str.str().c_str()));
+  CString hexSelStr = HexMemo->GetSelText();
+  ch=HexAnsiTocharptr( std::string( CT2CA(hexSelStr) ) );
+  print[0]=ConvertToPrintSign(*ch);
+  StringMemo->ReplaceSel(CString(print));
 
-HexMemo->GetSel(hexStart,hexEnd);
-rem=hexStart;
+  HexMemo->SetSel(rem,rem);
+  HexMemo->SetSel(-1,0);
+  getStream()->write(ch,1);
+  ShiftIfWrongHexSelStart();
 
-HexMemo->SetSel(hexPos,hexPos+2);
+  delete ch;
 
-ch=HexAnsiTobyteptr(HexMemo->SelText.c_str());
-print[0]=ConvertToPrintSign(*ch);
-StringMemo->SelText=AnsiString(print);
-HexMemo->SelLength=0;
-getStream()->write(ch,1);
-HexMemo->SelStart=rem;
-ShiftIfWrongHexSelStart();
-
-delete ch;
-
-//char
+  //char
 
 }
 
@@ -618,23 +770,32 @@ delete ch;
 
 void TStreamEdit::ShiftIfWrongHexSelStart()
 {
-int pos=ConvertHexPosToGlobal(HexMemo->SelStart);
-if(pos==ViewedLen-1)
+  long hexStart, hexEnd;
+  HexMemo->GetSel(hexStart,hexEnd);
+  int pos=ConvertHexPosToGlobal(hexStart);
+  if(pos==ViewedLen-1)
   {
-    HexMemo->SelStart--;
+    hexStart--;
+    hexEnd--;
+    HexMemo->SetSel(hexStart,hexEnd);
     ShiftHexSelStart(1);
   }
-else
+  else
   {
-    if(HexMemo->SelStart%(3*StringLen+1)==3*StringLen-1)
-     {
-       HexMemo->SelStart+=2;
-
-     }
+    if(hexStart%(3*StringLen+1)==3*StringLen-1)
+    {
+      hexStart+=2;
+      hexEnd+=2;
+      HexMemo->SetSel(hexStart,hexEnd);
+    }
   }
 
-if((HexMemo->SelStart%(3*StringLen+1))%3==2)
-HexMemo->SelStart++;
+  if((hexStart%(3*StringLen+1))%3==2)
+  {
+    hexStart++;
+    hexEnd++;
+    HexMemo->SetSel(hexStart,hexEnd);
+  }
 }
 
 int  TStreamEdit::ConvertGlobalToHexPos(int value)
@@ -650,44 +811,47 @@ void  TStreamEdit::HexRichEditKeyPress(unsigned char Key)
 //---------------------------------------------------------------------------
 int TStreamEdit::FindInStream(char* buf, int len)
 {
-//Stream->Search(buf,len);
-/*int res=0;
-int pos=0;
-int curPosition=stream->Position;
-char* work=new char[len];
+  getReporter().showMessage("TStreamEdit::FindInStream not implemented yet",MessageReporterBase::TYPE_WARNING);
+  //Stream->Search(buf,len);
+  /*int res=0;
+  int pos=0;
+  int curPosition=stream->Position;
+  char* work=new char[len];
 
-for(;res+stream->Position<stream->Size-len;res++)
- {
-   pos=stream->Position;
-   stream->Position+=res;
-   if(stream->Read(&work,len)==len);
-      if(memcmp(work,buf,len)==0)
-          break;
- }
-delete work;
-return -1;*/
+  for(;res+stream->Position<stream->Size-len;res++)
+  {
+  pos=stream->Position;
+  stream->Position+=res;
+  if(stream->Read(&work,len)==len);
+  if(memcmp(work,buf,len)==0)
+  break;
+  }
+  delete work;*/
+  return -1;
 }
 
 void  TStreamEdit::setCurrentPos( int value)
 {
-if((value<getStream()->seekg(0,std::ios_base::end).tellg())&&(value>=0))
- {
-  FCurrentPos=value;
-  LoadFromStream();
- }
+  if((value<getStream()->seekg(0,std::ios_base::end).tellg())&&(value>=0))
+  {
+    FCurrentPos=value;
+    LoadFromStream();
+  }
 }
 
 void  TStreamEdit::ShiftHexSelStart(int Shift)
 {
-int value=HexMemo->SelStart;
-int InBytePos=(value%(3*StringLen+1))%3;
-int Offset=ConvertHexPosToGlobal(value);
-int OldOffset=Offset;
-Offset+=Shift/2;
-if(Shift%2!=0)
- {
-  switch(Shift%2+InBytePos)
-   {
+  long Start,End,Len;
+  HexMemo->GetSel(Start,End);
+  long value=Start;
+  long InBytePos=(value%(3*StringLen+1))%3;
+  long Offset=ConvertHexPosToGlobal(value);
+  long OldOffset=Offset;
+  Offset+=Shift/2;
+  if(Shift%2!=0)
+  {
+    switch(Shift%2+InBytePos)
+    {
     case -1:
       Offset--;
       InBytePos=1;
@@ -696,283 +860,359 @@ if(Shift%2!=0)
       Offset++;
       InBytePos=0;
       break;
-     default :
+    default :
       InBytePos+=Shift%2;
-   }
- }
-
-if((Offset+FCurrentPos>=0)&&(Offset+FCurrentPos<getStream()->seekg(0,std::ios_base::end).tellg()))
- {
-   if((Offset<0)||(Offset>=ViewedLen))
-    {
-     FCurrentPos+=((Shift/(2*StringLen)))*StringLen+Shift%2;
-     Offset=OldOffset;
     }
-    HexMemo->SelStart=ConvertGlobalToHexPos(Offset)+InBytePos;
- }
-  GetVariablesAtPos(CurrentPos+Offset);
+  }
+
+  if((Offset+FCurrentPos>=0)&&(Offset+FCurrentPos<getStream()->seekg(0,std::ios_base::end).tellg()))
+  {
+    if((Offset<0)||(Offset>=ViewedLen))
+    {
+      FCurrentPos+=((Shift/(2*StringLen)))*StringLen+Shift%2;
+      Offset=OldOffset;
+    }
+    HexMemo->SetSel(ConvertGlobalToHexPos(Offset)+InBytePos,ConvertGlobalToHexPos(Offset)+InBytePos);
+  }
+  GetVariablesAtPos(FCurrentPos+Offset);
 }
 
 void  TStreamEdit::CopyMenuItemClick()
 {
-int Start;
-int End;
-int Len;
-boost::shared_ptr<std::stringstream> buf=boost::shared_ptr<std::stringstream>(new std::stringstream());
-if(HexMemo->SelLength>0)
-  {
-    Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-    End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
-  }
- else
-  {
-    End=ConvertHexPosToGlobal(HexMemo->SelStart);
-    Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
-  }
+  long Start,End,Len;
+  boost::shared_ptr<std::stringstream> buf=boost::shared_ptr<std::stringstream>(new std::stringstream());
+
+  HexMemo->GetSel(Start,End);
+  Len = Start - End;
+
+  End=ConvertHexPosToGlobal(End);
+  Start=ConvertHexPosToGlobal(Start);
+
   Len=End-Start+1;
-  getStream()->seekg(Start+CurrentPos,std::ios_base::beg);
+  getStream()->seekg(Start+FCurrentPos,std::ios_base::beg);
   //   copy
   std::vector<char> myBuf;
   myBuf.resize(Len);
   Len = getStream()->read(&(myBuf[0]),Len).gcount();
   buf->write(&(myBuf[0]),Len);
-//  Len=buf->CopyFrom(stream.get(),Len);
-ClipBoard.push_back(buf);
+  //  Len=buf->CopyFrom(stream.get(),Len);
+  ClipBoard.push_back(buf);
 }
-//---------------------------------------------------------------------------
-void  TStreamEdit::PopupMenu1Popup(TObject *Sender)
+namespace
 {
-int i;
-int len;
-CMenuItem* menu;
-AnsiString caption;
- CopytoMenuItem->Clear();
- PasteFromMenuItem->Clear();
- DeleteMenuItem->Clear();
- EditBufMenuItem->Clear();
- EditBufMenuItem->Enabled=(! ClipBoard.empty());
-    DeleteMenuItem->Enabled=(! ClipBoard.empty());
-    PasteFromMenuItem->Enabled=(! ClipBoard.empty());
-    PasteMenuItem->Enabled=(! ClipBoard.empty());
-    CopytoMenuItem->Enabled=((! ClipBoard.empty())&&(HexMemo->SelLength!=0));
-    ClearClipBoardMenuItem->Enabled=(! ClipBoard.empty());
-    CopyMenuItem->Enabled=(HexMemo->SelLength!=0);
-for(i=0;i<ClipBoard.size();i++)
- {
-   caption=ulongToAnsi(i).c_str();
-   menu= new CMenuItem(DeleteMenuItem);
-   menu->Caption=caption;
-   menu->OnClick=DeleteSubMenuClick;
-   DeleteMenuItem->Add(menu);
+  void clearMenu(CMenu& io_menu,Container& io_container)
+  {
+    while(io_menu.GetMenuItemCount() >0)
+    {
+      io_container.removeCommand(io_menu.GetMenuItemID(0));
+      io_menu.DeleteMenu(0,MF_BYPOSITION);
+    }
+  }
+}
 
-   menu= new CMenuItem(CopytoMenuItem);
-   menu->Caption=caption;
-   menu->OnClick=CopytoMenuClick;
-   CopytoMenuItem->Add(menu);
 
-   menu= new CMenuItem(PasteFromMenuItem);
-   menu->Caption=caption;
-   menu->OnClick=PasteFromMenuClick;
-   PasteFromMenuItem->Add(menu);
+//---------------------------------------------------------------------------
+void  TStreamEdit::PopupMenu1Popup()
+{
+  unsigned int i;
+  unsigned int len;
+  CMenuItem* menu;
+  std::string caption;
 
-   menu= new CMenuItem(EditBufMenuItem);
-   menu->Caption=caption;
-   menu->OnClick=EditBufMenuClick;
-   EditBufMenuItem->Add(menu);
- }
+  clearMenu(*CopytoMenuItem,d_menuCommands);
+  clearMenu(*PasteFromMenuItem,d_menuCommands);
+  clearMenu(*DeleteMenuItem,d_menuCommands);
+  clearMenu(*EditBufMenuItem,d_menuCommands);
+  clearMenu(*EditBufMenuItem,d_menuCommands);
+
+  long hexStart,hexEnd;
+  HexMemo->GetSel(hexStart,hexEnd);
+  PopupMenu->EnableMenuItem (12,MF_BYPOSITION   |  ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED ) );
+  PopupMenu->EnableMenuItem (13,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  PopupMenu->EnableMenuItem (11,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+
+  PopupMenu->EnableMenuItem (6,MF_BYPOSITION    | ( (hexEnd-hexStart!=0) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  PopupMenu->EnableMenuItem (7,MF_BYPOSITION    | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  PopupMenu->EnableMenuItem (10,MF_BYPOSITION   | ( ((! ClipBoard.empty())&&(hexEnd-hexStart!=0)) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  PopupMenu->EnableMenuItem (14,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+
+  for(i=0;i<ClipBoard.size();i++)
+  {
+    std::string caption = ulongToAnsi(i);
+
+    UINT DeleteEntryMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::DeleteSubMenuClick,this,(unsigned int)i)) ));
+    DeleteMenuItem->AppendMenu(MF_STRING, DeleteEntryMenuItemID, CString( caption.c_str() ) );
+
+    UINT CopytoMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::CopytoMenuClick,this,(unsigned int)i)) ));
+    CopytoMenuItem->AppendMenu(MF_STRING, CopytoMenuItemID, CString( caption.c_str() ) );
+
+    UINT PastefromMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::PasteFromMenuClick,this,(unsigned int)i)) ));
+    PasteFromMenuItem->AppendMenu(MF_STRING, PastefromMenuItemID, CString( caption.c_str() ) );
+
+    UINT EditBufMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::EditBufMenuClick,this,(unsigned int)i)) ));
+    EditBufMenuItem->AppendMenu(MF_STRING, EditBufMenuItemID, CString( caption.c_str() ) );
+  }
 }
 
 // read in from current position to the end
 // read data transfered to out
 void copyTheRest(std::ostream& out, std::istream& in,
-std::istream::traits_type::int_type len =  std::istream::traits_type::eof())
+                 std::istream::traits_type::int_type len =  std::istream::traits_type::eof())
 {
   if( len == std::istream::traits_type::eof())
   {
-  while (out && in)
-      {
-       char ch;
-       in.read(&ch,1);
-       out.write(&ch,1);
-      }
+    while (out && in)
+    {
+      char ch;
+      in.read(&ch,1);
+      out.write(&ch,1);
+    }
   }
   else
   {
-      std::istream::traits_type::int_type count = 0 ;
-      while (out && in && (count++ < len ))
-      {
-        char ch;
-        in.read(&ch,1);
-        out.write(&ch,1);
-      }
+    std::istream::traits_type::int_type count = 0 ;
+    while (out && in && (count++ < len ))
+    {
+      char ch;
+      in.read(&ch,1);
+      out.write(&ch,1);
+    }
   }
 
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::PasteMenuItemClick()
 {
-  int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
+  long Start,End;
+  HexMemo->GetSel(Start,End);
+  Start=ConvertHexPosToGlobal(Start);
   // initialize current position
-  getStream()->seekp(Start+CurrentPos, std::ios_base::beg);
+  getStream()->seekp(Start+FCurrentPos, std::ios_base::beg);
   // set read pointer to the beginnig
   ClipBoard.back().get()->seekg(0,std::ios_base::beg);
   copyTheRest(*getStream(),*(ClipBoard.back()));
-//  stream->CopyFrom(ClipBoard.back().get(),0);
+  //  stream->CopyFrom(ClipBoard.back().get(),0);
   LoadFromStream();
 }
 //---------------------------------------------------------------------------
-void  TStreamEdit::DeleteSubMenuClick(TObject *Sender)
+void  TStreamEdit::DeleteSubMenuClick(int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num = menu->Caption.ToInt();
+  unsigned int num = (unsigned int)idx;
   if(num < ClipBoard.size() )
-      ClipBoard.erase( ClipBoard.begin()+num );
+    ClipBoard.erase( ClipBoard.begin()+num );
   else
   {
     std::stringstream msg;
     msg << "Can't delete element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
-        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
     throw std::runtime_error( msg.str() );
   }
 }
 //---------------------------------------------------------------------------
-void  TStreamEdit::CopytoMenuClick(TObject *Sender)
+void  TStreamEdit::CopytoMenuClick(int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
-  int Start;
-  int End;
-  int Len;
+  unsigned int num = (unsigned int)idx;
+  long Start, End, Len;
 
-  if(HexMemo->SelLength>0)
-    {
-      Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-      End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
-    }
-  else
-    {
-      End=ConvertHexPosToGlobal(HexMemo->SelStart);
-      Start=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
-    }
+  HexMemo->GetSel(Start,End);
+  Len = Start - End;
+
+  End=ConvertHexPosToGlobal(End);
+  Start=ConvertHexPosToGlobal(Start);
+
   Len=End-Start+1;
-  getStream()seekg(Start+CurrentPos, std::ios_base::beg);
+  getStream()->seekg(Start+FCurrentPos, std::ios_base::beg);
   if( num < ClipBoard.size() )
   {
     boost::shared_ptr<std::stringstream> memory = ((*(ClipBoard.begin()+num)));
     memory->str("");
-    copyTheRest(*memory,*stream,Len);  // clear content
-//    memory->CopyFrom(*stream,Len);
+    copyTheRest(*memory,*getStream(),Len);  // clear content
+    //    memory->CopyFrom(*stream,Len);
   }
   else
   {
     std::stringstream msg;
     msg << "Can't copy to element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
-        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
     throw std::runtime_error( msg.str() );
   }
 
 }
 //---------------------------------------------------------------------------
-void  TStreamEdit::PasteFromMenuClick(TObject *Sender)
+void  TStreamEdit::PasteFromMenuClick(int idx)
 {
-CMenuItem* menu=(CMenuItem*)Sender;
-int num=menu->Caption.ToInt();
+  unsigned int num = (unsigned int)idx;
+  long Start,End;
 
-int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-getStream()seekp(Start+CurrentPos,std::ios_base::beg);
+  HexMemo->GetSel(Start,End);
+  End=ConvertHexPosToGlobal(End);
+  Start=ConvertHexPosToGlobal(Start);
+
+  getStream()->seekp(Start+FCurrentPos,std::ios_base::beg);
   if( num < ClipBoard.size() )
   {
     (*(ClipBoard.begin() + num)).get()->seekg(0,std::ios_base::beg);
     copyTheRest(*getStream(),*(*(ClipBoard.begin() + num)));
-//    stream->CopyFrom((*(ClipBoard.begin() + num)).get(),0);
+    //    stream->CopyFrom((*(ClipBoard.begin() + num)).get(),0);
   }
   else
   {
     std::stringstream msg;
     msg << "Can't copy from element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
-        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
     throw std::runtime_error( msg.str() );
   }
 
-LoadFromStream();
+  LoadFromStream();
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::ClearClipBoardMenuItemClick()
 {
-ClipBoard.clear();
+  ClipBoard.clear();
 }
 //---------------------------------------------------------------------------
 
 void  TStreamEdit::Font1Click()
 {
-  FontDialog->Execute();
-  HexMemo->Font=FontDialog->Font;
-  StringMemo->Font=FontDialog->Font;
-  PointerMemo->Font=FontDialog->Font;
+  if(FontDialog->DoModal()==IDOK)
+  {
+    // Create the font using the selected font from CFontDialog.
+    LOGFONT lf;
+    memcpy(&lf, FontDialog->m_cf.lpLogFont, sizeof(LOGFONT));
+
+    d_pointerMemoFont = boost::shared_ptr<CFont>(new CFont());
+    d_stringMemoFont = boost::shared_ptr<CFont>(new CFont());
+    d_hexMemoFont = boost::shared_ptr<CFont>(new CFont());
+    VERIFY(d_pointerMemoFont->CreateFontIndirect(&lf));
+    VERIFY(d_stringMemoFont->CreateFontIndirect(&lf));
+    VERIFY(d_hexMemoFont->CreateFontIndirect(&lf));
+
+    PointerMemo->SetFont(d_pointerMemoFont.get());
+    StringMemo->SetFont(d_stringMemoFont.get());
+    HexMemo->SetFont(d_hexMemoFont.get());
+
+  }
+
+
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::Color1Click()
 {
-  ColorDialog->Execute();
-  HexMemo->Color=ColorDialog->Color;
-  StringMemo->Color=ColorDialog->Color;
-  PointerMemo->Color=ColorDialog->Color;
+  if(ColorDialog->DoModal()==IDOK)
+  {
+      getReporter().showMessage("TStreamEdit::Color1Click not implemented yet",MessageReporterBase::TYPE_WARNING);
+  }
+
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::ChangeColor()
 {
-  ColorDialog->Execute();
-  ((TMemo*)Sender)->Color=ColorDialog->Color;
+  if(ColorDialog->DoModal()==IDOK)
+  {
+      getReporter().showMessage("TStreamEdit::ChangeColor not implemented yet",MessageReporterBase::TYPE_WARNING);
+      //((TMemo*)Sender)->Color=ColorDialog->Color;
+  }
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::StringFonCMenuItemClick()
 {
-if(FontDialog->Execute())
- StringMemo->Font=FontDialog->Font;
+  if(FontDialog->DoModal()==IDOK)
+  {
+    // Create the font using the selected font from CFontDialog.
+    LOGFONT lf;
+    memcpy(&lf, FontDialog->m_cf.lpLogFont, sizeof(LOGFONT));
+
+    d_stringMemoFont = boost::shared_ptr<CFont>(new CFont());
+    VERIFY(d_stringMemoFont->CreateFontIndirect(&lf));
+
+    StringMemo->SetFont(d_stringMemoFont.get());
+
+  }
+
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::PointerFonCMenuItemClick()
 {
-  if(FontDialog->Execute())
-    PointerMemo->Font=FontDialog->Font;
+  if(FontDialog->DoModal()==IDOK)
+  {
+    // Create the font using the selected font from CFontDialog.
+    LOGFONT lf;
+    memcpy(&lf, FontDialog->m_cf.lpLogFont, sizeof(LOGFONT));
+
+    d_pointerMemoFont = boost::shared_ptr<CFont>(new CFont());
+    VERIFY(d_pointerMemoFont->CreateFontIndirect(&lf));
+
+    PointerMemo->SetFont(d_pointerMemoFont.get());
+
+  }
+
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::HexFonCMenuItemClick()
 {
-  if(FontDialog->Execute())
-  HexMemo->Font=FontDialog->Font;
+  if(FontDialog->DoModal()==IDOK)
+  {
+    // Create the font using the selected font from CFontDialog.
+    LOGFONT lf;
+    memcpy(&lf, FontDialog->m_cf.lpLogFont, sizeof(LOGFONT));
+
+    d_hexMemoFont = boost::shared_ptr<CFont>(new CFont());
+    VERIFY(d_hexMemoFont->CreateFontIndirect(&lf));
+
+    HexMemo->SetFont(d_hexMemoFont.get());
+
+  }
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::StringColorMenuItemClick()
 {
-  if(ColorDialog->Execute())
-    StringMemo->Color=ColorDialog->Color;
+  if(FontDialog->DoModal()==IDOK)
+  {
+    // Create the font using the selected font from CFontDialog.
+    LOGFONT lf;
+    memcpy(&lf, FontDialog->m_cf.lpLogFont, sizeof(LOGFONT));
+
+    d_stringMemoFont = boost::shared_ptr<CFont>(new CFont());
+    VERIFY(d_hexMemoFont->CreateFontIndirect(&lf));
+
+    StringMemo->SetFont(d_stringMemoFont.get());
+
+  }
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::PointerColorMenuItemClick()
 {
-  if(ColorDialog->Execute())
-    PointerMemo->Color=ColorDialog->Color;
+  if(ColorDialog->DoModal()==IDOK)
+  {
+    d_pointerMemoColor = ColorDialog->GetColor();
+  }
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::HexColorMenuItemClick()
 {
-  if(ColorDialog->Execute())
-    HexMemo->Color=ColorDialog->Color;
+  if(ColorDialog->DoModal()==IDOK)
+  {
+    getReporter().showMessage("Color adjustmnet not implemented yet",MessageReporterBase::TYPE_WARNING);
+    d_hexMemoColor = ColorDialog->GetColor();
+  }
 }
 //---------------------------------------------------------------------------
-void  TStreamEdit::EditBufMenuClick(TObject *Sender)
+void  TStreamEdit::EditBufMenuClick(int idx)
 {
-  CMenuItem* menu=(CMenuItem*)Sender;
-  int num=menu->Caption.ToInt();
-if( num < ClipBoard.size() )
+  unsigned int num = (unsigned int)idx;
+  if( num < ClipBoard.size() )
   {
+    getReporter().showMessage("Buffer edit not implemented yet",MessageReporterBase::TYPE_WARNING);
+    /*
     TEditMemoryForm* EditMemoryForm=new TEditMemoryForm(this);
-      //BufferClipBoard.Value->Write(stream,true);
-      EditMemoryForm->Width=500;
-      EditMemoryForm->Height=400;
-      EditMemoryForm->StreamEdit->stream=(*(ClipBoard.begin() + num));
-      EditMemoryForm->Show();
+    //BufferClipBoard.Value->Write(stream,true);
+    EditMemoryForm->Width=500;
+    EditMemoryForm->Height=400;
+    EditMemoryForm->StreamEdit->stream=(*(ClipBoard.begin() + num));
+    EditMemoryForm->Show();
+    */
+
+
     /*BufferClipBoard.BeginWork();
     BufferClipBoard.SetPosition(num);
     stream->Position=0;
@@ -982,7 +1222,7 @@ if( num < ClipBoard.size() )
   {
     std::stringstream msg;
     msg << "Can't edit element at position " << num << " while ClipBoard size is " <<  ClipBoard.size() << std::endl << std::endl
-        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__  << std::endl;
     throw std::runtime_error( msg.str() );
   }
 
@@ -992,8 +1232,9 @@ void  TStreamEdit::StringsOptionChangedEvent()
 {
   try
   {
-    NumberOfString=AnsiToulong(StringNumberEdit->Text.c_str());
-    StringLen=AnsiToulong(StringLengthEdit->Text.c_str());
+        
+    NumberOfString=AnsiToulong(StringNumberEdit->getText());
+    StringLen=AnsiToulong(StringLengthEdit->getText());
   }
   catch(...)
   {
@@ -1001,188 +1242,210 @@ void  TStreamEdit::StringsOptionChangedEvent()
   LoadFromStream();
 }
 //---------------------------------------------------------------------------
-int  TStreamEdit::ConvertGlobalToStringPos(int value)
+long  TStreamEdit::ConvertGlobalToStringPos(long value)
 {
- return (StringLen+2)*(value/StringLen)+(value%StringLen);
+  return (StringLen+2)*(value/StringLen)+(value%StringLen);
 }
 
-int  TStreamEdit::ConvertStringPosToGlobal(int value)
+long  TStreamEdit::ConvertStringPosToGlobal(long value)
 {
-  int res=0;
+  long res=0;
   res+=StringLen*(value/(StringLen+2))+(value%(StringLen+2));
   return res;
 }
 
 void  TStreamEdit::StringRichEditKeyDown(UINT Key)
 {
-      if(Key==0x27)//right
-       {
-         ShiftStringSelStart(1);
-       }
+  if(Key==0x27)//right
+  {
+    ShiftStringSelStart(1);
+  }
+  else
+  {
+    if(Key==0x25) //left
+    {
+      ShiftStringSelStart(-1);
+    }
+    else
+    {
+      if(Key==0x26)//up
+      {
+        ShiftStringSelStart(-StringLen);
+      }
       else
-       {
-        if(Key==0x25) //left
-         {
-           ShiftStringSelStart(-1);
-         }
+      {
+        if(Key==0x28)//down
+        {
+          ShiftStringSelStart(StringLen);
+        }
         else
-         {
-          if(Key==0x26)//up
-           {
-            ShiftStringSelStart(-StringLen);
-           }
+        {
+          if(Key==0x23)//end
+          {
+
+          }
           else
-           {
-            if(Key==0x28)//down
-             {
-               ShiftStringSelStart(StringLen);
-             }
+          {
+            if(Key==0x22)//PgDown
+            {
+              ShiftStringSelStart(StringLen*NumberOfString);
+            }
             else
-             {
-              if(Key==0x23)//end
-               {
-
-               }
+            {
+              if(Key==0x21)//PgUp
+              {
+                ShiftStringSelStart(-StringLen*NumberOfString);
+              }
               else
-               {
-                if(Key==0x22)//PgDown
-                 {
-                   ShiftStringSelStart(StringLen*NumberOfString);
-                 }
+              {
+                if(Key==0x24)//Home
+                {
+
+                }
                 else
-                 {
-                  if(Key==0x21)//PgUp
-                   {
-                      ShiftStringSelStart(-StringLen*NumberOfString);
-                   }
+                {
+                  if(Key==0x9) //Tab
+                  {
+                    long stringStart, hexStart;
+                    StringMemo->GetSel(stringStart,hexStart);
+                    int pos=ConvertStringPosToGlobal(stringStart);
+                    HexMemo->SetSel(ConvertGlobalToHexPos(pos),ConvertGlobalToHexPos(pos));
+                    HexMemo->SetFocus();
+                  }
                   else
-                   {
-                    if(Key==0x24)//Home
-                     {
+                  {
+                    if(Key==0x1)   //??
+                    {
 
-                     }
+                    }
                     else
-                     {
-                      if(Key==0x9) //Tab
-                       {
-                         int pos=ConvertStringPosToGlobal(StringMemo->SelStart);
-                         HexMemo->SelStart=ConvertGlobalToHexPos(pos);
-                         HexMemo->SetFocus();
-                       }
-                      else
-                       {
-                        if(Key==0x1)   //??
-                         {
-
-                         }
-                        else
-                         {
-//                        StringRichEditKeyPres(Key);
-                         }
-                       }
-                     }
-                   }
-                 }
-               }
-             }
-           }
-         }
-       }
- Key=0;
+                    {
+                      //                        StringRichEditKeyPres(Key);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  Key=0;
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::ShiftStringSelStart(int Shift)
 {
-int value=StringMemo->SelStart;
-int Offset=ConvertStringPosToGlobal(value);
-int OldOffset=Offset;
-Offset+=Shift;
+  long StartString, EndString;
+  StringMemo->GetSel(StartString,EndString);
+  int len = EndString - StartString;
+  int Offset=ConvertStringPosToGlobal(StartString);
+  int OldOffset=Offset;
+  Offset+=Shift;
 
-if((Offset+CurrentPos>=0)&&(Offset+CurrentPos<getStream()->seekg(0,std::ios_base::end).tellg()))
- {
-   if((Offset<0)||(Offset>=ViewedLen))
+  if((Offset+FCurrentPos>=0)&&(Offset+FCurrentPos<getStream()->seekg(0,std::ios_base::end).tellg()))
+  {
+    if((Offset<0)||(Offset>=ViewedLen))
     {
-     CurrentPos+=((Shift/(StringLen)))*StringLen +Shift%StringLen;
-     Offset=OldOffset;
+      FCurrentPos+=((Shift/(StringLen)))*StringLen +Shift%StringLen;
+      Offset=OldOffset;
     }
-    StringMemo->SelStart=ConvertGlobalToStringPos(Offset);
- }
+    StringMemo->SetSel(ConvertGlobalToStringPos(Offset), ConvertGlobalToStringPos(Offset) + len);
+  }
 }
 
 void  TStreamEdit::StringRichEditKeyPres(unsigned char value)
 {
-int pos=ConvertStringPosToGlobal(StringMemo->SelStart);
-int hexpos=ConvertGlobalToHexPos(pos);
-HexMemo->SelStart=hexpos;
-HexMemo->SelLength=2;
-char ch[2];
-HexMemo->SelText=byteptrToHexAnsi(&value,1).c_str();
-ch[0]=ConvertToPrintSign(value);
-ch[1]=0;
-getStream()->seekp(CurrentPos+pos,std::ios_base::beg);
-StringMemo->SelLength=1;
-StringMemo->SelText=AnsiString(ch);
-StringMemo->SelLength=0;
 
-getStream()->write(ch,1);
-ShiftIfWrongStringSelStart();
+  long StartString, EndString;
+  StringMemo->GetSel(StartString,EndString);
+
+  int pos=ConvertStringPosToGlobal(StartString);
+  int hexpos=ConvertGlobalToHexPos(pos);
+  HexMemo->SetSel(hexpos,hexpos+1);
+
+  char ch[2];
+  HexMemo->ReplaceSel(CString(charptrToHexAnsi((char*)&value,1).c_str()));
+
+  ch[0]=ConvertToPrintSign(value);
+  ch[1]=0;
+  getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
+
+  StringMemo->SetSel(StartString,StartString);
+    StringMemo->ReplaceSel(CString(ch));
+  StringMemo->SetSel(-1,0); // remove selection
+
+  getStream()->write(ch,1);
+  ShiftIfWrongStringSelStart();
 }
 
 void  TStreamEdit::StringRichEditKeyPress(unsigned char Key)
 {
-if(Key!=0x9)// not tab
- StringRichEditKeyPres(Key);
-Key=0;
+  if(Key!=0x9)// not tab
+    StringRichEditKeyPres(Key);
+  Key=0;
 }
 //---------------------------------------------------------------------------
 
 void  TStreamEdit::ShiftIfWrongStringSelStart(void)
 {
-if(StringMemo->SelStart%(StringLen+2)==StringLen)
- {
-  if(ViewedLen==(StringMemo->SelStart/(StringLen+2)+1)*StringLen)
-   {
-    StringMemo->SelStart--;
-    ShiftStringSelStart(1);
-   }
-  else
-   StringMemo->SelStart+=2;
- }
+  long Start, End;
+  StringMemo->GetSel(Start,End);
+  if(Start%(StringLen+2)==StringLen)
+  {
+    if(ViewedLen==(Start/(StringLen+2)+1)*StringLen)
+    {
+      Start--;
+      End--;
+      StringMemo->SetSel(Start,End);
+      ShiftStringSelStart(1);
+    }
+    else
+    {
+      Start+=2;
+      End+=2;
+      StringMemo->SetSel(Start,End);
+    }
+      
+  }
 }
 
 void  TStreamEdit::StringRichEditMouseMove(TObject *Sender,
-      TShiftState Shift, int X, int Y)
+                                           TShiftState Shift, int X, int Y)
 {
-int Start=ConvertStringPosToGlobal(StringMemo->SelStart);
-int End=ConvertStringPosToGlobal(StringMemo->SelStart+StringMemo->SelLength);
-HexMemo->SelStart=ConvertGlobalToHexPos(Start);
-HexMemo->SelLength=ConvertGlobalToHexPos(End)-ConvertGlobalToHexPos(Start);
+  long Start,End;
+  StringMemo->GetSel(Start,End);
+  Start=ConvertStringPosToGlobal(Start);
+  End=ConvertStringPosToGlobal(End);
+  HexMemo->SetSel(ConvertGlobalToHexPos(Start),
+    ConvertGlobalToHexPos(Start));
 }
 //---------------------------------------------------------------------------
 
 void  TStreamEdit::HexRichEditMouseMove(TObject *Sender,
-      TShiftState Shift, int X, int Y)
+                                        TShiftState Shift, int X, int Y)
 {
-int Start=ConvertHexPosToGlobal(HexMemo->SelStart);
-int End=ConvertHexPosToGlobal(HexMemo->SelStart+HexMemo->SelLength);
-StringMemo->SelStart=ConvertGlobalToStringPos(Start);
-StringMemo->SelLength=ConvertGlobalToStringPos(End)-ConvertGlobalToStringPos(Start);
+  long Start,End;
+  HexMemo->GetSel(Start,End);
+  Start=ConvertHexPosToGlobal(Start);
+  End=ConvertHexPosToGlobal(End);
+  StringMemo->SetSel(ConvertGlobalToStringPos(Start),ConvertGlobalToStringPos(End));
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::PointersNotifyEvent(int value)
- {
-  CurrentPos=value;
- }
+{
+  FCurrentPos=value;
+}
 //---------------------------------------------------------------------------
 void  TStreamEdit::setStream(boost::shared_ptr<std::iostream> value)
 {
-   Fstream=value;
-   LoadFromStream();
+  Fstream=value;
+  LoadFromStream();
 }
 //------------------------------------------------------------
 void  TStreamEdit::ContinueSearchMenuItemClick()
 {
-Search(false);
+  Search(false);
 }
 
 //---------------------------------------------------------------------------
@@ -1198,23 +1461,23 @@ Searcher->NotifyEvent=DoProgress;
 ProgressBar->Max=stream->Size;
 ProgressBar->Min=0;ProgressBar->Position=0;
 if(!SearcherProperties->Find->IsEmpty())
- {
-  Searcher->Find->Clear();
-  SearcherProperties->Find->WriteDataToStream(Searcher->Find);
+{
+Searcher->Find->Clear();
+SearcherProperties->Find->WriteDataToStream(Searcher->Find);
 if(IsNewSearch) {ProgressBar->Max=Searcher->stream->Size;SearchResult=Searcher->StartSearch();}
- else {ProgressBar->Max=Searcher->Pointers->Count;SearchResult=Searcher->ContinueSearch();}
+else {ProgressBar->Max=Searcher->Pointers->Count;SearchResult=Searcher->ContinueSearch();}
 if(SearchResult)
- {
-  if(Searcher->Pointers->Count<200)
-   {
-     for(int i=0;i<Searcher->Pointers->Count;i++)
-      {
-       vi.v=Searcher->Pointers->Items[i];
-       GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
-      }
-   }
- }
- }
+{
+if(Searcher->Pointers->Count<200)
+{
+for(int i=0;i<Searcher->Pointers->Count;i++)
+{
+vi.v=Searcher->Pointers->Items[i];
+GotoInputGroupBox->Strings->Add(ulongToHexAnsi(vi.ul));
+}
+}
+}
+}
 EndSearch=TDateTime::CurrentDateTime();
 ProgressBar->Position=0;
 
@@ -1226,118 +1489,131 @@ return Searcher->Pointers->Count>0;
 
 bool  TStreamEdit::Search(bool IsNewSearch)
 {
-DateTime StartSearch=TDateTime::CurrentDateTime();
-TDateTime EndSearch;
-int PointersFound;
-getStream()->clear();// clear flags 
-DWORD streamSize = getStream()->seekg(0,std::ios_base::end).tellg();
-ProgressBar->Max=  100;
-ProgressBar->Min=0;ProgressBar->Position=0;
+  CTime StartSearch=CTime::GetCurrentTime();
+  CTime EndSearch;
+  int PointersFound;
+  getStream()->clear();// clear flags 
+  DWORD streamSize = getStream()->seekg(0,std::ios_base::end).tellg();
+  ProgressBar->SetRange32(0,100);
+  ProgressBar->SetStep(1);
+  ProgressBar->SetPos(0);
 
-PointersFound=SearcherProperties->Search(IsNewSearch,stream,DoProgress);
-ProgressBar->Position=0;
-EndSearch=TDateTime::CurrentDateTime();
-InfoEdit->Lines->Add(AnsiString("Search started at ") +
-StartSearch.DateTimeString()+
-AnsiString(" ")+AnsiString("finished at ")+
-EndSearch.DateTimeString()+AnsiString(" search time ")+(EndSearch-StartSearch).TimeString()+AnsiString(" Found :")+AnsiString(PointersFound)+AnsiString(" matches."));
-return    PointersFound>0;
+  PointersFound=SearcherProperties->Search(IsNewSearch,getStream(),TSearcherAfterReadNotifyPtr(
+    new TSearcherAfterReadNotify(boost::bind(&TStreamEdit::DoProgress,this,_1))));
+  ProgressBar->SetPos(0);
+  EndSearch=CTime::GetCurrentTime();
+  
+  std::stringstream msg;
+  msg << "Search started at " << 
+    StartSearch.Format("%Y%m%d %H:%M:%S") << " "
+    "finished at " << 
+    EndSearch.Format("%Y%m%d %H:%M:%S")<<" search time "<<(EndSearch-StartSearch).Format("%Y%m%d %H:%M:%S") << 
+    " Found :" << PointersFound << " matches.";
+  append(*InfoEdit, msg.str());
+  return    PointersFound>0;
 }
 
 bool  TStreamEdit::SlowSearch(void)
 {
-TDateTime StartSearch=TDateTime::CurrentDateTime();
-TDateTime EndSearch;
-int PointersFound;
-DWORD streamSize = getStream()->seekg(0,std::ios_base::end).tellg();
-ProgressBar->Max=100;
-ProgressBar->Min=0;ProgressBar->Position=0;
+  CTime StartSearch=CTime::GetCurrentTime();
+  CTime EndSearch;
+  int PointersFound;
+  DWORD streamSize = getStream()->seekg(0,std::ios_base::end).tellg();
+  ProgressBar->SetRange32(0,100);
+  ProgressBar->SetStep(1);
+  ProgressBar->SetPos(0);
 
-PointersFound=SearcherProperties->SlowSearch(stream,DoProgress);
-ProgressBar->Position=0;
-EndSearch=TDateTime::CurrentDateTime();
-InfoEdit->Lines->Add(AnsiString("Search started at ") +StartSearch.DateTimeString()+AnsiString(" ")+AnsiString("finished at ")+EndSearch.DateTimeString()+AnsiString(" search time ")+(EndSearch-StartSearch).TimeString()+AnsiString(" Found :")+AnsiString(PointersFound)+AnsiString(" matches."));
-return    PointersFound>0;
+  PointersFound=SearcherProperties->SlowSearch(getStream(),TSearcherAfterReadNotifyPtr(
+    new TSearcherAfterReadNotify(boost::bind(&TStreamEdit::DoProgress,this,_1))));
+  ProgressBar->SetPos(0);
+
+  EndSearch=CTime::GetCurrentTime();
+  std::stringstream msg;
+  msg << "Search started at " << 
+    StartSearch.Format("%Y%m%d %H:%M:%S") << " "
+    "finished at " << 
+    EndSearch.Format("%Y%m%d %H:%M:%S")<<" search time "<<(EndSearch-StartSearch).Format("%Y%m%d %H:%M:%S") << 
+    " Found :" << PointersFound << " matches.";
+  append(*InfoEdit, msg.str());
+  return    PointersFound>0;
 }
 //----------------------------------------------
 void  TStreamEdit::DoProgress(int pos)
 {
- ProgressBar->Position=pos;
+  ProgressBar->SetPos(pos);
 }
 
 void  TStreamEdit::GetVariablesAtPos(int pos)
 {
-WORK_ANSILIB_UNION_FOR_CONVERT buf;
-getStream()->seekg(pos,std::ios_base::beg);
-getStream()->read((char*)&buf,sizeof(buf));
-AnsiString newInfo=AnsiString("char ")+AnsiString((int)buf.char_)+AnsiString(",");
-newInfo+=AnsiString("byte ")+ulongToAnsi(buf.byte_).c_str()+AnsiString(",");
-newInfo+=AnsiString("ulong ")+ulongToAnsi(buf._ulong).c_str()+AnsiString(",");
-newInfo+=AnsiString("int ")+AnsiString(buf._int)+AnsiString(",");
-try
-{
-newInfo+=AnsiString("double ")+AnsiString(buf.double_)+AnsiString(",");
+  WORK_ANSILIB_UNION_FOR_CONVERT buf;
+  getStream()->seekg(pos,std::ios_base::beg);
+  getStream()->read((char*)&buf,sizeof(buf));
+  std::stringstream msg;
+  msg << "char " << ((int)buf.char_) << ","
+  << "byte " << ulongToAnsi(buf.byte_) << ","  
+  << "ulong " << ulongToAnsi(buf._ulong) << ","
+  << "int " << buf._int << ",";
+  try
+  {
+    msg << "double " << buf.double_ << (",");
 
-}
-catch(...)
-{
-newInfo+=AnsiString("double ")+AnsiString("NAN")+AnsiString(",");
-}
+  }
+  catch(...)
+  {
+    msg << "double " << "NAN" << (",");
+  }
 
-try
-{
+  try
+  {
 
-newInfo+=AnsiString("float ")+AnsiString(buf.float_)+AnsiString(",");
-}
-catch(...)
-{
-newInfo+=AnsiString("float ")+AnsiString("NAN")+AnsiString(",");
-}
-CurrectEditSelection=newInfo;
-//InfoLabel=AnsiString("int(")+
+    msg << "float " << buf.float_ << (",");
+  }
+  catch(...)
+  {
+    msg << "float " << "NAN" << (",");
+  }
+  FCurrectEditSelection=msg.str();
+  //InfoLabel=AnsiString("int(")+
 }
 
 
 
 void  TStreamEdit::ReplaceAllMenuItemClick()
 {
-SearcherProperties->ReplaceAll();
+  SearcherProperties->ReplaceAll();
 }
 
 //-------------------------------------------------------------------------
 void  TStreamEdit::setKeyPressed(const std::string& i_value)
 {
-FKeyPressed=i_value;
-UpdateInfoString();
+  FKeyPressed=i_value;
+  UpdateInfoString();
 }
 
 void  TStreamEdit::setCurrectEditSelection(const std::string& i_value)
 {
-FCurrectEditSelection=i_value;
-UpdateInfoString();
+  FCurrectEditSelection=i_value;
+  UpdateInfoString();
 }
 
 void  TStreamEdit::UpdateInfoString(void)
 {
-if(InfoEdit->Lines->Count==0)
- {
-InfoEdit->Lines->Add(" ");
- }
-InfoEdit->Lines->Strings[0]=KeyPressed+AnsiString("   ")+CurrectEditSelection;
-InfoEdit->SelStart=0;
+  std::stringstream msg;
+  msg << FKeyPressed << FCurrectEditSelection;
+  append(*InfoEdit,msg.str());
 }
 
-   
+
 //-------------------------------------------------------------
 boost::shared_ptr<TSearcher>  TStreamEdit::GetSearcher(void)
 {
-return SearcherProperties->Searcher;
+  return SearcherProperties->getSearcher();
 }
 
 
 void TStreamEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-  Reload(nPos);  
+//  Reload(nPos);  
   CMyBaseForm::OnVScroll(nSBCode,nPos,pScrollBar);
 }
 
@@ -1345,23 +1621,25 @@ void TStreamEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
   WORD Key = nChar;
   // TODO: Add your message handler code here and/or call default
-  if(Key==0x2E) //delete key
+/*  if(Key==0x2E) //delete key
   {
     DeleteSelectedPointers();
     Key=0;
   }
-  else
+  else*/
     CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void TStreamEdit::OnInitMenu(CMenu* pMenu)
 {
-  CMyBaseForm::OnInitMenu(pMenu);
+  PopupMenu1Popup();
+  //CMyBaseForm::OnInitMenu(pMenu);
 }
 
 void TStreamEdit::OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu)
 {
-CMyBaseForm::OnInitMenuPopup(pPopupMenu,nIndex,bSysMenu);
+  PopupMenu1Popup();
+  //  CMyBaseForm::OnInitMenuPopup(pPopupMenu,nIndex,bSysMenu);
 }
 
 void TStreamEdit::OnRButtonDown(UINT nFlags, CPoint point)
@@ -1374,7 +1652,7 @@ void TStreamEdit::OnRButtonDown(UINT nFlags, CPoint point)
   //ASSERT(myMenu.get());
   CPoint screen(point);
   this->ClientToScreen(&screen);
-  PopupMenu.TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, screen.x, 
+  PopupMenu->TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, screen.x, 
     screen.y, this);
 
 }
@@ -1383,10 +1661,11 @@ void TStreamEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
   // TODO: Add your message handler code here and/or call default
   CRect pbRect;
-  d_pointersBox->GetWindowRect(&pbRect);
+/*  d_pointersBox->GetWindowRect(&pbRect);
   if(pbRect.PtInRect(point) == TRUE)
     PointersBoxDblClick(nFlags,point);
   else
+  */
     CMyBaseForm::OnLButtonDblClk(nFlags, point);
 }
 
@@ -1397,40 +1676,40 @@ unsigned char getCharacter(UINT nKey)
 
 int TStreamEdit::OnVKeyToItem(UINT nKey,CListBox* pListBox,UINT nIndex)
 {
-if(!pListBox)
-{
+  if(!pListBox)
+  {
     std::stringstream msg;
     msg << "Corrupted pListBox!!!"  << std::endl << std::endl
-        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
     throw std::runtime_error( msg.str() );
-}
-unsigned char ch = getCharacter(nKey);
+  }
+  unsigned char ch = getCharacter(nKey);
 
-if(pListBox.m_hWnd==HexMemo.m_hWnd)
-{
-  if(ch)
-    HexRichEditKeyPress(ch);
+  if(pListBox->m_hWnd==HexMemo->m_hWnd)
+  {
+    if(ch)
+      HexRichEditKeyPress(ch);
+    else
+      HexRichEditKeyDown(nKey);
+  }
+  else if(pListBox->m_hWnd==StringMemo->m_hWnd)
+  {
+    if(ch)
+      StringRichEditKeyPress(ch);
+    else
+      StringRichEditKeyDown(nKey);
+  }
   else
-    HexRichEditKeyDown(nKey);
-}
-else if(pListBox.m_hWnd==StringMemo.m_hWnd)
-{
-  if(ch)
-    StringRichEditKeyPress(ch);
-  else
-    StringRichEditKeyDown(nKey);
-}
-else
-{
+  {
     std::stringstream msg;
     msg << "Neither HexMemo nor StringMemo"  << std::endl << std::endl
-        << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
     throw std::runtime_error( msg.str() );
 
-}
-//http://msdn.microsoft.com/en-us/library/02z9kdt8.aspx
-CMyBaseForm::OnVKeyToItem(nKey, pListBox,nIndex);
-return -2;
+  }
+  //http://msdn.microsoft.com/en-us/library/02z9kdt8.aspx
+  CMyBaseForm::OnVKeyToItem(nKey, pListBox,nIndex);
+  return -2;
 }
 
 BOOL TStreamEdit::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
@@ -1438,7 +1717,7 @@ BOOL TStreamEdit::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO*
 
   if (nCode== CN_COMMAND)
   { // pop-up menu sent CN_COMMAND
-    
+
     // execute command
     if(d_menuCommands.hasCommand(nID))
       d_menuCommands.getCommand(nID)();
@@ -1447,6 +1726,14 @@ BOOL TStreamEdit::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO*
   // If the object(s) in the extended command route don't handle
   // the command, then let the base class OnCmdMsg handle it.
   return CMyBaseForm::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+}
+
+BOOL TStreamEdit::customOnNotify( UINT id, NMHDR * pNotifyStruct, LRESULT * result )
+{
+  std::stringstream msg;
+  msg << id << pNotifyStruct->code;
+  getReporter().showMessage(msg.str(),MessageReporterBase::TYPE_INFO);
+  return FALSE;
 }
 
 BOOL TStreamEdit::OnInitDialog()

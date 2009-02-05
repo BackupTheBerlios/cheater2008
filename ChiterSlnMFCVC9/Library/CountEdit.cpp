@@ -52,7 +52,7 @@ void TCountEdit::CreateInstance(void)
     editRect.left=5;
     editRect.right=editRect.left + 55;
     editRect.bottom=editRect.top + 20;
- EditField->Create(ES_LEFT | ES_MULTILINE ,editRect,this,IDC_TCOUNTEDIT_EDITFIELD);
+ EditField->Create(ES_LEFT | ES_MULTILINE | ES_WANTRETURN ,editRect,this,IDC_TCOUNTEDIT_EDITFIELD);
  EditField->ShowWindow(TRUE);
  UpDownField=new TUpDown();
     SCROLLINFO scrollInfo;

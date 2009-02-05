@@ -147,13 +147,17 @@ void  TPointersViewBox::updateSize(void)
   d_scrollBar->MoveWindow(scRect);
 }
 
-void clearMenu(CMenu& io_menu,Container& io_container)
+namespace
 {
-  while(io_menu.GetMenuItemCount() >0)
+  void clearMenu(CMenu& io_menu,Container& io_container)
   {
-    io_container.removeCommand(io_menu.GetMenuItemID(0));
-    io_menu.DeleteMenu(0,MF_BYPOSITION);
+    while(io_menu.GetMenuItemCount() >0)
+    {
+      io_container.removeCommand(io_menu.GetMenuItemID(0));
+      io_menu.DeleteMenu(0,MF_BYPOSITION);
+    }
   }
+
 }
 
 void  TPointersViewBox::PopupMenuOnPopup()

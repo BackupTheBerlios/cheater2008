@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MessageReporterBase.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MyBaseForm.cpp"
 				>
 			</File>
@@ -243,13 +247,10 @@
 			<File
 				RelativePath=".\StreamEdit.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\WindowProcedure.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
@@ -283,6 +284,10 @@
 			</File>
 			<File
 				RelativePath=".\MemoryInfoEdit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MessageReporterBase.h"
 				>
 			</File>
 			<File
@@ -323,6 +328,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WindowProcedure.h"
 				>
 			</File>
 		</Filter>

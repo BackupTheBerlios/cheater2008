@@ -210,7 +210,7 @@ void  TSearcherProperties::setPageSizeClick()
 }
 
 //----------------------------------------------------------------------------
-int  TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress)
+int  TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<std::iostream> stream,TSearcherAfterReadNotifyPtr DoProgress)
 {
   if(! getSearcher())
   {
@@ -261,7 +261,7 @@ int  TSearcherProperties::Search(bool IsNewSearch, boost::shared_ptr<std::iostre
   return getSearcher()->getPointers()->size();
 }
 //----------------------------------------------------------------------------
-int  TSearcherProperties::SlowSearch(boost::shared_ptr<std::iostream> stream,AfterReadNotify DoProgress)
+int  TSearcherProperties::SlowSearch(boost::shared_ptr<std::iostream> stream,TSearcherAfterReadNotifyPtr DoProgress)
 {
   if(!getSearcher())
   {

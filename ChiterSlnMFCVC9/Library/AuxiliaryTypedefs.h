@@ -7,7 +7,7 @@ enum TShiftState
 };
 typedef CStatic TPanel;
 
-typedef CEdit TRichEdit;
+typedef CRichEditCtrl TRichEdit;
 
 typedef CProgressCtrl TProgressBar;
 
@@ -20,7 +20,7 @@ typedef CMenu CMenuItem;
 typedef CFileDialog COpenFileDialog ;
 typedef CFileDialog CSaveFileDialog ;
 
-typedef CEdit CRichEdit ;
+typedef CRichEditCtrl CRichEdit ;
 
 typedef CObject TObject ;
 
