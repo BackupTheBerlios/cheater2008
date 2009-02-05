@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Library", "Library\Library.vcproj", "{554DB0A1-6DCF-4B0C-84B5-147760659EF1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B1B3BD02-0B92-428E-9257-E9F4BF85D0F0} = {B1B3BD02-0B92-428E-9257-E9F4BF85D0F0}
+		{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E} = {AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChiterApp", "ChiterApp\ChiterApp.vcproj", "{031D6FA0-1E7C-467D-9F35-C34DAB3FB196}"
@@ -13,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChiterApp", "ChiterApp\Chit
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Standart", "Standart\Standart.vcproj", "{B1B3BD02-0B92-428E-9257-E9F4BF85D0F0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplitterCtrl", "SplitterCtrl\SplitterCtrl.vcproj", "{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +35,10 @@ Global
 		{B1B3BD02-0B92-428E-9257-E9F4BF85D0F0}.Debug|Win32.Build.0 = Debug|Win32
 		{B1B3BD02-0B92-428E-9257-E9F4BF85D0F0}.Release|Win32.ActiveCfg = Release|Win32
 		{B1B3BD02-0B92-428E-9257-E9F4BF85D0F0}.Release|Win32.Build.0 = Release|Win32
+		{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}.Debug|Win32.Build.0 = Debug|Win32
+		{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}.Release|Win32.ActiveCfg = Release|Win32
+		{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
