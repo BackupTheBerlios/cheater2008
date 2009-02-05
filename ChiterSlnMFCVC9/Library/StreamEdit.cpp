@@ -74,13 +74,28 @@ public:
     d_ParentToWndMap.clear();
 
   }
+
   static LRESULT CALLBACK myWndProc(HWND hWnd, UINT event, WPARAM wParam, LPARAM lParam)
   {
     WindowsMessageHandler& handler = getWindowsMessageHandler();
     CWnd& child = getCWnd(hWnd);
 
     std::stringstream msg;
-    msg << " child [" << std::string( CT2CA(CString(child.GetRuntimeClass()->m_lpszClassName)) ) << "]got " << "message\r\n";
+    msg << " child [" << std::string( CT2CA(CString(child.GetRuntimeClass()->m_lpszClassName)) ) << "]got " << " ["<< event <<"]<< event\r\n";
+    if (event==WM_RBUTTONDBLCLK) 
+      msg << "Right button dblck\r\n";
+    if (event==WM_RBUTTONDOWN) 
+    {
+      msg << "Right button down\r\n";
+      TStreamEdit* parent = handler.d_wndToParentMap[hWnd];
+      /*
+      CPoint pt(lParam);
+
+      CWnd::FromHandle(hWnd)->MapWindowPoints(parent,&pt,1);
+      lParam=MAKEWORD(pt.y,pt.x);
+      */
+      parent->SendMessage(event,wParam,lParam);
+    }
     ::OutputDebugString(CString(msg.str().c_str()));
     WNDPROC_TYPE old = handler.d_wndToOldProc[hWnd];
     return old(hWnd,event,wParam,lParam);
@@ -479,6 +494,8 @@ void  TStreamEdit::initialize(void)
   SearcherProperties->setOnSelectPointer( TPointerSelectEventPtr (new TPointerSelectEvent(boost::bind(&TStreamEdit::PointersNotifyEvent,this,_1)) ) );
 
   WindowsMessageHandler::getWindowsMessageHandler().append(HexMemo,this);
+  WindowsMessageHandler::getWindowsMessageHandler().append(StringMemo,this);
+  WindowsMessageHandler::getWindowsMessageHandler().append(PointerMemo,this);
 }
 
 //---------------------------------------------------------------------------
