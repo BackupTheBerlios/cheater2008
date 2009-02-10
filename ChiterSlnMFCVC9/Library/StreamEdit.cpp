@@ -1398,7 +1398,7 @@ void  TStreamEdit::StringRichEditKeyPres(unsigned char value)
 
   int pos=ConvertStringPosToGlobal(StartString);
   int hexpos=ConvertGlobalToHexPos(pos);
-  HexMemo.SetSel(hexpos,hexpos+1);
+  HexMemo.SetSel(hexpos,hexpos+2);
 
   char ch[2];
   HexMemo.ReplaceSel(CString(charptrToHexAnsi((char*)&value,1).c_str()));
@@ -1407,7 +1407,7 @@ void  TStreamEdit::StringRichEditKeyPres(unsigned char value)
   ch[1]=0;
   getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
 
-  StringMemo.SetSel(StartString,StartString);
+  StringMemo.SetSel(StartString,StartString+1);
     StringMemo.ReplaceSel(CString(ch));
   StringMemo.SetSel(-1,0); // remove selection
 
@@ -1658,9 +1658,9 @@ void TStreamEdit::processKey(INT nKey,CRichEditCtrl* pListBox,UINT nIndex)
   else if(pListBox->m_hWnd==StringMemo.m_hWnd)
   {
     if(ch)
-      StringRichEditKeyDown(ch);
+      StringRichEditKeyPress(ch);
     else
-      StringRichEditKeyPress(nKey);
+      StringRichEditKeyDown(nKey);
   }
   else
   {
