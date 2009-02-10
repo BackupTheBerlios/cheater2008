@@ -196,6 +196,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SplitterCtrlDll.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SplitterCtrlUtil.cpp"
 				>
 			</File>
