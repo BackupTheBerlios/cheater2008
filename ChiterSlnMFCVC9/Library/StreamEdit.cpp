@@ -776,14 +776,15 @@ void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
 
   getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
 
-  HexMemo.SetSel(hexStart,hexStart);
-  std::stringstream str;
-  str << std::hex << value;
-  HexMemo.ReplaceSel(CString(str.str().c_str()));
+  HexMemo.SetSel(hexStart,hexStart+1);
+  std::stringstream stream;
+  stream << std::hex << (unsigned int)value;
+  std::string str = stream.str();
+  HexMemo.ReplaceSel(CString(str.c_str()));
 
   HexMemo.GetSel(hexStart,hexEnd);
   rem=hexStart;
-  HexMemo.SetSel(hexPos,hexPos+1);
+  HexMemo.SetSel(hexPos,hexPos+2);
 
   CString hexSelStr = HexMemo.GetSelText();
   ch=HexAnsiTocharptr( std::string( CT2CA(hexSelStr) ) );
@@ -795,7 +796,7 @@ void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
   getStream()->write(ch,1);
   ShiftIfWrongHexSelStart();
 
-  delete ch;
+  delete[] ch;
 
   //char
 
