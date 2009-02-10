@@ -22,13 +22,14 @@ BEGIN_MESSAGE_MAP(TCountEdit, CMyBaseForm)
     ON_WM_SIZE()
 END_MESSAGE_MAP()
 
+enum TCountEditIDS
+{
+IDC_TCountEdit_FRAME = 0x1212,
 
+};
 //----------------------------------------------------------------------------
 TCountEdit::TCountEdit(CWnd* pParent/* = NULL*/):
-CMyBaseForm(pParent),
-EditField(0),
-UpDownField(0)
-
+CMyBaseForm(pParent)
 {
 
 }
@@ -42,19 +43,23 @@ void TCountEdit::CreateInstance(void)
 {
     CRect crect;
     this->GetWindowRect(&crect);
-    crect.right = crect.left + 80;
-    crect.bottom = crect.top + 24;
+    crect.right = crect.left + 90;
+    crect.bottom = crect.top + 34;
     this->MoveWindow(crect);
     //TODO: Add your source code here
- EditField=new CEdit();
-    RECT editRect;
-    editRect.top=2;
-    editRect.left=5;
-    editRect.right=editRect.left + 55;
-    editRect.bottom=editRect.top + 20;
- EditField->Create(ES_LEFT | ES_MULTILINE | ES_WANTRETURN ,editRect,this,IDC_TCOUNTEDIT_EDITFIELD);
- EditField->ShowWindow(TRUE);
- UpDownField=new TUpDown();
+    
+    CFont* font = new CFont();
+    font->CreatePointFont(90, CString("Arial"));
+
+    d_staticFrame.Create(CString("Static"),SS_LEFT ,CRect(0,0,0,0),this,IDC_TCountEdit_FRAME);
+    d_staticFrame.SetFont(font);
+    d_staticFrame.ShowWindow(SW_SHOW);
+
+
+    d_editField.Create(ES_LEFT | ES_MULTILINE | ES_WANTRETURN ,CRect(0,0,0,0),this,IDC_TCOUNTEDIT_EDITFIELD);
+    d_editField.ShowWindow(TRUE);
+    d_editField.SetFont(font);
+
     SCROLLINFO scrollInfo;
     scrollInfo.cbSize = sizeof(SCROLLINFO);     
     scrollInfo.fMask = SIF_ALL;     
@@ -64,14 +69,10 @@ void TCountEdit::CreateInstance(void)
     scrollInfo.nPos = 16;    
     scrollInfo.nTrackPos = 2; 
 
-    RECT UpDownFieldRect;
-    UpDownFieldRect.top=editRect.top;
-    UpDownFieldRect.left=editRect.right + 1;
-    UpDownFieldRect.right=editRect.right + 15;
-    UpDownFieldRect.bottom=editRect.top + (editRect.bottom - editRect.top);
-  UpDownField->Create(SBS_VERT ,UpDownFieldRect,this,IDC_TCOUNTEDIT_UPDOWNFIELD);
-  UpDownField->SetScrollInfo(&scrollInfo);
-  UpDownField->ShowWindow(TRUE);
+
+    d_upDownField.Create(SBS_VERT ,CRect(0,0,0,0),this,IDC_TCOUNTEDIT_UPDOWNFIELD);
+    d_upDownField.SetScrollInfo(&scrollInfo);
+    d_upDownField.ShowWindow(TRUE);
   //UpDownField->OnChangingEx=UpDownFieldChangingEventEx;
 
  OnChangeEvent.reset();
@@ -79,6 +80,27 @@ void TCountEdit::CreateInstance(void)
 
 setMin(1);
 setMax(100);
+adjustSizes(-1,-1);
+}
+
+void TCountEdit::adjustSizes(int cx,int cy)
+{
+  CRect ret;
+  this->GetClientRect(&ret);
+  CRect staticFrameRect(ret);
+  staticFrameRect.DeflateRect(2,2,2,2);
+  d_staticFrame.MoveWindow(ret);
+
+  CRect editRect(ret);
+  editRect.DeflateRect(2,15,15,2);
+  d_editField.MoveWindow(editRect);
+
+
+  CRect upDownFieldRect(editRect);
+  upDownFieldRect.left = editRect.right;
+  upDownFieldRect.right = staticFrameRect.right-2;
+  d_upDownField.MoveWindow(upDownFieldRect);
+
 }
 
 void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
@@ -93,7 +115,7 @@ void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
         throw std::runtime_error( msg.str() );
     }*/
     CString cstr;
-    EditField->GetWindowText(cstr);
+    d_editField.GetWindowText(cstr);
     DWORD value=AnsiToulong(std::string(CT2CA(cstr)));
     UINT Direction = nSBCode;
     if(Direction==SB_LINEUP )
@@ -109,7 +131,7 @@ void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     }
     if((value>=getMin())&&(value<=getMax()))
     {
-        EditField->SetWindowText( CString(ulongToAnsi(value).c_str()) );
+        d_editField.SetWindowText( CString(ulongToAnsi(value).c_str()) );
 
         if(OnChangeEvent) (*OnChangeEvent)();
 
@@ -129,7 +151,7 @@ void  TCountEdit::OnResizeEvent()
     CRect editRect;
     editRect.top=15;
     editRect.left=2;
-if(EditField && UpDownField)
+if(d_editField && d_upDownField)
 {
     CRect UpDownFieldRect;
     UpDownFieldRect.top=editRect.top;
@@ -149,8 +171,8 @@ if(EditField && UpDownField)
     UpDownFieldRect.left=editRect.left+editRect.Width()+1;
     UpDownFieldRect.bottom=UpDownFieldRect.top + editRect.Height();
 
-    EditField->MoveWindow(&editRect,TRUE);
-    UpDownField->MoveWindow(&UpDownFieldRect,TRUE);
+    d_editField.MoveWindow(&editRect,TRUE);
+    d_upDownField.MoveWindow(&UpDownFieldRect,TRUE);
 }
 
 
@@ -165,13 +187,13 @@ CreateInstance();
 void  TCountEdit::setText(const std::string & value)
 {
         //TODO: Add your source code here
-EditField->SetWindowText(CString(value.c_str()));
+d_staticFrame.SetWindowText(CString(value.c_str()));
 }
 std::string TCountEdit::getText()
 {
         //TODO: Add your source code here
     CString cstr;
-    EditField->GetWindowText(cstr);
+    d_editField.GetWindowText(cstr);
     return    std::string(CT2CA(cstr));
 }
 

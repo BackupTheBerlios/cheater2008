@@ -38,14 +38,15 @@ public:
     void  setMax(DWORD value);
 protected:
     DECLARE_MESSAGE_MAP()
+    CStatic d_staticFrame;
 
-
-    CEdit* EditField;
-    TUpDown* UpDownField;
+    CEdit d_editField;
+    TUpDown d_upDownField;
 public:
      TCountEdit(CWnd* pParent = NULL);
 
      virtual ~TCountEdit(void);
+    void adjustSizes(int cx,int cy);
     afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
     afx_msg void OnSize(UINT, int, int);
      //void  UpDownFieldChangingEventEx(TObject* Sender, bool &AllowChange, short NewValue, TUpDownDirection Direction);

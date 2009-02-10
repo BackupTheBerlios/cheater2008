@@ -29,44 +29,35 @@ class AUGUST2002_EXPORT TStreamEdit : public CMyBaseForm
   DECLARE_DYNAMIC(TStreamEdit)
 private:
   Container d_menuCommands;
-  SplitterCtrl_NS::SplitterCtrl* d_splitterWnd;
-  SplitterCtrl_NS::SplitterCtrl* d_splitterWndTop;
-  SplitterCtrl_NS::SplitterCtrl* d_splitterWndTopLeft;
-  SplitterCtrl_NS::SplitterCtrl* d_splitterWndTopRight;
-  CStatic* d_splitterWndTopRightBox;
-  SplitterCtrl_NS::SplitterCtrl* d_splitterWndBottom;
+  SplitterCtrl_NS::SplitterCtrl d_splitterWnd;
+  SplitterCtrl_NS::SplitterCtrl d_splitterWndTop;
+  SplitterCtrl_NS::SplitterCtrl d_splitterWndTopLeft;
+  SplitterCtrl_NS::SplitterCtrl d_splitterWndTopRight;
+  CStatic d_splitterWndTopRightBox;
+  SplitterCtrl_NS::SplitterCtrl d_splitterWndBottom;
 
-  TGroupBox *GroupBox1;
+  TPopupMenu PopupMenu;
+  CMenuItem CopytoMenuItem;
+  CMenuItem PasteFromMenuItem;
 
-  TPopupMenu* PopupMenu;
-  CMenuItem *CopytoMenuItem;
-  CMenuItem *PasteFromMenuItem;
+  CMenuItem SearchMenuItem;
+  CMenuItem LoadFromStreamMenuitem;
+  CMenuItem GotoMenuItem;
+  CMenuItem CopyMenuItem;
+  CMenuItem PasteMenuItem;
 
-  TGroupBox *GroupBox2;
+  CMenuItem ClearClipBoardMenuItem;
+  CMenuItem FonCMenuItem;
+  CMenuItem StringFonCMenuItem;
+  CMenuItem HexFonCMenuItem;
+  CMenuItem PointerFonCMenuItem;
+  CMenuItem StringColorMenuItem;
+  CMenuItem HexColorMenuItem;
+  CMenuItem PointerColorMenuItem;
+  CMenuItem DeleteMenuItem;
 
-  CMenuItem *SearchMenuItem;
-  CMenuItem *LoadFromStreamMenuitem;
-  CMenuItem *GotoMenuItem;
-  CMenuItem *CopyMenuItem;
-  CMenuItem *PasteMenuItem;
-  CMenuItem *N1;
-  CMenuItem *N2;
-
-
-  CMenuItem *ClearClipBoardMenuItem;
-  CMenuItem *N3;
-  CMenuItem *FonCMenuItem;
-  CMenuItem *StringFonCMenuItem;
-  CMenuItem *HexFonCMenuItem;
-  CMenuItem *PointerFonCMenuItem;
-  CMenuItem *StringColorMenuItem;
-  CMenuItem *HexColorMenuItem;
-  CMenuItem *PointerColorMenuItem;
-  CMenuItem *DeleteMenuItem;
-  CMenuItem *N4;
-
-  CFontDialog *FontDialog;
-  CColorDialog *ColorDialog;
+  CFontDialog FontDialog;
+  CColorDialog ColorDialog;
 
   boost::shared_ptr<CFont> d_pointerMemoFont;
   boost::shared_ptr<CFont> d_hexMemoFont;
@@ -77,36 +68,36 @@ private:
   DWORD d_stringMemoColor;
 
 
-  CMenuItem *ColorMenuItem;
+  CMenuItem ColorMenuItem;
   //        CMenuItem *PointerEdiCMenuItem;
-  CMenuItem *Font1;
-  CMenuItem *Color1;
+  CMenuItem Font1;
+  CMenuItem Color1;
   //        CMenuItem *HexEdit1;
   //        CMenuItem *StringEdit1;
   //        CMenuItem *PointerEdit1;
   //        CMenuItem *HexEdiCMenuItem;
-  COpenFileDialog *OpenDialog;
-  CSaveFileDialog *SaveDialog;
-  CMenuItem *EditBufMenuItem;
-  TCountEdit *StringNumberEdit;
-  TCountEdit *StringLengthEdit;
+  COpenFileDialog OpenDialog;
+  CSaveFileDialog SaveDialog;
+  CMenuItem EditBufMenuItem;
+  TCountEdit StringNumberEdit;
+  TCountEdit StringLengthEdit;
 
-  CRichEditCtrl *StringMemo;
-  CRichEditCtrl *HexMemo;
-  CRichEditCtrl *PointerMemo;
+  CRichEditCtrl StringMemo;
+  CRichEditCtrl HexMemo;
+  CRichEditCtrl PointerMemo;
 
-  CMenuItem *ContinueSearchMenuItem;
-  TProgressBar *ProgressBar;
+  CMenuItem ContinueSearchMenuItem;
+  TProgressBar ProgressBar;
   /*
   TLabel *InfoLabel;
   TLabel *KeyLabel;
   */
-  CRichEdit* InfoEdit;
-  CMenuItem *SlowSearchMenuItem;
+  CRichEdit InfoEdit;
+  CMenuItem SlowSearchMenuItem;
   //        CMenuItem *N5;
-  CMenuItem *ReplaceAllMenuItem;
-  TSearcherProperties *SearcherProperties;
-  InputGroupBox *GotoInputGroupBox;
+  CMenuItem ReplaceAllMenuItem;
+  TSearcherProperties SearcherProperties;
+  InputGroupBox GotoInputGroupBox;
 public:
   void  SearchMenuItemClick();
   void  LoadFromStreamMenuitemClick();
@@ -209,8 +200,7 @@ protected:
   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
   afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
   afx_msg int OnVKeyToItem(UINT nKey,CListBox* pListBox,UINT nIndex);
-  BOOL customOnNotify( UINT id, NMHDR * pNotifyStruct, LRESULT * result );
-
+  afx_msg void OnSize(UINT, int cx,int cy);
   virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo);
   virtual BOOL OnInitDialog();
   DECLARE_MESSAGE_MAP()
