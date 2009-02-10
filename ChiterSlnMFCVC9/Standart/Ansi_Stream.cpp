@@ -19,7 +19,7 @@ std::string    ConvertStreamToHexAnsi(std::istream& io_stream)
       work._ulong=0;
    while(io_stream.read((char*)&work._ulong,1))
     {
-	  ret += intToHex(work._int,2);
+	  ret += intToHex(work._ulong,2);
     }
   io_stream.clear();
   io_stream.seekg(backupPos,std::ios_base::beg);
@@ -35,11 +35,11 @@ std::string    ConvertStreamToHexAnsiWithSpace(std::istream& io_stream)
       work._ulong=0;
   io_stream.seekg(0,std::ios_base::beg);
      if( io_stream.read((char*)&work._ulong,1) )
-         res+=intToHex(work._int,2);
+         res+=intToHex(work._ulong,2);
      while(io_stream.read((char*)&work._ulong,1))
       {
         res+=std::string(SPACE_STRING);
-		res+=intToHex(work._int,2);
+		res+=intToHex(work._ulong,2);
 
       }
   io_stream.clear();

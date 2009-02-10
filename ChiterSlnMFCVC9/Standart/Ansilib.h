@@ -72,7 +72,7 @@ STANDART_EXPORT_FUN(unsigned long)  charptrToulong(const char* buf,unsigned long
 
 // Auxiliary functions
 // width minimum number of output digits 
-STANDART_EXPORT_FUN(std::string) intToHex(int i_num,int i_width);
+STANDART_EXPORT_FUN(std::string) intToHex(unsigned int i_num,int i_width);
 STANDART_EXPORT_FUN(int) ToInt(const std::string& i_str);
 STANDART_EXPORT_FUN(double) ToDouble(const std::string& i_str);
 STANDART_EXPORT_FUN(std::string) IntToString(int i_num);
