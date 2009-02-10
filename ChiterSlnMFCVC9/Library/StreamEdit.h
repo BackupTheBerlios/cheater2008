@@ -189,6 +189,8 @@ public:		// User declarations
 
   std::string    getCurrectEditSelection() const {return FCurrectEditSelection;}
   void   setCurrectEditSelection(const std::string& i_value );
+
+  void processKey(INT nKey,CRichEditCtrl* pListBox,UINT nIndex);
 protected:
   //Windows events
   afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
@@ -199,7 +201,6 @@ protected:
   afx_msg void OnInitMenuPopup(CMenu* pPopupMenu,UINT nIndex,BOOL bSysMenu);
   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
   afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-  afx_msg int OnVKeyToItem(UINT nKey,CListBox* pListBox,UINT nIndex);
   afx_msg void OnSize(UINT, int cx,int cy);
   virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo);
   virtual BOOL OnInitDialog();

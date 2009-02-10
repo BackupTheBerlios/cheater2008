@@ -82,9 +82,10 @@ public:
 
     std::stringstream msg;
     msg << " child [" << std::string( CT2CA(CString(child.GetRuntimeClass()->m_lpszClassName)) ) << "]got " << " ["<< event <<"]<< event\r\n";
+    bool processed = false;
     if (event==WM_RBUTTONDBLCLK) 
       msg << "Right button dblck\r\n";
-    if (event==WM_RBUTTONDOWN) 
+    else if (event==WM_RBUTTONDOWN) 
     {
       msg << "Right button down\r\n";
       TStreamEdit* parent = handler.d_wndToParentMap[hWnd];
@@ -96,9 +97,41 @@ public:
       */
       parent->SendMessage(event,wParam,lParam);
     }
+    else if ( (event==WM_KEYDOWN)  ) 
+    {
+      processed = true;
+      msg << "WM_KEYDOWN\r\n";
+      TStreamEdit* parent = handler.d_wndToParentMap[hWnd];
+      /*
+      CPoint pt(lParam);
+
+      CWnd::FromHandle(hWnd)->MapWindowPoints(parent,&pt,1);
+      lParam=MAKEWORD(pt.y,pt.x);
+      */
+      parent->SendMessage(event,wParam,lParam);
+    }
+    else if ((event==WM_CHAR) ) 
+    {
+      processed = true;
+      msg << "WM_CHAR\r\n";
+      TStreamEdit* parent = handler.d_wndToParentMap[hWnd];
+      INT nKey = (INT) wParam;
+      UINT nIndex = (UINT) lParam;
+      CRichEditCtrl*  pListBox = dynamic_cast<CRichEditCtrl* >( &child) ;
+      parent->processKey(nKey,pListBox,nIndex);
+      /*
+      CPoint pt(lParam);
+
+      CWnd::FromHandle(hWnd)->MapWindowPoints(parent,&pt,1);
+      lParam=MAKEWORD(pt.y,pt.x);
+      */
+      //parent->SendMessage(event,wParam,lParam);
+    }
     ::OutputDebugString(CString(msg.str().c_str()));
     WNDPROC_TYPE old = handler.d_wndToOldProc[hWnd];
-    return old(hWnd,event,wParam,lParam);
+    if(! processed)
+      return old(hWnd,event,wParam,lParam);
+    return 0; // message processed
   }
 
   void append(CWnd* wnd, TStreamEdit* parent)
@@ -146,7 +179,6 @@ BEGIN_MESSAGE_MAP(TStreamEdit, CMyBaseForm)
   ON_WM_VSCROLL()
   ON_WM_SIZE()
   ON_WM_RBUTTONDOWN()
-  ON_WM_VKEYTOITEM()
 END_MESSAGE_MAP()
 void append(CRichEditCtrl& edit, const std::string& str)
 {
@@ -1599,6 +1631,47 @@ void  TStreamEdit::setCurrectEditSelection(const std::string& i_value)
   UpdateInfoString();
 }
 
+unsigned char getCharacter(UINT nKey)
+{
+  return nKey;
+}
+
+void TStreamEdit::processKey(INT nKey,CRichEditCtrl* pListBox,UINT nIndex)
+{
+  if(!pListBox)
+  {
+    std::stringstream msg;
+    msg << "Corrupted pListBox!!!"  << std::endl << std::endl
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+    throw std::runtime_error( msg.str() );
+  }
+  unsigned char ch = getCharacter(nKey);
+
+  if(pListBox->m_hWnd==HexMemo.m_hWnd)
+  {
+    if(ch)
+      HexRichEditKeyDown(ch);
+    else
+      HexRichEditKeyPress(nKey);
+  }
+  else if(pListBox->m_hWnd==StringMemo.m_hWnd)
+  {
+    if(ch)
+      StringRichEditKeyDown(ch);
+    else
+      StringRichEditKeyPress(nKey);
+  }
+  else
+  {
+    std::stringstream msg;
+    msg << "Neither HexMemo nor StringMemo"  << std::endl << std::endl
+      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
+    throw std::runtime_error( msg.str() );
+
+  }
+
+}
+
 void  TStreamEdit::UpdateInfoString(void)
 {
   std::stringstream msg;
@@ -1670,49 +1743,6 @@ void TStreamEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
   else
   */
     CMyBaseForm::OnLButtonDblClk(nFlags, point);
-}
-
-unsigned char getCharacter(UINT nKey)
-{
-  return nKey;
-}
-
-int TStreamEdit::OnVKeyToItem(UINT nKey,CListBox* pListBox,UINT nIndex)
-{
-  if(!pListBox)
-  {
-    std::stringstream msg;
-    msg << "Corrupted pListBox!!!"  << std::endl << std::endl
-      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
-    throw std::runtime_error( msg.str() );
-  }
-  unsigned char ch = getCharacter(nKey);
-
-  if(pListBox->m_hWnd==HexMemo.m_hWnd)
-  {
-    if(ch)
-      HexRichEditKeyPress(ch);
-    else
-      HexRichEditKeyDown(nKey);
-  }
-  else if(pListBox->m_hWnd==StringMemo.m_hWnd)
-  {
-    if(ch)
-      StringRichEditKeyPress(ch);
-    else
-      StringRichEditKeyDown(nKey);
-  }
-  else
-  {
-    std::stringstream msg;
-    msg << "Neither HexMemo nor StringMemo"  << std::endl << std::endl
-      << " File: " << __FILE__ << std::endl << " Line: " << __LINE__ << std::endl << " Function: " << __FUNCTION__ << std::endl;
-    throw std::runtime_error( msg.str() );
-
-  }
-  //http://msdn.microsoft.com/en-us/library/02z9kdt8.aspx
-  CMyBaseForm::OnVKeyToItem(nKey, pListBox,nIndex);
-  return -2;
 }
 
 void TStreamEdit::OnSize(UINT, int cx,int cy)

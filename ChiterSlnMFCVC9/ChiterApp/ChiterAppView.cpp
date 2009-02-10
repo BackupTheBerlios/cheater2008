@@ -70,9 +70,6 @@ int CChiterAppView::OnCreate(LPCREATESTRUCT lpcs)
     d_streamEdit.SetWindowPos ( 0, streamEditrRect.left, streamEditrRect.top, streamEditrRect.Width()+400, streamEditrRect.Height(), SWP_NOZORDER  );
     d_streamEdit.ShowWindow( SW_SHOW );
 
-    boost::shared_ptr<std::iostream> test =  boost::shared_ptr<std::iostream>(new std::fstream("d:\\a.txt"));
-    d_streamEdit.setStream(test);
-
     return 0;
 
 }
