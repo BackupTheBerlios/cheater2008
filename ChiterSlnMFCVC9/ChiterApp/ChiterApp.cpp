@@ -19,7 +19,7 @@
 BEGIN_MESSAGE_MAP(CChiterAppApp, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CChiterAppApp::OnAppAbout)
 	// Standard file based document commands
-	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
+	ON_COMMAND(ID_FILE_NEW, &CChiterAppApp::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
 	// Standard print setup command
 	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinApp::OnFilePrintSetup)
@@ -148,6 +148,120 @@ void CChiterAppApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
+}
+
+void CChiterAppApp::openFile(const std::string& i_name)
+{
+
+  boost::shared_ptr<std::iostream> file = boost::shared_ptr<std::iostream>(new std::fstream(i_name.c_str()));
+  if(!file)
+  {
+    std::stringstream msg;
+    msg << "Cant open file "  << i_name;
+    throw std::runtime_error(msg.str());
+  }
+  else 
+  {
+    if(! (*(file.get())) )
+    {
+      std::stringstream msg;
+      msg << "Failed to  open file "  << i_name << " for read/write";
+      throw std::runtime_error(msg.str());
+    }
+  }
+  //---------------------------------------------------------------------------
+  POSITION pos = m_pDocManager->GetFirstDocTemplatePosition();
+  CDocTemplate* pTemplate =  m_pDocManager->GetNextDocTemplate(pos);
+
+
+  CString lpszPathName = CString("");
+  BOOL bMakeVisible = TRUE;
+  CDocument* pDocument = pTemplate->CreateNewDocument();
+  if (pDocument == NULL)
+  {
+    TRACE(traceAppMsg, 0, "CDocTemplate::CreateNewDocument returned NULL.\n");
+    AfxMessageBox(AFX_IDP_FAILED_TO_CREATE_DOC);
+    return;
+  }
+  ASSERT_VALID(pDocument);
+
+  BOOL bAutoDelete = pDocument->m_bAutoDelete;
+  pDocument->m_bAutoDelete = FALSE;   // don't destroy if something goes wrong
+  CFrameWnd* pFrame = pTemplate->CreateNewFrame(pDocument, NULL);
+  pDocument->m_bAutoDelete = bAutoDelete;
+  if (pFrame == NULL)
+  {
+    AfxMessageBox(AFX_IDP_FAILED_TO_CREATE_DOC);
+    delete pDocument;       // explicit delete on error
+    return;
+  }
+  ASSERT_VALID(pFrame);
+
+  if (lpszPathName.GetLength() == 0)
+  {
+    // create a new document - with default document name
+    pTemplate->SetDefaultTitle(pDocument);
+
+    // avoid creating temporary compound file when starting up invisible
+    if (!bMakeVisible)
+      pDocument->m_bEmbedded = TRUE;
+
+    if (!pDocument->OnNewDocument())
+    {
+      // user has be alerted to what failed in OnNewDocument
+      TRACE(traceAppMsg, 0, "CDocument::OnNewDocument returned FALSE.\n");
+      pFrame->DestroyWindow();
+      return;
+    }
+  }
+  else
+  {
+    // open an existing document
+    CWaitCursor wait;
+    if (!pDocument->OnOpenDocument(lpszPathName))
+    {
+      // user has be alerted to what failed in OnOpenDocument
+      TRACE(traceAppMsg, 0, "CDocument::OnOpenDocument returned FALSE.\n");
+      pFrame->DestroyWindow();
+      return;
+    }
+    pDocument->SetPathName(lpszPathName);
+  }
+  pTemplate->InitialUpdateFrame(pFrame, pDocument, bMakeVisible);
+  //---------------------------------------------------------------------------
+  CChiterAppView* view = dynamic_cast<CChiterAppView*>  (pFrame->GetActiveView());
+  if(!view)
+  {
+    std::stringstream msg;
+    msg << "Unknown view ";
+    throw std::runtime_error(msg.str());
+  }
+  view->setStream(file);
+  CString frameTitle ("File: ");
+  frameTitle+= CString(i_name.c_str());
+  pFrame->SetWindowText(frameTitle);
+}
+
+
+
+
+
+void CChiterAppApp::OnFileNew()
+{
+  CFileDialog dlg(TRUE);
+  if (IDOK == dlg.DoModal())
+  {
+    CString name = dlg.GetFileName();
+    CString folder = dlg.GetFolderPath();
+    CString ext = dlg.GetFileExt();
+    CString title = dlg.GetFileTitle();
+    CString fullpath = folder + CString("\\") + name;
+    std::string fileName = std::string(CT2CA(fullpath));
+    openFile(fileName);
+  }
+
+ //return pDocument;
+  //CWinApp::OnFileNew();
 }
 
 

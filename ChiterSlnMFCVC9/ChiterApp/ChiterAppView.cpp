@@ -7,6 +7,8 @@
 #include "ChiterAppDoc.h"
 #include "ChiterAppView.h"
 
+#include <boost/shared_ptr.hpp>
+#include <fstream>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -48,38 +50,28 @@ int CChiterAppView::OnCreate(LPCREATESTRUCT lpcs)
 {
     if(CView::OnCreate( lpcs) == -1 )
         return -1;
-
-    d_valueBox.Create ( this );
-    d_valueBox.SetWindowPos (NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-    d_valueBox.ShowWindow( SW_SHOW );
-    CRect valueRect;
-    d_valueBox.GetClientRect( valueRect );
-    d_valueBox.MapWindowPoints(this,valueRect);
-    valueRect.MoveToY(valueRect.bottom);
+    CRect countEditRect(0, 0, 100, 50);
     d_countEdit.Create ( this );
-    d_countEdit.SetWindowPos ( 0, valueRect.left, valueRect.top, 100, 50, SWP_NOZORDER | SWP_NOSIZE);
+    d_countEdit.SetWindowPos ( 0, countEditRect.left, countEditRect.top, countEditRect.Width(), countEditRect.Height(), SWP_NOZORDER | SWP_NOSIZE);
     d_countEdit.ShowWindow( SW_SHOW );
 
-    d_ponterViewBox.Create( this );
-    CRect ponterViewBoxRect;
-    d_countEdit.GetClientRect(ponterViewBoxRect);
-    d_countEdit.MapWindowPoints(this,ponterViewBoxRect);
-    ponterViewBoxRect.MoveToY(ponterViewBoxRect.bottom + 4);
-    ponterViewBoxRect.right = ponterViewBoxRect.left + 400;
-    ponterViewBoxRect.bottom = ponterViewBoxRect.top + 400;
-    d_ponterViewBox.SetWindowPos ( 0, ponterViewBoxRect.left, ponterViewBoxRect.top, ponterViewBoxRect.Width(), ponterViewBoxRect.Height(), SWP_NOZORDER );
-    d_ponterViewBox.ShowWindow( SW_SHOW );
-
-    CRect searcherRect;
-    d_ponterViewBox.GetClientRect( searcherRect );
-    d_ponterViewBox.MapWindowPoints(this,searcherRect);
+    CRect searcherRect(countEditRect);
     searcherRect.MoveToX( searcherRect.right );
-    searcherRect.right = searcherRect.left + 700;
+    searcherRect.right = searcherRect.left + 500;
     searcherRect.top = 10;
-    searcherRect.bottom =900;
+    searcherRect.bottom =800;
     d_searcherProperties.Create(this);
     d_searcherProperties.SetWindowPos ( 0, searcherRect.left, searcherRect.top, searcherRect.Width(), searcherRect.Height(), SWP_NOZORDER  );
     d_searcherProperties.ShowWindow( SW_SHOW );
+
+    CRect streamEditrRect(searcherRect);
+    streamEditrRect.MoveToX( streamEditrRect.right +5);
+    d_streamEdit.Create(this);
+    d_streamEdit.SetWindowPos ( 0, streamEditrRect.left, streamEditrRect.top, streamEditrRect.Width()+400, streamEditrRect.Height(), SWP_NOZORDER  );
+    d_streamEdit.ShowWindow( SW_SHOW );
+
+    boost::shared_ptr<std::iostream> test =  boost::shared_ptr<std::iostream>(new std::fstream("d:\\a.txt"));
+    d_streamEdit.setStream(test);
 
     return 0;
 
@@ -137,6 +129,12 @@ CChiterAppDoc* CChiterAppView::GetDocument() const // non-debug version is inlin
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CChiterAppDoc)));
 	return (CChiterAppDoc*)m_pDocument;
 }
+
+void CChiterAppView::setStream(boost::shared_ptr<std::iostream> i_stream)
+{
+  d_streamEdit.setStream(i_stream);
+}
+
 #endif //_DEBUG
 
 

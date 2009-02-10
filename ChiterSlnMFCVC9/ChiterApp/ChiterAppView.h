@@ -7,6 +7,10 @@
 #include "Library/CountEdit.h"
 #include "Library/PointersViewBox.h"
 #include "Library/SearcherProperties.h"
+#include "Library/StreamEdit.h"
+
+#include <boost/shared_ptr.hpp>
+#include <iostream>
 
 class CChiterAppView : public CView
 {
@@ -19,10 +23,13 @@ protected: // create from serialization only
   TPointersViewBox d_ponterViewBox;
 
   TSearcherProperties d_searcherProperties;
+
+  TStreamEdit d_streamEdit;
+
 // Attributes
 public:
 	CChiterAppDoc* GetDocument() const;
-
+  void setStream(boost::shared_ptr<std::iostream>);
 // Operations
 public:
 

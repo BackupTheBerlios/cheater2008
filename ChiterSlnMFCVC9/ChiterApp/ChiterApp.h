@@ -7,7 +7,7 @@
 #endif
 
 #include "resource.h"       // main symbols
-
+#include <string>
 
 // CChiterAppApp:
 // See ChiterApp.cpp for the implementation of this class
@@ -18,13 +18,14 @@ class CChiterAppApp : public CWinApp
 public:
 	CChiterAppApp();
 
-
+  void openFile(const std::string& i_name);
 // Overrides
 public:
 	virtual BOOL InitInstance();
 
 // Implementation
 	afx_msg void OnAppAbout();
+  afx_msg void OnFileNew();
 	DECLARE_MESSAGE_MAP()
 };
 
