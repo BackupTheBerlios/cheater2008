@@ -1405,6 +1405,7 @@ void  TStreamEdit::StringRichEditKeyPres(unsigned char value)
 
   ch[0]=ConvertToPrintSign(value);
   ch[1]=0;
+  getStream()->clear();
   getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
 
   StringMemo.SetSel(StartString,StartString+1);
