@@ -18,12 +18,6 @@ protected: // create from serialization only
 	CChiterAppView();
 	DECLARE_DYNCREATE(CChiterAppView)
 	
-  InputGroupBox d_valueBox;
-  TCountEdit d_countEdit;
-  TPointersViewBox d_ponterViewBox;
-
-  TSearcherProperties d_searcherProperties;
-
   TStreamEdit d_streamEdit;
 
 // Attributes
@@ -43,6 +37,7 @@ protected:
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 
     afx_msg int OnCreate(LPCREATESTRUCT lpcs);
+    afx_msg void OnSize( UINT, int, int );
 // Implementation
 public:
 	virtual ~CChiterAppView();

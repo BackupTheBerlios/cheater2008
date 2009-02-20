@@ -20,7 +20,8 @@ IMPLEMENT_DYNCREATE(CChiterAppView, CView)
 
 BEGIN_MESSAGE_MAP(CChiterAppView, CView)
 	// Standard printing commands
-    ON_WM_CREATE()
+  ON_WM_CREATE()
+  ON_WM_SIZE()
 	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
@@ -50,28 +51,24 @@ int CChiterAppView::OnCreate(LPCREATESTRUCT lpcs)
 {
     if(CView::OnCreate( lpcs) == -1 )
         return -1;
-    CRect countEditRect(0, 0, 100, 50);
-    d_countEdit.Create ( this );
-    d_countEdit.SetWindowPos ( 0, countEditRect.left, countEditRect.top, countEditRect.Width(), countEditRect.Height(), SWP_NOZORDER | SWP_NOSIZE);
-    d_countEdit.ShowWindow( SW_SHOW );
 
-    CRect searcherRect(countEditRect);
-    searcherRect.MoveToX( searcherRect.right );
-    searcherRect.right = searcherRect.left + 500;
-    searcherRect.top = 10;
-    searcherRect.bottom =800;
-    d_searcherProperties.Create(this);
-    d_searcherProperties.SetWindowPos ( 0, searcherRect.left, searcherRect.top, searcherRect.Width(), searcherRect.Height(), SWP_NOZORDER  );
-    d_searcherProperties.ShowWindow( SW_SHOW );
-
-    CRect streamEditrRect(searcherRect);
-    streamEditrRect.MoveToX( streamEditrRect.right +5);
+    CRect streamEditrRect(0,0,0,0);
+    streamEditrRect.right = streamEditrRect.left + 500;
+    streamEditrRect.top = 10;
+    streamEditrRect.bottom =800;
     d_streamEdit.Create(this);
     d_streamEdit.SetWindowPos ( 0, streamEditrRect.left, streamEditrRect.top, streamEditrRect.Width()+400, streamEditrRect.Height(), SWP_NOZORDER  );
     d_streamEdit.ShowWindow( SW_SHOW );
 
     return 0;
 
+}
+
+void CChiterAppView::OnSize(UINT nType,int cx,int cy)
+{
+  CView::OnSize(nType, cx, cy);
+  // Resize d_streamEdit to fill the whole view.
+  d_streamEdit.MoveWindow (0, 0, cx, cy);
 }
 
 
