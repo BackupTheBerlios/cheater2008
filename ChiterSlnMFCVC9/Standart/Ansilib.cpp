@@ -64,8 +64,8 @@ std::string   charptrToHexAnsi(char * buf, unsigned long len)
    {
     for(unsigned long i=0;i<len;i++)
      {
-      work._ulong=buf[i];
-	  res+=intToHex(work._ulong,2);
+      work._ulong=(unsigned char)buf[i];
+	    res+=intToHex(work._ulong,2);
      }
    }
   return res;
@@ -87,7 +87,7 @@ std::string    charptrToHexAnsiWithSpace(char * buf, unsigned long len)
 		    res+=intToHex(work._ulong,2);
         res+=std::string(SPACE_STRING);
        }
-      work._ulong=buf[i];
+      work._ulong=(unsigned char)buf[i];
       res+=intToHex(work._ulong,2);
      }
    }
