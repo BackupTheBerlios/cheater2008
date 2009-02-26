@@ -382,12 +382,11 @@ void  TStreamEdit::initialize(void)
   this->GetClientRect(&clientRect);
 
   d_splitterWnd.Create(this, WS_CHILD|WS_VISIBLE, clientRect, SplitterWnd_ID);
-  d_splitterWndTop.Create(&d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndTop_ID);
-  d_splitterWndBottom.Create(&d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndBottom_ID);
-  d_splitterWndTopLeft.Create(&d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndTopLeft_ID);
-  d_splitterWndTopRight.Create(&d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,500,500), SplitterWndTopRight_ID);
-
-
+  d_splitterWndTop.Create(&d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndTop_ID);
+  d_splitterWndBottom.Create(&d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndBottom_ID);
+  d_splitterWndTopLeft.Create(&d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndTopLeft_ID);
+  d_splitterWndTopRight.Create(&d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndTopRight_ID);
+  
   d_splitterWndTopRightBox.Create(CString(""),SS_SIMPLE,CRect(0,0,0,0),&d_splitterWndTopRight);
 
 
@@ -443,16 +442,16 @@ void  TStreamEdit::initialize(void)
   //--------------Top left panel-----------------------------------
   // throwException("Sergey3");
 
-  StringMemo.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,StringMemo_ID);
+  d_stringMemo.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,StringMemo_ID);
 #pragma message ("TODO: implement event handlers")
   //   StringMemo.OnKeyDown=StringRichEditKeyDown;
   //   StringMemo.OnKeyPress=StringRichEditKeyPress;
   // StringMemo.OnMouseMove=StringRichEditMouseMove;
 
 
-  PointerMemo.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,PointerMemo_ID);
+  d_pointerMemo.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,PointerMemo_ID);
 
-  HexMemo.Create(ES_MULTILINE| ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,HexMemo_ID);
+  d_hexMemo.Create(ES_MULTILINE| ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,HexMemo_ID);
 #pragma message ("TODO: implement event handlers")
   //   HexMemo.OnKeyDown=HexRichEditKeyDown;
   //   HexMemo.OnKeyPress=HexRichEditKeyPress;
@@ -463,9 +462,9 @@ void  TStreamEdit::initialize(void)
   d_splitterWndTopLeft.AddColumn();
   d_splitterWndTopLeft.AddColumn();
 
-  d_splitterWndTopLeft.SetWindow(0,0,PointerMemo.m_hWnd);
-  d_splitterWndTopLeft.SetWindow(0,1,HexMemo.m_hWnd);
-  d_splitterWndTopLeft.SetWindow(0,2,StringMemo.m_hWnd);
+  d_splitterWndTopLeft.SetWindow(0,0,d_pointerMemo.m_hWnd);
+  d_splitterWndTopLeft.SetWindow(0,1,d_hexMemo.m_hWnd);
+  d_splitterWndTopLeft.SetWindow(0,2,d_stringMemo.m_hWnd);
 
   //-------------------- Joining Top panes -----------------------
   d_splitterWndTop.AddRow();
@@ -489,9 +488,9 @@ void  TStreamEdit::initialize(void)
   StringNumberEdit.ShowWindow(SW_SHOW);
   StringLengthEdit.ShowWindow(SW_SHOW);
   SearcherProperties.ShowWindow(SW_SHOW);
-  PointerMemo.ShowWindow(SW_SHOW);
-  HexMemo.ShowWindow(SW_SHOW);
-  StringMemo.ShowWindow(SW_SHOW);
+  d_pointerMemo.ShowWindow(SW_SHOW);
+  d_hexMemo.ShowWindow(SW_SHOW);
+  d_stringMemo.ShowWindow(SW_SHOW);
 
   d_splitterWndTopRightBox.ShowWindow(SW_SHOW);
 
@@ -502,6 +501,22 @@ void  TStreamEdit::initialize(void)
   d_splitterWndTopLeft.ShowWindow(SW_SHOW);
   d_splitterWndTopRight.ShowWindow(SW_SHOW);
 
+
+  d_splitterWnd.SetResizeMode(SplitterCtrl_NS::SPLITTERCTRL_RESIZE_DYNAMIC);
+  d_splitterWndTop.SetMinHeight(200);
+  d_splitterWndBottom.SetMinHeight(70);
+  d_splitterWnd.SetHeightForDynamic(0,80);
+  d_splitterWnd.SetHeightForDynamic(1,20);
+  d_splitterWnd.SetHeightForDynamic(0,80);
+
+  d_splitterWndTop.SetWidthForStatic(0,800);
+  d_splitterWndTop.SetWidthForStatic(1,100);
+  d_splitterWndTopLeft.SetResizeMode(SplitterCtrl_NS::SPLITTERCTRL_RESIZE_STATIC);
+  d_splitterWndTopLeft.SetMinWidth(100);
+  d_splitterWndTopLeft.SetWidthForStatic(0,100);
+  d_splitterWndTopLeft.SetWidthForStatic(1,500);
+  d_splitterWndTopLeft.SetWidthForStatic(2,200);
+
   d_splitterWnd.Update();
   d_splitterWndTop.Update();
   d_splitterWndBottom.Update();
@@ -511,9 +526,9 @@ void  TStreamEdit::initialize(void)
 
   SearcherProperties.setOnSelectPointer( TPointerSelectEventPtr (new TPointerSelectEvent(boost::bind(&TStreamEdit::PointersNotifyEvent,this,_1)) ) );
 
-  WindowsMessageHandler::getWindowsMessageHandler().append(&HexMemo,this);
-  WindowsMessageHandler::getWindowsMessageHandler().append(&StringMemo,this);
-  WindowsMessageHandler::getWindowsMessageHandler().append(&PointerMemo,this);
+  WindowsMessageHandler::getWindowsMessageHandler().append(&d_hexMemo,this);
+  WindowsMessageHandler::getWindowsMessageHandler().append(&d_stringMemo,this);
+  WindowsMessageHandler::getWindowsMessageHandler().append(&d_pointerMemo,this);
 }
 
 //---------------------------------------------------------------------------
@@ -549,12 +564,12 @@ void  TStreamEdit::LoadFromStream(void)
   char* ch=new char[StringLen];
   long HexMemoSelStart,HexMemoSelEnd;
   long StringMemoSelStart,StringMemoSelEnd;
-  HexMemo.GetSel(HexMemoSelStart,HexMemoSelEnd);
-  StringMemo.GetSel(StringMemoSelStart,StringMemoSelEnd);
+  d_hexMemo.GetSel(HexMemoSelStart,HexMemoSelEnd);
+  d_stringMemo.GetSel(StringMemoSelStart,StringMemoSelEnd);
 
-  HexMemo.SetWindowText(CString(""));
-  StringMemo.SetWindowText(CString(""));
-  PointerMemo.SetWindowText(CString(""));
+  d_hexMemo.SetWindowText(CString(""));
+  d_stringMemo.SetWindowText(CString(""));
+  d_pointerMemo.SetWindowText(CString(""));
 
   try
   {
@@ -585,6 +600,8 @@ void  TStreamEdit::LoadFromStream(void)
       {
         if((RealRead=getStream()->read(ch,StringLen).gcount())>0)
         {
+          if(RealRead < StringLen)
+            getStream()->clear();
           pointerStream << ulongTo8digitHexString((unsigned long)getStream()->tellg()-RealRead) << "\r\n";
           hexStream << charptrToHexAnsiWithSpace(ch,RealRead)<< "\r\n";
           stringStream << ConvertToPrintString(ch,RealRead)<< "\r\n";
@@ -594,9 +611,9 @@ void  TStreamEdit::LoadFromStream(void)
           if(i==0)
             if(getStream()->tellg()>FCurrentPos) FCurrentPos=getStream()->tellg();
       }
-      HexMemo.SetWindowText(CString(hexStream.str().c_str()));
-      StringMemo.SetWindowText(CString(stringStream.str().c_str()));
-      PointerMemo.SetWindowText(CString(pointerStream.str().c_str()));
+      d_hexMemo.SetWindowText(CString(hexStream.str().c_str()));
+      d_stringMemo.SetWindowText(CString(stringStream.str().c_str()));
+      d_pointerMemo.SetWindowText(CString(pointerStream.str().c_str()));
     }
   }
   catch(std::exception& e)
@@ -608,8 +625,8 @@ void  TStreamEdit::LoadFromStream(void)
   StringNumberEdit.SetWindowText(CString(ulongToAnsi(NumberOfString).c_str()));
   StringLengthEdit.SetWindowText(CString(ulongToAnsi(StringLen).c_str()));
 
-  HexMemo.SetSel(HexMemoSelStart,HexMemoSelStart);
-  StringMemo.SetSel(StringMemoSelStart,StringMemoSelStart);
+  d_hexMemo.SetSel(HexMemoSelStart,HexMemoSelStart);
+  d_stringMemo.SetSel(StringMemoSelStart,StringMemoSelStart);
 }
 
 void  TStreamEdit::LoadFromStreamMenuitemClick()
@@ -700,9 +717,9 @@ void  TStreamEdit::HexRichEditKeyDown(UINT Key)
                       if(Key==0x9) //tab
                       {
                         long hexStart,hexEnd;
-                        HexMemo.GetSel(hexStart,hexEnd);
+                        d_hexMemo.GetSel(hexStart,hexEnd);
                         int pos=ConvertHexPosToGlobal(hexStart);
-                        StringMemo.SetSel(ConvertGlobalToStringPos(pos),ConvertGlobalToStringPos(pos));
+                        d_stringMemo.SetSel(ConvertGlobalToStringPos(pos),ConvertGlobalToStringPos(pos));
                       }
                       else
                       {
@@ -763,7 +780,7 @@ void  TStreamEdit::GotoMenuItemClick()
 void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
 {
   long hexStart,hexEnd;
-  HexMemo.GetSel(hexStart,hexEnd);
+  d_hexMemo.GetSel(hexStart,hexEnd);
   int pos=ConvertHexPosToGlobal(hexStart);
   int rem;
   int hexPos=ConvertGlobalToHexPos(pos);
@@ -771,28 +788,28 @@ void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
   char print[2];
   print[1]=0;
   int StringPos=ConvertGlobalToStringPos(pos);
-  StringMemo.SetSel(StringPos,StringPos+1);
+  d_stringMemo.SetSel(StringPos,StringPos+1);
 
-
+  getStream()->clear();
   getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
 
-  HexMemo.SetSel(hexStart,hexStart+1);
+  d_hexMemo.SetSel(hexStart,hexStart+1);
   std::stringstream stream;
   stream << std::hex << (unsigned int)value;
   std::string str = stream.str();
-  HexMemo.ReplaceSel(CString(str.c_str()));
+  d_hexMemo.ReplaceSel(CString(str.c_str()));
 
-  HexMemo.GetSel(hexStart,hexEnd);
+  d_hexMemo.GetSel(hexStart,hexEnd);
   rem=hexStart;
-  HexMemo.SetSel(hexPos,hexPos+2);
+  d_hexMemo.SetSel(hexPos,hexPos+2);
 
-  CString hexSelStr = HexMemo.GetSelText();
+  CString hexSelStr = d_hexMemo.GetSelText();
   ch=HexAnsiTocharptr( std::string( CT2CA(hexSelStr) ) );
   print[0]=ConvertToPrintSign(*ch);
-  StringMemo.ReplaceSel(CString(print));
+  d_stringMemo.ReplaceSel(CString(print));
 
-  HexMemo.SetSel(rem,rem);
-  HexMemo.SetSel(-1,0);
+  d_hexMemo.SetSel(rem,rem);
+  d_hexMemo.SetSel(-1,0);
   getStream()->write(ch,1);
   ShiftIfWrongHexSelStart();
 
@@ -807,13 +824,13 @@ void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
 void TStreamEdit::ShiftIfWrongHexSelStart()
 {
   long hexStart, hexEnd;
-  HexMemo.GetSel(hexStart,hexEnd);
+  d_hexMemo.GetSel(hexStart,hexEnd);
   int pos=ConvertHexPosToGlobal(hexStart);
   if(pos==ViewedLen-1)
   {
     hexStart--;
     hexEnd--;
-    HexMemo.SetSel(hexStart,hexEnd);
+    d_hexMemo.SetSel(hexStart,hexEnd);
     ShiftHexSelStart(1);
   }
   else
@@ -822,7 +839,7 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
     {
       hexStart+=2;
       hexEnd+=2;
-      HexMemo.SetSel(hexStart,hexEnd);
+      d_hexMemo.SetSel(hexStart,hexEnd);
     }
   }
 
@@ -830,7 +847,7 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
   {
     hexStart++;
     hexEnd++;
-    HexMemo.SetSel(hexStart,hexEnd);
+    d_hexMemo.SetSel(hexStart,hexEnd);
   }
 }
 
@@ -878,7 +895,7 @@ void  TStreamEdit::setCurrentPos( int value)
 void  TStreamEdit::ShiftHexSelStart(int Shift)
 {
   long Start,End,Len;
-  HexMemo.GetSel(Start,End);
+  d_hexMemo.GetSel(Start,End);
   long value=Start;
   long InBytePos=(value%(3*StringLen+1))%3;
   long Offset=ConvertHexPosToGlobal(value);
@@ -908,7 +925,7 @@ void  TStreamEdit::ShiftHexSelStart(int Shift)
       FCurrentPos+=((Shift/(2*StringLen)))*StringLen+Shift%2;
       Offset=OldOffset;
     }
-    HexMemo.SetSel(ConvertGlobalToHexPos(Offset)+InBytePos,ConvertGlobalToHexPos(Offset)+InBytePos);
+    d_hexMemo.SetSel(ConvertGlobalToHexPos(Offset)+InBytePos,ConvertGlobalToHexPos(Offset)+InBytePos);
   }
   GetVariablesAtPos(FCurrentPos+Offset);
 }
@@ -918,7 +935,7 @@ void  TStreamEdit::CopyMenuItemClick()
   long Start,End,Len;
   boost::shared_ptr<std::stringstream> buf=boost::shared_ptr<std::stringstream>(new std::stringstream());
 
-  HexMemo.GetSel(Start,End);
+  d_hexMemo.GetSel(Start,End);
   Len = Start - End;
 
   End=ConvertHexPosToGlobal(End);
@@ -962,7 +979,7 @@ void  TStreamEdit::PopupMenu1Popup()
   clearMenu(EditBufMenuItem,d_menuCommands);
 
   long hexStart,hexEnd;
-  HexMemo.GetSel(hexStart,hexEnd);
+  d_hexMemo.GetSel(hexStart,hexEnd);
   PopupMenu.EnableMenuItem (12,MF_BYPOSITION   |  ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED ) );
   PopupMenu.EnableMenuItem (13,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
   PopupMenu.EnableMenuItem (11,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
@@ -1020,7 +1037,7 @@ void copyTheRest(std::ostream& out, std::istream& in,
 void  TStreamEdit::PasteMenuItemClick()
 {
   long Start,End;
-  HexMemo.GetSel(Start,End);
+  d_hexMemo.GetSel(Start,End);
   Start=ConvertHexPosToGlobal(Start);
   // initialize current position
   getStream()->seekp(Start+FCurrentPos, std::ios_base::beg);
@@ -1050,7 +1067,7 @@ void  TStreamEdit::CopytoMenuClick(int idx)
   unsigned int num = (unsigned int)idx;
   long Start, End, Len;
 
-  HexMemo.GetSel(Start,End);
+  d_hexMemo.GetSel(Start,End);
   Len = Start - End;
 
   End=ConvertHexPosToGlobal(End);
@@ -1080,7 +1097,7 @@ void  TStreamEdit::PasteFromMenuClick(int idx)
   unsigned int num = (unsigned int)idx;
   long Start,End;
 
-  HexMemo.GetSel(Start,End);
+  d_hexMemo.GetSel(Start,End);
   End=ConvertHexPosToGlobal(End);
   Start=ConvertHexPosToGlobal(Start);
 
@@ -1123,9 +1140,9 @@ void  TStreamEdit::Font1Click()
     VERIFY(d_stringMemoFont->CreateFontIndirect(&lf));
     VERIFY(d_hexMemoFont->CreateFontIndirect(&lf));
 
-    PointerMemo.SetFont(d_pointerMemoFont.get());
-    StringMemo.SetFont(d_stringMemoFont.get());
-    HexMemo.SetFont(d_hexMemoFont.get());
+    d_pointerMemo.SetFont(d_pointerMemoFont.get());
+    d_stringMemo.SetFont(d_stringMemoFont.get());
+    d_hexMemo.SetFont(d_hexMemoFont.get());
 
   }
 
@@ -1161,7 +1178,7 @@ void  TStreamEdit::StringFonCMenuItemClick()
     d_stringMemoFont = boost::shared_ptr<CFont>(new CFont());
     VERIFY(d_stringMemoFont->CreateFontIndirect(&lf));
 
-    StringMemo.SetFont(d_stringMemoFont.get());
+    d_stringMemo.SetFont(d_stringMemoFont.get());
 
   }
 
@@ -1178,7 +1195,7 @@ void  TStreamEdit::PointerFonCMenuItemClick()
     d_pointerMemoFont = boost::shared_ptr<CFont>(new CFont());
     VERIFY(d_pointerMemoFont->CreateFontIndirect(&lf));
 
-    PointerMemo.SetFont(d_pointerMemoFont.get());
+    d_pointerMemo.SetFont(d_pointerMemoFont.get());
 
   }
 
@@ -1195,7 +1212,7 @@ void  TStreamEdit::HexFonCMenuItemClick()
     d_hexMemoFont = boost::shared_ptr<CFont>(new CFont());
     VERIFY(d_hexMemoFont->CreateFontIndirect(&lf));
 
-    HexMemo.SetFont(d_hexMemoFont.get());
+    d_hexMemo.SetFont(d_hexMemoFont.get());
 
   }
 }
@@ -1211,7 +1228,7 @@ void  TStreamEdit::StringColorMenuItemClick()
     d_stringMemoFont = boost::shared_ptr<CFont>(new CFont());
     VERIFY(d_hexMemoFont->CreateFontIndirect(&lf));
 
-    StringMemo.SetFont(d_stringMemoFont.get());
+    d_stringMemo.SetFont(d_stringMemoFont.get());
 
   }
 }
@@ -1343,10 +1360,10 @@ void  TStreamEdit::StringRichEditKeyDown(UINT Key)
                   if(Key==0x9) //Tab
                   {
                     long stringStart, hexStart;
-                    StringMemo.GetSel(stringStart,hexStart);
+                    d_stringMemo.GetSel(stringStart,hexStart);
                     int pos=ConvertStringPosToGlobal(stringStart);
-                    HexMemo.SetSel(ConvertGlobalToHexPos(pos),ConvertGlobalToHexPos(pos));
-                    HexMemo.SetFocus();
+                    d_hexMemo.SetSel(ConvertGlobalToHexPos(pos),ConvertGlobalToHexPos(pos));
+                    d_hexMemo.SetFocus();
                   }
                   else
                   {
@@ -1373,7 +1390,7 @@ void  TStreamEdit::StringRichEditKeyDown(UINT Key)
 void  TStreamEdit::ShiftStringSelStart(int Shift)
 {
   long StartString, EndString;
-  StringMemo.GetSel(StartString,EndString);
+  d_stringMemo.GetSel(StartString,EndString);
   int len = EndString - StartString;
   int Offset=ConvertStringPosToGlobal(StartString);
   int OldOffset=Offset;
@@ -1386,7 +1403,7 @@ void  TStreamEdit::ShiftStringSelStart(int Shift)
       FCurrentPos+=((Shift/(StringLen)))*StringLen +Shift%StringLen;
       Offset=OldOffset;
     }
-    StringMemo.SetSel(ConvertGlobalToStringPos(Offset), ConvertGlobalToStringPos(Offset) + len);
+    d_stringMemo.SetSel(ConvertGlobalToStringPos(Offset), ConvertGlobalToStringPos(Offset) + len);
   }
 }
 
@@ -1394,23 +1411,23 @@ void  TStreamEdit::StringRichEditKeyPres(unsigned char value)
 {
 
   long StartString, EndString;
-  StringMemo.GetSel(StartString,EndString);
+  d_stringMemo.GetSel(StartString,EndString);
 
   int pos=ConvertStringPosToGlobal(StartString);
   int hexpos=ConvertGlobalToHexPos(pos);
-  HexMemo.SetSel(hexpos,hexpos+2);
+  d_hexMemo.SetSel(hexpos,hexpos+2);
 
   char ch[2];
-  HexMemo.ReplaceSel(CString(charptrToHexAnsi((char*)&value,1).c_str()));
+  d_hexMemo.ReplaceSel(CString(charptrToHexAnsi((char*)&value,1).c_str()));
 
   ch[0]=ConvertToPrintSign(value);
   ch[1]=0;
   getStream()->clear();
   getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
 
-  StringMemo.SetSel(StartString,StartString+1);
-    StringMemo.ReplaceSel(CString(ch));
-  StringMemo.SetSel(-1,0); // remove selection
+  d_stringMemo.SetSel(StartString,StartString+1);
+    d_stringMemo.ReplaceSel(CString(ch));
+  d_stringMemo.SetSel(-1,0); // remove selection
 
   getStream()->write(ch,1);
   ShiftIfWrongStringSelStart();
@@ -1427,21 +1444,21 @@ void  TStreamEdit::StringRichEditKeyPress(unsigned char Key)
 void  TStreamEdit::ShiftIfWrongStringSelStart(void)
 {
   long Start, End;
-  StringMemo.GetSel(Start,End);
+  d_stringMemo.GetSel(Start,End);
   if(Start%(StringLen+2)==StringLen)
   {
     if(ViewedLen==(Start/(StringLen+2)+1)*StringLen)
     {
       Start--;
       End--;
-      StringMemo.SetSel(Start,End);
+      d_stringMemo.SetSel(Start,End);
       ShiftStringSelStart(1);
     }
     else
     {
       Start+=2;
       End+=2;
-      StringMemo.SetSel(Start,End);
+      d_stringMemo.SetSel(Start,End);
     }
       
   }
@@ -1451,10 +1468,10 @@ void  TStreamEdit::StringRichEditMouseMove(TObject *Sender,
                                            TShiftState Shift, int X, int Y)
 {
   long Start,End;
-  StringMemo.GetSel(Start,End);
+  d_stringMemo.GetSel(Start,End);
   Start=ConvertStringPosToGlobal(Start);
   End=ConvertStringPosToGlobal(End);
-  HexMemo.SetSel(ConvertGlobalToHexPos(Start),
+  d_hexMemo.SetSel(ConvertGlobalToHexPos(Start),
     ConvertGlobalToHexPos(Start));
 }
 //---------------------------------------------------------------------------
@@ -1463,10 +1480,10 @@ void  TStreamEdit::HexRichEditMouseMove(TObject *Sender,
                                         TShiftState Shift, int X, int Y)
 {
   long Start,End;
-  HexMemo.GetSel(Start,End);
+  d_hexMemo.GetSel(Start,End);
   Start=ConvertHexPosToGlobal(Start);
   End=ConvertHexPosToGlobal(End);
-  StringMemo.SetSel(ConvertGlobalToStringPos(Start),ConvertGlobalToStringPos(End));
+  d_stringMemo.SetSel(ConvertGlobalToStringPos(Start),ConvertGlobalToStringPos(End));
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::PointersNotifyEvent(int value)
@@ -1649,14 +1666,14 @@ void TStreamEdit::processKey(INT nKey,CRichEditCtrl* pListBox,UINT nIndex)
   }
   unsigned char ch = getCharacter(nKey);
 
-  if(pListBox->m_hWnd==HexMemo.m_hWnd)
+  if(pListBox->m_hWnd==d_hexMemo.m_hWnd)
   {
     if(ch)
       HexRichEditKeyDown(ch);
     else
       HexRichEditKeyPress(nKey);
   }
-  else if(pListBox->m_hWnd==StringMemo.m_hWnd)
+  else if(pListBox->m_hWnd==d_stringMemo.m_hWnd)
   {
     if(ch)
       StringRichEditKeyPress(ch);

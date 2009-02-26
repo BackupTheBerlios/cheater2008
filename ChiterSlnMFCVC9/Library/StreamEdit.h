@@ -82,9 +82,9 @@ private:
   TCountEdit StringNumberEdit;
   TCountEdit StringLengthEdit;
 
-  CRichEditCtrl StringMemo;
-  CRichEditCtrl HexMemo;
-  CRichEditCtrl PointerMemo;
+  CRichEditCtrl d_stringMemo;
+  CRichEditCtrl d_hexMemo;
+  CRichEditCtrl d_pointerMemo;
 
   CMenuItem ContinueSearchMenuItem;
   TProgressBar ProgressBar;
