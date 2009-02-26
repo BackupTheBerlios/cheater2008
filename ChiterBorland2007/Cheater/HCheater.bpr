@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="HCheater.exe"/>
+    <OBJFILES value="HCheater.obj Main.obj ..\Library\ProcessChoiceFrame.obj"/>
+    <RESFILES value="HCheater.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) Main.dfm ..\Library\ProcessChoiceFrame.dfm"/>
+    <LIBFILES value="&quot;c:\program files\borland\cbuilder6\Lib\PSDK\psapi.lib&quot; 
+      ..\Library\standart\Library.lib"/>
+    <LIBRARIES value="inet.lib august2002.lib bcb2kaxserver.lib vcldb.lib dbrtl.lib vclx.lib 
+      vcl.lib rtl.lib"/>
+    <SPARELIBS value="rtl.lib vcl.lib vclx.lib dbrtl.lib vcldb.lib bcb2kaxserver.lib 
+      august2002.lib inet.lib"/>
+    <PACKAGES value="rtl.bpi vcl.bpi bcb2kaxserver.bpi vclx.bpi proide50.bpi bcbie.bpi 
+      bcbsmp.bpi cgdide50.bpi crbide50.bpi dsnap.bpi inetdb.bpi inet.bpi 
+      dbrtl.bpi vcldb.bpi adortl.bpi bdertl.bpi vcldbx.bpi dss.bpi ibxpress.bpi 
+      vclie.bpi nmfast.bpi dclocx.bpi qrpt.bpi teeui.bpi teedb.bpi tee.bpi 
+      teeqr.bpi webdsnap.bpi direct50.bpi rcpkg50.bpi stride50.bpi DCLUSR.bpi"/>
+    <PATHCPP value=".;..\Library"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT"/>
+    <MAINSOURCE value="HCheater.cpp"/>
+    <INCLUDEPATH value="..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Lib;$(BCB)\include;$(BCB)\include\vcl;..\Library\standart;..\Library\august2002"/>
+    <LIBPATH value="..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;..\Library\august2002;..\Library\standart"/>
+    <WARNINGS value="-w-par"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-I..\Library -I$(BCB)\Imports -I$(BCB)\Projects -I$(BCB)\OBJREPOS 
+      -I$(BCB)\Lib -I$(BCB)\include -I$(BCB)\include\vcl -I..\Library\standart 
+      -I..\Library\august2002 -src_suffix cpp -D_DEBUG -boa"/>
+    <CFLAG1 value="-Od -H=c:\PROGRA~1\borland\CBUILD~1\lib\vcl60.csm -Hc -Vx -Ve -X- -r- -a8 
+      -6 -b- -k -y -v -vi- -c -tW -tWM"/>
+    <PFLAGS value="-$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zi"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpe -x -Gn -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="HCheater.cpp" FORMNAME="" UNITNAME="HCheater" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="HCheater.res" FORMNAME="" UNITNAME="HCheater.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Main.cpp" FORMNAME="Form1" UNITNAME="Main" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="c:\program files\borland\cbuilder6\Lib\PSDK\psapi.lib" FORMNAME="" UNITNAME="psapi" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\Library\ProcessChoiceFrame.cpp" FORMNAME="ProcessChoice1" UNITNAME="ProcessChoiceFrame" CONTAINERID="CCompiler" DESIGNCLASS="TFrame" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\Library\standart\Library.lib" FORMNAME="" UNITNAME="Library" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1049
+CodePage=1251
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=13
+Item0=..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Lib;$(BCB)\include;$(BCB)\include\vcl;..\Library\standart;..\Library\august2002
+Item1=$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Lib;$(BCB)\include;$(BCB)\include\vcl;..\Library\standart;..\Library\august2002\
+Item2=..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Lib;$(BCB)\include;$(BCB)\include\vcl;D:\Library\standart\;D:\Library\august2002\
+Item3=$(BCB)\Imports;$(BCB)\Projects\;$(BCB)\OBJREPOS\;$(BCB)\Lib\;$(BCB)\include;$(BCB)\include\vcl;..\..\Library\standart;..\..\Library\august2002
+Item4=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;d:\program files\borland\cbuilder5\Lib\;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;..\Library\OldLibrary;..\Library\BuilberLibrary;..\Library
+Item5=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;d:\program files\borland\cbuilder5\Lib\;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;..\Library\OldLibrary;..\Library\BuilberLibrary;D:\Program\Library
+Item6=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;..\Library;D:\tmp\;d:\program files\borland\cbuilder5\Lib\;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;..\Library\OldLibrary;..\Library\BuilberLibrary
+Item7=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;..\Library;D:\tmp\;d:\program files\borland\cbuilder5\Lib\;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;..\Library\OldLibrary;..\Library\BuilberLibrary;D:\Program\Library
+Item8=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS;..\Library;D:\tmp\;d:\program files\borland\cbuilder5\Lib\;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;..\Library\OldLibrary;..\Library\BuilberLibrary
+Item9=..\Library;D:\tmp\;d:\program files\borland\cbuilder5\Lib\;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;..\Library\OldLibrary;..\Library\BuilberLibrary
+Item10=..\Library;D:\tmp;d:\program files\borland\cbuilder5\Lib;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl;D:\Program\Library\OldLibrary;D:\Program\Library\BuilberLibrary
+Item11=..\Library;D:\tmp;d:\program files\borland\cbuilder5\Lib;..\Library\dll;$(BCB)\include;$(BCB)\include\vcl
+Item12=$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=12
+Item0=..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;..\Library\august2002;..\Library\standart
+Item1=..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;..\Library\august2002\;..\Library\standart\
+Item2=..\Library;$(BCB)\Imports;$(BCB)\Projects;$(BCB)\OBJREPOS;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;D:\Library\august2002\;D:\Library\standart\
+Item3=$(BCB)\Imports;$(BCB)\Projects\;$(BCB)\OBJREPOS\;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;..\..\Library\august2002;..\..\Library\standart
+Item4=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;..\library\builberlibrary;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;D:\tmp\;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib;..\Library
+Item5=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;..\library\builberlibrary;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;D:\tmp\;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib;D:\Program\Library
+Item6=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects\;..\library\builberlibrary;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS\;..\Library;D:\tmp\;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib
+Item7=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects;..\library\builberlibrary;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS;..\Library;D:\tmp\;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib;D:\Program\Library
+Item8=$(BCB)\Imports;d:\Program Files\Borland\CBuilder5\Projects;..\library\builberlibrary;D:\PROGRAM FILES\BORLAND\CBUILDER5\OBJREPOS;..\Library;D:\tmp\;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib
+Item9=..\Library;D:\tmp\;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib
+Item10=..\Library;D:\tmp;$(BCB)\Projects\Lib;..\Library\dll;$(BCB)\lib\obj;$(BCB)\lib
+Item11=$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_DEBUG
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

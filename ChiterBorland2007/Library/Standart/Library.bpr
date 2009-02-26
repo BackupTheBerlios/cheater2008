@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="Library.lib"/>
+    <OBJFILES value="Library.obj Ansilib.obj Functions.obj Ansi_Stream.obj"/>
+    <RESFILES value=""/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value=""/>
+    <PACKAGES value=""/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value=""/>
+    <RELEASELIBPATH value=""/>
+    <LINKER value="TLib"/>
+    <USERDEFINES value="_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT"/>
+    <MAINSOURCE value="Library.cpp"/>
+    <INCLUDEPATH value="$(BCB)\Lib;$(BCB)\Bin;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Projects;..\august2002"/>
+    <LIBPATH value="..;..\OldLibrary;..\DLL;&quot;d:\Program Files\Borland\CBuilder5\Projects\&quot;;&quot;D:\Program Files\Borland\CBuilder5\Lib\&quot;"/>
+    <WARNINGS value="-w-par -w-8027 -w-8026"/>
+    <WARNOPTSTR value=""/>
+    <LISTFILE value=""/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-src_suffix cpp -D_DEBUG -I$(BCB)\Lib -I$(BCB)\Bin -I$(BCB)\include 
+      -I$(BCB)\include\vcl -I$(BCB)\Projects -I..\august2002 -boa"/>
+    <CFLAG1 value="-Od -H=d:\PROGRA~1\borland\CBUILD~1\lib\vcl60.csm -Hc -Vx -Ve -X- -r- -a8 
+      -6 -b- -k -y -v -vi- -c -tWM"/>
+    <PFLAGS value="-$Y+ -$W -$O- -$A8 -v -JPHN -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zi"/>
+    <LFLAGS value=""/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="$(OBJFILES)"/>
+    <ALLRES value=""/>
+    <ALLLIB value=""/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="Library.cpp" FORMNAME="" UNITNAME="Library" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Ansilib.cpp" FORMNAME="" UNITNAME="Ansilib" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Functions.cpp" FORMNAME="" UNITNAME="Functions" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Ansi_Stream.cpp" FORMNAME="" UNITNAME="Ansi_Stream" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=14
+Item0=$(BCB)\Lib\;$(BCB)\Bin;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Lib;$(BCB)\Projects\;..\..\Library\standart;..\..\Library\august2002
+Item1=..\;..\OldLibrary;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary;..\dll
+Item2=..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary;..\dll
+Item3=..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary
+Item4=..\;d:\Program Files\Borland\CBuilder5\Projects\;..;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary
+Item5=d:\Program Files\Borland\CBuilder5\Projects;..\;..;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary
+Item6=..\;..;D:\Program Files\Borland\CBuilder5\Lib\;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary
+Item7=..\;D:\Program Files\Borland\CBuilder5\Lib;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;..\BuilberLibrary;..
+Item8=..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib;D:\Program\Library\BuilberLibrary;D:\Program\Library\OldLibrary;D:\Program\Library
+Item9=..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;..\..\PROGRAM FILES\BORLAND\CBuilder4\Lib
+Item10=..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl;F:\PROGRAM FILES\BORLAND\CBuilder4\Lib
+Item11=F:\Cpp Programs for Builder\Sergey Library;..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;$(BCB)\include;$(BCB)\include\vcl
+Item12=..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;..\;$(BCB)\include;$(BCB)\include\vcl;F:\Cpp Programs for Builder\Sergey Library
+Item13=..\..\PROGRAM FILES\BORLAND\CBuilder4\Bin;F:\Cpp Programs for Builder\Sergey Library;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=8
+Item0=..\;..\OldLibrary;..;..\DLL;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\
+Item1=..\DLL;..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\
+Item2=..\;..;d:\Program Files\Borland\CBuilder5\Projects\;D:\Program Files\Borland\CBuilder5\Lib\
+Item3=..\;d:\Program Files\Borland\CBuilder5\Projects\;..;D:\Program Files\Borland\CBuilder5\Lib\
+Item4=d:\Program Files\Borland\CBuilder5\Projects;..\;..;D:\Program Files\Borland\CBuilder5\Lib\
+Item5=..\;..;D:\Program Files\Borland\CBuilder5\Lib\
+Item6=..\;D:\Program Files\Borland\CBuilder5\Lib
+Item7=F:\PROGRAM FILES\BORLAND\CBuilder4\Lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_DEBUG
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=1
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>
