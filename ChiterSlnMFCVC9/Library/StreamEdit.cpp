@@ -102,23 +102,23 @@ public:
       processed = true;
       msg << "WM_KEYDOWN\r\n";
       TStreamEdit* parent = handler.d_wndToParentMap[hWnd];
+      INT nKey = (INT) wParam;
+      UINT nIndex = (UINT) lParam;
+      CRichEditCtrl*  pListBox = dynamic_cast<CRichEditCtrl* >( &child) ;
+      parent->processKey(nKey,pListBox,nIndex);
+
       /*
       CPoint pt(lParam);
 
       CWnd::FromHandle(hWnd)->MapWindowPoints(parent,&pt,1);
       lParam=MAKEWORD(pt.y,pt.x);
       */
-      parent->SendMessage(event,wParam,lParam);
     }
     else if ((event==WM_CHAR) ) 
     {
       processed = true;
       msg << "WM_CHAR\r\n";
-      TStreamEdit* parent = handler.d_wndToParentMap[hWnd];
-      INT nKey = (INT) wParam;
-      UINT nIndex = (UINT) lParam;
-      CRichEditCtrl*  pListBox = dynamic_cast<CRichEditCtrl* >( &child) ;
-      parent->processKey(nKey,pListBox,nIndex);
+
       /*
       CPoint pt(lParam);
 
@@ -600,9 +600,11 @@ void  TStreamEdit::LoadFromStream(void)
       {
         if((RealRead=getStream()->read(ch,StringLen).gcount())>0)
         {
-          if(RealRead < StringLen)
+          /*if(RealRead < StringLen)
             getStream()->clear();
-          pointerStream << ulongTo8digitHexString((unsigned long)getStream()->tellg()-RealRead) << "\r\n";
+            */
+          unsigned long streamPos = (unsigned long)getStream()->seekg(0,std::ios_base::cur).tellg();
+          pointerStream << ulongTo8digitHexString(streamPos-RealRead) << "\r\n";
           hexStream << charptrToHexAnsiWithSpace(ch,RealRead)<< "\r\n";
           stringStream << ConvertToPrintString(ch,RealRead)<< "\r\n";
           ViewedLen+=RealRead;
