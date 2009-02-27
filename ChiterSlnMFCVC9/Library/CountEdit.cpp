@@ -133,7 +133,8 @@ void TCountEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     {
         d_editField.SetWindowText( CString(ulongToAnsi(value).c_str()) );
 
-        if(OnChangeEvent) (*OnChangeEvent)();
+        if(OnChangeEvent) 
+          (*OnChangeEvent)();
 
     }
     //AllowChange=false;
