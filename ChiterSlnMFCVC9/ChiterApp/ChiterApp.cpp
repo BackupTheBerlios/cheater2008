@@ -153,7 +153,7 @@ void CChiterAppApp::OnAppAbout()
 void CChiterAppApp::openFile(const std::string& i_name)
 {
 
-  boost::shared_ptr<std::iostream> file = boost::shared_ptr<std::iostream>(new std::fstream(i_name.c_str(),std::ios_base::in | std::ios_base::out));
+  boost::shared_ptr<std::iostream> file = boost::shared_ptr<std::iostream>(new std::fstream(i_name.c_str(),std::ios_base::in | std::ios_base::out | std::ios_base::binary));
   if(!file)
   {
     std::stringstream msg;
