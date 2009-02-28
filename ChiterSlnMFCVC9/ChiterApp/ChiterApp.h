@@ -26,6 +26,8 @@ public:
 // Implementation
 	afx_msg void OnAppAbout();
   afx_msg void OnFileNew();
+  afx_msg void OnProcessView();
+  
 	DECLARE_MESSAGE_MAP()
 };
 

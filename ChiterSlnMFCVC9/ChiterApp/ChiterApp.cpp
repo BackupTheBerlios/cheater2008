@@ -8,7 +8,8 @@
 #include "ChildFrm.h"
 #include "ChiterAppDoc.h"
 #include "ChiterAppView.h"
-
+#include "Library/ProcessChoiceFrame.h"
+#include "Library/ProcessChoiceFrame.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -23,6 +24,7 @@ BEGIN_MESSAGE_MAP(CChiterAppApp, CWinApp)
 	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
 	// Standard print setup command
 	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinApp::OnFilePrintSetup)
+  ON_COMMAND(ID_PROCESS_VIEW, &CChiterAppApp::OnProcessView)
 END_MESSAGE_MAP()
 
 
@@ -262,6 +264,10 @@ void CChiterAppApp::OnFileNew()
 
  //return pDocument;
   //CWinApp::OnFileNew();
+}
+
+void CChiterAppApp::OnProcessView()
+{
 }
 
 

@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ProcessChoiceFrame.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ProcessManager.cpp"
 				>
 			</File>
@@ -300,6 +304,10 @@
 			</File>
 			<File
 				RelativePath=".\PointersViewBox.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcessChoiceFrame.h"
 				>
 			</File>
 			<File

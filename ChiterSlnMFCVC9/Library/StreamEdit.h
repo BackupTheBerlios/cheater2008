@@ -3,20 +3,28 @@
 #ifndef StreamEditH
 #define StreamEditH
 //---------------------------------------------------------------------------
-#include <boost/shared_ptr.hpp>
-#include "InputGroupBox.h"
-#include "AuxiliaryTypedefs.h"
-#include "MyBaseForm.h"
+
+#include "Library/InputGroupBox.h"
+#include "Library/AuxiliaryTypedefs.h"
+#include "Library/MyBaseForm.h"
+#include "Library/searcher.h"
+
+#include "Library/PointersViewBox.h"
+#include "Library/ProcessManager.h"
+#include "Library/SearcherProperties.h"
+#include "Library/CountEdit.h"
+#include "Library/august2002Fwd.h"
+#include "Library/AuxiliaryTypedefs.h"
 #include "Library/Command.h"
-#include "searcher.h"
-#include "Standart/AnsiLib.h"
-#include "PointersViewBox.h"
-#include "ProcessManager.h"
-#include "SearcherProperties.h"
-#include "CountEdit.h"
-#include "august2002Fwd.h"
-#include "AuxiliaryTypedefs.h"
 #include "Library/WindowProcedure.h"
+
+
+#include "Standart/AnsiLib.h"
+
+#include "SplitterCtrl/SplitterCtrl.h"
+
+#include <boost/shared_ptr.hpp>
+
 //class TForm1;
 extern char* WhatFind;
 

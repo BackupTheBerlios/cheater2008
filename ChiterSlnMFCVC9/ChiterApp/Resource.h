@@ -6,6 +6,8 @@
 #define IDP_OLE_INIT_FAILED			100
 #define IDR_MAINFRAME				128
 #define IDR_ChiterAppTYPE				129
+#define ID_PROCESS_VIEW				32771
+
 
 // Next default values for new objects
 //
@@ -14,6 +16,6 @@
 #define _APS_NEXT_RESOURCE_VALUE	130
 #define _APS_NEXT_CONTROL_VALUE		1000
 #define _APS_NEXT_SYMED_VALUE		101
-#define _APS_NEXT_COMMAND_VALUE		32771
+#define _APS_NEXT_COMMAND_VALUE		32772
 #endif
 #endif
