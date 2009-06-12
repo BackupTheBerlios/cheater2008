@@ -24,6 +24,10 @@ int NumberOfCopies=0;
 char* WhatFind="Search query";
 std::vector< boost::shared_ptr<std::stringstream> > ClipBoard;     // clipboard for selections
 
+inline int getHexEditLineLength(int i_bytes)
+{
+  return 3*i_bytes;
+}
 class WindowsMessageHandler
 {
 private:
@@ -44,7 +48,7 @@ private:
   std::map<HWND,TStreamEdit*,cmp1> d_wndToParentMap;
   std::map<TStreamEdit*,HWND,cmp2> d_ParentToWndMap;
 public:
- 
+
   WindowsMessageHandler()
   {
 
@@ -67,7 +71,7 @@ public:
     {
       CWnd* wnd = CWnd::FromHandle((pair.first));
       if(wnd)
-       replaceWndProc(*wnd,pair.second);
+        replaceWndProc(*wnd,pair.second);
     }
     d_wndToOldProc.clear();
     d_wndToParentMap.clear();
@@ -140,12 +144,12 @@ public:
       throw std::runtime_error("Corrupted child window");
     if(! parent->m_hWnd)
       throw std::runtime_error("Corrupted parent window");
-    
+
     std::map<HWND,WNDPROC_TYPE,cmp1>::iterator it = d_wndToOldProc.find(wnd->m_hWnd);
-     if(it!=d_wndToOldProc.end())
+    if(it!=d_wndToOldProc.end())
       throw std::runtime_error("Can't redefine windows procedure twice");
 
-    
+
     d_wndToParentMap.insert (std::pair<HWND,TStreamEdit*>(wnd->m_hWnd,parent) );
     d_ParentToWndMap.insert ( std::pair<TStreamEdit*,HWND>(parent,wnd->m_hWnd) );
     WNDPROC_TYPE old = replaceWndProc(*wnd,myWndProc);
@@ -189,7 +193,7 @@ void append(CRichEditCtrl& edit, const std::string& str)
     edit.SetWindowText(CString(str.c_str()));
   }
   {
-    int nBegin, nEnd;
+    int nBegin;
     // Replace the second line, if it exists, of the edit control
     // with the text lpszmyString.
     if ((nBegin=edit.LineIndex(lines-1)) != -1)
@@ -212,11 +216,11 @@ SaveDialog(FALSE)
   {
     //  ClipBoard=new TList();
   }
-  Fstream=boost::shared_ptr<std::iostream>((std::iostream*)0);
-  FCurrentPos=0;
-  ViewedLen=0;
-  NumberOfString=20;
-  StringLen=16;
+  d_stream=boost::shared_ptr<std::iostream>((std::iostream*)0);
+  d_streamPos=0;
+  d_viewedLen=0;
+  d_numberOfString=20;
+  d_stringLen=16;
   IsProcessKeyDown=false;
 
   NumberOfCopies++;
@@ -225,103 +229,103 @@ SaveDialog(FALSE)
 void TStreamEdit::initializePopupMenu()
 {
   //-------------------Upper all OK--------------------------------------
-  PopupMenu.CreatePopupMenu();
-//0
-  PopupMenu.AppendMenu(MF_STRING, 
+  d_popupMenu.CreatePopupMenu();
+  //0
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::SlowSearchMenuItemClick,this)) )), 
     CString( "Slow Search") );
 
-//1
-  PopupMenu.AppendMenu(MF_STRING, 
+  //1
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::SearchMenuItemClick,this)) )), 
     CString( "Search") );
 
-//2
-  PopupMenu.AppendMenu(MF_STRING, 
+  //2
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::ContinueSearchMenuItemClick,this)) )), 
     CString( "Continue Search") );
 
-//3
-  PopupMenu.AppendMenu(MF_STRING, 
+  //3
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::LoadFromStreamMenuitemClick,this)) )), 
     CString( "ReLoad") );
 
-//4
-  PopupMenu.AppendMenu(MF_STRING, 
+  //4
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::GotoMenuItemClick,this)) )), 
     CString( "Goto...") );
 
-//5
-  PopupMenu.AppendMenu(MF_SEPARATOR,0,CString("-") );
+  //5
+  d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-") );
 
-//6
-  PopupMenu.AppendMenu(MF_STRING, 
+  //6
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::CopyMenuItemClick,this)) )), 
     CString( "Copy") );
   //7
-  PopupMenu.AppendMenu(MF_STRING, 
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
     CString( "Paste") );
 
-//8
-  PopupMenu.AppendMenu(MF_STRING, 
+  //8
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
     CString( "Paste") );
 
-//9
-  PopupMenu.AppendMenu(MF_SEPARATOR,0,CString("-"));
+  //9
+  d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-"));
 
-  CopytoMenuItem.CreatePopupMenu();
+  d_copytoMenuItem.CreatePopupMenu();
 
-//10
-  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)CopytoMenuItem.m_hMenu, CString( "Coptyto..." ) ); //6
+  //10
+  d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)d_copytoMenuItem.m_hMenu, CString( "Coptyto..." ) ); //6
 
 
-  PasteFromMenuItem.CreatePopupMenu();
-//11
-  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)PasteFromMenuItem.m_hMenu, CString( "Paste from" ) ); //6
+  d_pasteFromMenuItem.CreatePopupMenu();
+  //11
+  d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)d_pasteFromMenuItem.m_hMenu, CString( "Paste from" ) ); //6
 
   EditBufMenuItem.CreatePopupMenu();
-//12
-  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)EditBufMenuItem.m_hMenu, CString( "Edit buf" ) ); //6
+  //12
+  d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)EditBufMenuItem.m_hMenu, CString( "Edit buf" ) ); //6
 
 
   DeleteMenuItem.CreatePopupMenu();
-//13
-  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)DeleteMenuItem.m_hMenu, CString( "Delete" ) ); //6
+  //13
+  d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)DeleteMenuItem.m_hMenu, CString( "Delete" ) ); //6
 
-//14
-  PopupMenu.AppendMenu(MF_STRING, 
+  //14
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::ClearClipBoardMenuItemClick,this)) )), 
     CString( "Clear ClipBoard") );
 
-//15
-  PopupMenu.AppendMenu(MF_SEPARATOR,0,CString("-"));
+  //15
+  d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-"));
 
-//16
-  PopupMenu.AppendMenu(MF_STRING, 
+  //16
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::Color1Click,this)) )), 
     CString( "Color") );
 
-//17
-  PopupMenu.AppendMenu(MF_STRING, 
+  //17
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::Font1Click,this)) )), 
     CString( "Font") );
 
   FonCMenuItem.CreatePopupMenu();
-//18
-  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)FonCMenuItem.m_hMenu, CString( "Font" ) ); //6
+  //18
+  d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)FonCMenuItem.m_hMenu, CString( "Font" ) ); //6
 
   //--------------------------------------------------
 
@@ -344,8 +348,8 @@ void TStreamEdit::initializePopupMenu()
   //--------------------------------------------------
 
   ColorMenuItem.CreatePopupMenu();
-//19
-  PopupMenu.AppendMenu(MF_POPUP, (UINT_PTR)ColorMenuItem.m_hMenu, CString( "Color" ) ); //6
+  //19
+  d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)ColorMenuItem.m_hMenu, CString( "Color" ) ); //6
 
 
   ColorMenuItem.AppendMenu(MF_STRING, 
@@ -365,11 +369,11 @@ void TStreamEdit::initializePopupMenu()
     CString( "Pointer") );
 
   //--------------------------------------------------
-//20
-  PopupMenu.AppendMenu(MF_SEPARATOR,0,CString("-") );
+  //20
+  d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-") );
   //---------------------------------------
-//21
-  PopupMenu.AppendMenu(MF_STRING, 
+  //21
+  d_popupMenu.AppendMenu(MF_STRING, 
     d_menuCommands.createCommand( 
     CommandPtr(new Command(boost::bind(&TStreamEdit::ReplaceAllMenuItemClick,this)) )), 
     CString( "Replace All") );
@@ -386,14 +390,14 @@ void  TStreamEdit::initialize(void)
   d_splitterWndBottom.Create(&d_splitterWnd, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndBottom_ID);
   d_splitterWndTopLeft.Create(&d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndTopLeft_ID);
   d_splitterWndTopRight.Create(&d_splitterWndTop, WS_CHILD|WS_VISIBLE, CRect(0,0,30,30), SplitterWndTopRight_ID);
-  
+
   d_splitterWndTopRightBox.Create(CString(""),SS_SIMPLE,CRect(0,0,0,0),&d_splitterWndTopRight);
 
 
   initializePopupMenu();
   //-------------- Bottom pane --------------------------------
   ProgressBar.Create(PBS_SMOOTH , CRect(0,0,0,0), &d_splitterWndBottom, ProgressBar_ID);
-  
+
 
   InfoEdit.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndBottom,InfoEdit_ID);
 
@@ -441,8 +445,15 @@ void  TStreamEdit::initialize(void)
 
   //--------------Top left panel-----------------------------------
   // throwException("Sergey3");
+  d_pointerMemoFont = boost::shared_ptr<CFont>(new CFont());
+  d_stringMemoFont = boost::shared_ptr<CFont>(new CFont());
+  d_hexMemoFont = boost::shared_ptr<CFont>(new CFont());
+  d_pointerMemoFont->CreatePointFont(10,_T("Fixedsys"));
+  d_stringMemoFont->CreatePointFont(10,_T("Fixedsys"));
+  d_hexMemoFont->CreatePointFont(10,_T("Fixedsys"));
 
   d_stringMemo.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,StringMemo_ID);
+  d_stringMemo.SetFont( d_stringMemoFont.get() );
 #pragma message ("TODO: implement event handlers")
   //   StringMemo.OnKeyDown=StringRichEditKeyDown;
   //   StringMemo.OnKeyPress=StringRichEditKeyPress;
@@ -450,8 +461,11 @@ void  TStreamEdit::initialize(void)
 
 
   d_pointerMemo.Create(ES_MULTILINE | ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,PointerMemo_ID);
+  d_pointerMemo.SetFont( d_pointerMemoFont.get() );
 
   d_hexMemo.Create(ES_MULTILINE| ES_WANTRETURN,CRect(0,0,0,0),&d_splitterWndTopLeft,HexMemo_ID);
+  d_hexMemo.SetFont( d_hexMemoFont.get() );
+
 #pragma message ("TODO: implement event handlers")
   //   HexMemo.OnKeyDown=HexRichEditKeyDown;
   //   HexMemo.OnKeyPress=HexRichEditKeyPress;
@@ -559,9 +573,9 @@ TStreamEdit::~TStreamEdit(void)
 
 void  TStreamEdit::LoadFromStream(void)
 {
-  ViewedLen=0;
-  int RealRead=StringLen;
-  char* ch=new char[StringLen];
+  d_viewedLen=0;
+  int RealRead=d_stringLen;
+  char* ch=new char[d_stringLen];
   long HexMemoSelStart,HexMemoSelEnd;
   long StringMemoSelStart,StringMemoSelEnd;
   d_hexMemo.GetSel(HexMemoSelStart,HexMemoSelEnd);
@@ -591,27 +605,27 @@ void  TStreamEdit::LoadFromStream(void)
         << std::setfill('0') << std::setw(8) << getStream()->seekg(0,std::ios_base::end).tellg()
         << " (hex), (dec) - " << getStream()->seekg(0,std::ios_base::end).tellg();
       //GroupBox1->Caption = caption.str().c_str();
-      getStream()->seekg(FCurrentPos,std::ios_base::beg);
+      getStream()->seekg(d_streamPos,std::ios_base::beg);
 
       std::stringstream pointerStream;
       std::stringstream hexStream;
       std::stringstream stringStream;
-      for(int i=0;(i<NumberOfString)&&(RealRead!=0);i++)
+      for(int i=0;(i<d_numberOfString)&&(RealRead!=0);i++)
       {
-        if((RealRead=getStream()->read(ch,StringLen).gcount())>0)
+        if((RealRead=getStream()->read(ch,d_stringLen).gcount())>0)
         {
           /*if(RealRead < StringLen)
-            getStream()->clear();
-            */
+          getStream()->clear();
+          */
           unsigned long streamPos = (unsigned long)getStream()->seekg(0,std::ios_base::cur).tellg();
           pointerStream << ulongTo8digitHexString(streamPos-RealRead) << "\r\n";
           hexStream << charptrToHexAnsiWithSpace(ch,RealRead)<< "\r\n";
           stringStream << ConvertToPrintString(ch,RealRead)<< "\r\n";
-          ViewedLen+=RealRead;
+          d_viewedLen+=RealRead;
         }
         else
           if(i==0)
-            if(getStream()->tellg()>FCurrentPos) FCurrentPos=getStream()->tellg();
+            if(getStream()->tellg()>d_streamPos) d_streamPos=getStream()->tellg();
       }
       d_hexMemo.SetWindowText(CString(hexStream.str().c_str()));
       d_stringMemo.SetWindowText(CString(stringStream.str().c_str()));
@@ -624,8 +638,8 @@ void  TStreamEdit::LoadFromStream(void)
   }
   delete ch;
 
-  StringNumberEdit.SetWindowText(CString(ulongToAnsi(NumberOfString).c_str()));
-  StringLengthEdit.SetWindowText(CString(ulongToAnsi(StringLen).c_str()));
+  StringNumberEdit.SetWindowText(CString(ulongToAnsi(d_numberOfString).c_str()));
+  StringLengthEdit.SetWindowText(CString(ulongToAnsi(d_stringLen).c_str()));
 
   d_hexMemo.SetSel(HexMemoSelStart,HexMemoSelStart);
   d_stringMemo.SetSel(StringMemoSelStart,StringMemoSelStart);
@@ -641,7 +655,7 @@ int  TStreamEdit::ConvertHexPosToGlobal(int value)
 {
   //value=HexRichEdit->SelStart;
   int res=0;
-  res+=StringLen*(value/(3*StringLen+1))+(value%(3*StringLen+1))/3;
+  res+=d_stringLen*(value/(getHexEditLineLength(d_stringLen)))+(value%(getHexEditLineLength(d_stringLen)))/3;
   return res;
 }
 
@@ -682,13 +696,13 @@ void  TStreamEdit::HexRichEditKeyDown(UINT Key)
         {
           if(Key==0x26)//up
           {
-            ShiftHexSelStart(-StringLen*2);
+            ShiftHexSelStart(-d_stringLen*2);
           }
           else
           {
             if(Key==0x28)//down
             {
-              ShiftHexSelStart(StringLen*2);
+              ShiftHexSelStart(d_stringLen*2);
             }
             else
             {
@@ -700,13 +714,13 @@ void  TStreamEdit::HexRichEditKeyDown(UINT Key)
               {
                 if(Key==0x22)//PgDown
                 {
-                  ShiftHexSelStart(StringLen*NumberOfString*2);
+                  ShiftHexSelStart(d_stringLen*d_numberOfString*2);
                 }
                 else
                 {
                   if(Key==0x21)//PgUp
                   {
-                    ShiftHexSelStart(-StringLen*NumberOfString*2);
+                    ShiftHexSelStart(-d_stringLen*d_numberOfString*2);
                   }
                   else
                   {
@@ -793,7 +807,7 @@ void  TStreamEdit::HexRichEditKeyPres(unsigned char value)
   d_stringMemo.SetSel(StringPos,StringPos+1);
 
   getStream()->clear();
-  getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
+  getStream()->seekp(d_streamPos+pos,std::ios_base::beg);
 
   d_hexMemo.SetSel(hexStart,hexStart+1);
   std::stringstream stream;
@@ -828,7 +842,7 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
   long hexStart, hexEnd;
   d_hexMemo.GetSel(hexStart,hexEnd);
   int pos=ConvertHexPosToGlobal(hexStart);
-  if(pos==ViewedLen-1)
+  if(pos==d_viewedLen-1)
   {
     hexStart--;
     hexEnd--;
@@ -837,7 +851,7 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
   }
   else
   {
-    if(hexStart%(3*StringLen+1)==3*StringLen-1)
+    if(hexStart%(getHexEditLineLength(d_stringLen))==3*d_stringLen-1)
     {
       hexStart+=2;
       hexEnd+=2;
@@ -845,7 +859,7 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
     }
   }
 
-  if((hexStart%(3*StringLen+1))%3==2)
+  if((hexStart%(getHexEditLineLength(d_stringLen)))%3==2)
   {
     hexStart++;
     hexEnd++;
@@ -856,7 +870,8 @@ void TStreamEdit::ShiftIfWrongHexSelStart()
 int  TStreamEdit::ConvertGlobalToHexPos(int value)
 {
   //Edit2->Text=AnsiString((3*StringLen+1)*(value/StringLen)+(value%StringLen)*3);
-  return (3*StringLen+1)*(value/StringLen)+(value%StringLen)*3;
+ /* return (3*d_stringLen+1)*(value/d_stringLen)+(value%d_stringLen)*3;*/
+  return getHexEditLineLength(d_stringLen)*(value/d_stringLen)+(value%d_stringLen)*3;
 }
 
 void  TStreamEdit::HexRichEditKeyPress(unsigned char Key)
@@ -889,7 +904,7 @@ void  TStreamEdit::setCurrentPos( int value)
 {
   if((value<getStream()->seekg(0,std::ios_base::end).tellg())&&(value>=0))
   {
-    FCurrentPos=value;
+    d_streamPos=value;
     LoadFromStream();
   }
 }
@@ -899,7 +914,7 @@ void  TStreamEdit::ShiftHexSelStart(int Shift)
   long Start,End,Len;
   d_hexMemo.GetSel(Start,End);
   long value=Start;
-  long InBytePos=(value%(3*StringLen+1))%3;
+  long InBytePos=(value%getHexEditLineLength(d_stringLen))%3;
   long Offset=ConvertHexPosToGlobal(value);
   long OldOffset=Offset;
   Offset+=Shift/2;
@@ -920,16 +935,17 @@ void  TStreamEdit::ShiftHexSelStart(int Shift)
     }
   }
 
-  if((Offset+FCurrentPos>=0)&&(Offset+FCurrentPos<getStream()->seekg(0,std::ios_base::end).tellg()))
+  if((Offset+d_streamPos>=0)&&(Offset+d_streamPos<getStream()->seekg(0,std::ios_base::end).tellg()))
   {
-    if((Offset<0)||(Offset>=ViewedLen))
+    if((Offset<0)||(Offset>=d_viewedLen))
     {
-      FCurrentPos+=((Shift/(2*StringLen)))*StringLen+Shift%2;
-      Offset=OldOffset;
+      long newStreamPos = d_streamPos + (((long)Shift/(long)(2*d_stringLen)))*d_stringLen+Shift%2;
+      setCurrentPos( newStreamPos );
+      Offset = OldOffset;
     }
     d_hexMemo.SetSel(ConvertGlobalToHexPos(Offset)+InBytePos,ConvertGlobalToHexPos(Offset)+InBytePos);
   }
-  GetVariablesAtPos(FCurrentPos+Offset);
+  GetVariablesAtPos(d_streamPos + Offset);
 }
 
 void  TStreamEdit::CopyMenuItemClick()
@@ -944,7 +960,7 @@ void  TStreamEdit::CopyMenuItemClick()
   Start=ConvertHexPosToGlobal(Start);
 
   Len=End-Start+1;
-  getStream()->seekg(Start+FCurrentPos,std::ios_base::beg);
+  getStream()->seekg(Start+d_streamPos,std::ios_base::beg);
   //   copy
   std::vector<char> myBuf;
   myBuf.resize(Len);
@@ -974,22 +990,22 @@ void  TStreamEdit::PopupMenu1Popup()
   CMenuItem* menu;
   std::string caption;
 
-  clearMenu(CopytoMenuItem,d_menuCommands);
-  clearMenu(PasteFromMenuItem,d_menuCommands);
+  clearMenu(d_copytoMenuItem,d_menuCommands);
+  clearMenu(d_pasteFromMenuItem,d_menuCommands);
   clearMenu(DeleteMenuItem,d_menuCommands);
   clearMenu(EditBufMenuItem,d_menuCommands);
   clearMenu(EditBufMenuItem,d_menuCommands);
 
   long hexStart,hexEnd;
   d_hexMemo.GetSel(hexStart,hexEnd);
-  PopupMenu.EnableMenuItem (12,MF_BYPOSITION   |  ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED ) );
-  PopupMenu.EnableMenuItem (13,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
-  PopupMenu.EnableMenuItem (11,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  d_popupMenu.EnableMenuItem (12,MF_BYPOSITION   |  ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED ) );
+  d_popupMenu.EnableMenuItem (13,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  d_popupMenu.EnableMenuItem (11,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
 
-  PopupMenu.EnableMenuItem (6,MF_BYPOSITION    | ( (hexEnd-hexStart!=0) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
-  PopupMenu.EnableMenuItem (7,MF_BYPOSITION    | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
-  PopupMenu.EnableMenuItem (10,MF_BYPOSITION   | ( ((! ClipBoard.empty())&&(hexEnd-hexStart!=0)) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
-  PopupMenu.EnableMenuItem (14,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  d_popupMenu.EnableMenuItem (6,MF_BYPOSITION    | ( (hexEnd-hexStart!=0) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  d_popupMenu.EnableMenuItem (7,MF_BYPOSITION    | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  d_popupMenu.EnableMenuItem (10,MF_BYPOSITION   | ( ((! ClipBoard.empty())&&(hexEnd-hexStart!=0)) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
+  d_popupMenu.EnableMenuItem (14,MF_BYPOSITION   | ( (! ClipBoard.empty()) ? MF_ENABLED : MF_DISABLED |MF_GRAYED) );
 
   for(i=0;i<ClipBoard.size();i++)
   {
@@ -999,10 +1015,10 @@ void  TStreamEdit::PopupMenu1Popup()
     DeleteMenuItem.AppendMenu(MF_STRING, DeleteEntryMenuItemID, CString( caption.c_str() ) );
 
     UINT CopytoMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::CopytoMenuClick,this,(unsigned int)i)) ));
-    CopytoMenuItem.AppendMenu(MF_STRING, CopytoMenuItemID, CString( caption.c_str() ) );
+    d_copytoMenuItem.AppendMenu(MF_STRING, CopytoMenuItemID, CString( caption.c_str() ) );
 
     UINT PastefromMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::PasteFromMenuClick,this,(unsigned int)i)) ));
-    PasteFromMenuItem.AppendMenu(MF_STRING, PastefromMenuItemID, CString( caption.c_str() ) );
+    d_pasteFromMenuItem.AppendMenu(MF_STRING, PastefromMenuItemID, CString( caption.c_str() ) );
 
     UINT EditBufMenuItemID = d_menuCommands.createCommand(CommandPtr(new Command(boost::bind(&TStreamEdit::EditBufMenuClick,this,(unsigned int)i)) ));
     EditBufMenuItem.AppendMenu(MF_STRING, EditBufMenuItemID, CString( caption.c_str() ) );
@@ -1042,7 +1058,7 @@ void  TStreamEdit::PasteMenuItemClick()
   d_hexMemo.GetSel(Start,End);
   Start=ConvertHexPosToGlobal(Start);
   // initialize current position
-  getStream()->seekp(Start+FCurrentPos, std::ios_base::beg);
+  getStream()->seekp(Start+d_streamPos, std::ios_base::beg);
   // set read pointer to the beginnig
   ClipBoard.back().get()->seekg(0,std::ios_base::beg);
   copyTheRest(*getStream(),*(ClipBoard.back()));
@@ -1076,7 +1092,7 @@ void  TStreamEdit::CopytoMenuClick(int idx)
   Start=ConvertHexPosToGlobal(Start);
 
   Len=End-Start+1;
-  getStream()->seekg(Start+FCurrentPos, std::ios_base::beg);
+  getStream()->seekg(Start+d_streamPos, std::ios_base::beg);
   if( num < ClipBoard.size() )
   {
     boost::shared_ptr<std::stringstream> memory = ((*(ClipBoard.begin()+num)));
@@ -1103,7 +1119,7 @@ void  TStreamEdit::PasteFromMenuClick(int idx)
   End=ConvertHexPosToGlobal(End);
   Start=ConvertHexPosToGlobal(Start);
 
-  getStream()->seekp(Start+FCurrentPos,std::ios_base::beg);
+  getStream()->seekp(Start+d_streamPos,std::ios_base::beg);
   if( num < ClipBoard.size() )
   {
     (*(ClipBoard.begin() + num)).get()->seekg(0,std::ios_base::beg);
@@ -1155,7 +1171,7 @@ void  TStreamEdit::Color1Click()
 {
   if(ColorDialog.DoModal()==IDOK)
   {
-      getReporter().showMessage("TStreamEdit::Color1Click not implemented yet",MessageReporterBase::TYPE_WARNING);
+    getReporter().showMessage("TStreamEdit::Color1Click not implemented yet",MessageReporterBase::TYPE_WARNING);
   }
 
 }
@@ -1164,8 +1180,8 @@ void  TStreamEdit::ChangeColor()
 {
   if(ColorDialog.DoModal()==IDOK)
   {
-      getReporter().showMessage("TStreamEdit::ChangeColor not implemented yet",MessageReporterBase::TYPE_WARNING);
-      //((TMemo*)Sender)->Color=ColorDialog.Color;
+    getReporter().showMessage("TStreamEdit::ChangeColor not implemented yet",MessageReporterBase::TYPE_WARNING);
+    //((TMemo*)Sender)->Color=ColorDialog.Color;
   }
 }
 //---------------------------------------------------------------------------
@@ -1287,9 +1303,9 @@ void  TStreamEdit::StringsOptionChangedEvent()
 {
   try
   {
-        
-    NumberOfString=AnsiToulong(StringNumberEdit.getText());
-    StringLen=AnsiToulong(StringLengthEdit.getText());
+
+    d_numberOfString=AnsiToulong(StringNumberEdit.getText());
+    d_stringLen=AnsiToulong(StringLengthEdit.getText());
   }
   catch(...)
   {
@@ -1299,13 +1315,13 @@ void  TStreamEdit::StringsOptionChangedEvent()
 //---------------------------------------------------------------------------
 long  TStreamEdit::ConvertGlobalToStringPos(long value)
 {
-  return (StringLen+2)*(value/StringLen)+(value%StringLen);
+  return (d_stringLen+2)*(value/d_stringLen)+(value%d_stringLen);
 }
 
 long  TStreamEdit::ConvertStringPosToGlobal(long value)
 {
   long res=0;
-  res+=StringLen*(value/(StringLen+2))+(value%(StringLen+2));
+  res+=d_stringLen*(value/(d_stringLen+2))+(value%(d_stringLen+2));
   return res;
 }
 
@@ -1325,13 +1341,13 @@ void  TStreamEdit::StringRichEditKeyDown(UINT Key)
     {
       if(Key==0x26)//up
       {
-        ShiftStringSelStart(-StringLen);
+        ShiftStringSelStart(-d_stringLen);
       }
       else
       {
         if(Key==0x28)//down
         {
-          ShiftStringSelStart(StringLen);
+          ShiftStringSelStart(d_stringLen);
         }
         else
         {
@@ -1343,13 +1359,13 @@ void  TStreamEdit::StringRichEditKeyDown(UINT Key)
           {
             if(Key==0x22)//PgDown
             {
-              ShiftStringSelStart(StringLen*NumberOfString);
+              ShiftStringSelStart(d_stringLen*d_numberOfString);
             }
             else
             {
               if(Key==0x21)//PgUp
               {
-                ShiftStringSelStart(-StringLen*NumberOfString);
+                ShiftStringSelStart(-d_stringLen*d_numberOfString);
               }
               else
               {
@@ -1398,11 +1414,11 @@ void  TStreamEdit::ShiftStringSelStart(int Shift)
   int OldOffset=Offset;
   Offset+=Shift;
 
-  if((Offset+FCurrentPos>=0)&&(Offset+FCurrentPos<getStream()->seekg(0,std::ios_base::end).tellg()))
+  if((Offset+d_streamPos>=0)&&(Offset+d_streamPos<getStream()->seekg(0,std::ios_base::end).tellg()))
   {
-    if((Offset<0)||(Offset>=ViewedLen))
+    if((Offset<0)||(Offset>=d_viewedLen))
     {
-      FCurrentPos+=((Shift/(StringLen)))*StringLen +Shift%StringLen;
+      d_streamPos+=((Shift/(d_stringLen)))*d_stringLen +Shift%d_stringLen;
       Offset=OldOffset;
     }
     d_stringMemo.SetSel(ConvertGlobalToStringPos(Offset), ConvertGlobalToStringPos(Offset) + len);
@@ -1425,10 +1441,10 @@ void  TStreamEdit::StringRichEditKeyPres(unsigned char value)
   ch[0]=ConvertToPrintSign(value);
   ch[1]=0;
   getStream()->clear();
-  getStream()->seekp(FCurrentPos+pos,std::ios_base::beg);
+  getStream()->seekp(d_streamPos+pos,std::ios_base::beg);
 
   d_stringMemo.SetSel(StartString,StartString+1);
-    d_stringMemo.ReplaceSel(CString(ch));
+  d_stringMemo.ReplaceSel(CString(ch));
   d_stringMemo.SetSel(-1,0); // remove selection
 
   getStream()->write(ch,1);
@@ -1447,9 +1463,9 @@ void  TStreamEdit::ShiftIfWrongStringSelStart(void)
 {
   long Start, End;
   d_stringMemo.GetSel(Start,End);
-  if(Start%(StringLen+2)==StringLen)
+  if(Start%(d_stringLen+2)==d_stringLen)
   {
-    if(ViewedLen==(Start/(StringLen+2)+1)*StringLen)
+    if(d_viewedLen==(Start/(d_stringLen+2)+1)*d_stringLen)
     {
       Start--;
       End--;
@@ -1462,7 +1478,7 @@ void  TStreamEdit::ShiftIfWrongStringSelStart(void)
       End+=2;
       d_stringMemo.SetSel(Start,End);
     }
-      
+
   }
 }
 
@@ -1490,12 +1506,12 @@ void  TStreamEdit::HexRichEditMouseMove(TObject *Sender,
 //---------------------------------------------------------------------------
 void  TStreamEdit::PointersNotifyEvent(int value)
 {
-  FCurrentPos=value;
+  d_streamPos=value;
 }
 //---------------------------------------------------------------------------
 void  TStreamEdit::setStream(boost::shared_ptr<std::iostream> value)
 {
-  Fstream=value;
+  d_stream=value;
   LoadFromStream();
 }
 //------------------------------------------------------------
@@ -1558,7 +1574,7 @@ bool  TStreamEdit::Search(bool IsNewSearch)
     new TSearcherAfterReadNotify(boost::bind(&TStreamEdit::DoProgress,this,_1))));
   ProgressBar.SetPos(0);
   EndSearch=CTime::GetCurrentTime();
-  
+
   std::stringstream msg;
   msg << "Search started at " << 
     StartSearch.Format("%Y%m%d %H:%M:%S") << " "
@@ -1606,9 +1622,9 @@ void  TStreamEdit::GetVariablesAtPos(int pos)
   getStream()->read((char*)&buf,sizeof(buf));
   std::stringstream msg;
   msg << "char " << ((int)buf.char_) << ","
-  << "byte " << ulongToAnsi(buf.byte_) << ","  
-  << "ulong " << ulongToAnsi(buf._ulong) << ","
-  << "int " << buf._int << ",";
+    << "byte " << ulongToAnsi(buf.byte_) << ","  
+    << "ulong " << ulongToAnsi(buf._ulong) << ","
+    << "int " << buf._int << ",";
   try
   {
     msg << "double " << buf.double_ << (",");
@@ -1628,7 +1644,7 @@ void  TStreamEdit::GetVariablesAtPos(int pos)
   {
     msg << "float " << "NAN" << (",");
   }
-  FCurrectEditSelection=msg.str();
+  setCurrectEditSelection(msg.str());
   //InfoLabel=AnsiString("int(")+
 }
 
@@ -1648,7 +1664,7 @@ void  TStreamEdit::setKeyPressed(const std::string& i_value)
 
 void  TStreamEdit::setCurrectEditSelection(const std::string& i_value)
 {
-  FCurrectEditSelection=i_value;
+  FCurrectEditSelection = i_value;
   UpdateInfoString();
 }
 
@@ -1710,24 +1726,23 @@ boost::shared_ptr<TSearcher>  TStreamEdit::GetSearcher(void)
 
 void TStreamEdit::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-//  Reload(nPos);  
+  //  Reload(nPos);  
   CMyBaseForm::OnVScroll(nSBCode,nPos,pScrollBar);
 }
 
 void TStreamEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-  WORD Key = nChar;
   // TODO: Add your message handler code here and/or call default
-/*  if(Key==0x2E) //delete key
+  /*  if(Key==0x2E) //delete key
   {
-    DeleteSelectedPointers();
-    Key=0;
+  DeleteSelectedPointers();
+  Key=0;
   }
   else*/
-    CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
+  CMyBaseForm::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
-void TStreamEdit::OnInitMenu(CMenu* pMenu)
+void TStreamEdit::OnInitMenu(CMenu* /*pMenu*/)
 {
   PopupMenu1Popup();
   //CMyBaseForm::OnInitMenu(pMenu);
@@ -1749,7 +1764,7 @@ void TStreamEdit::OnRButtonDown(UINT nFlags, CPoint point)
   //ASSERT(myMenu.get());
   CPoint screen(point);
   this->ClientToScreen(&screen);
-  PopupMenu.TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, screen.x, 
+  d_popupMenu.TrackPopupMenu(TPM_LEFTALIGN |TPM_RIGHTBUTTON, screen.x, 
     screen.y, this);
 
 }
@@ -1758,12 +1773,12 @@ void TStreamEdit::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
   // TODO: Add your message handler code here and/or call default
   CRect pbRect;
-/*  d_pointersBox->GetWindowRect(&pbRect);
+  /*  d_pointersBox->GetWindowRect(&pbRect);
   if(pbRect.PtInRect(point) == TRUE)
-    PointersBoxDblClick(nFlags,point);
+  PointersBoxDblClick(nFlags,point);
   else
   */
-    CMyBaseForm::OnLButtonDblClk(nFlags, point);
+  CMyBaseForm::OnLButtonDblClk(nFlags, point);
 }
 
 void TStreamEdit::OnSize(UINT, int cx,int cy)

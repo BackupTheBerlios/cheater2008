@@ -44,11 +44,11 @@ private:
   CStatic d_splitterWndTopRightBox;
   SplitterCtrl_NS::SplitterCtrl d_splitterWndBottom;
 
-  TPopupMenu PopupMenu;
-  CMenuItem CopytoMenuItem;
-  CMenuItem PasteFromMenuItem;
+  TPopupMenu d_popupMenu;
+  CMenuItem d_copytoMenuItem;
+  CMenuItem d_pasteFromMenuItem;
 
-  CMenuItem SearchMenuItem;
+  CMenuItem d_searchMenuItem;
   CMenuItem LoadFromStreamMenuitem;
   CMenuItem GotoMenuItem;
   CMenuItem CopyMenuItem;
@@ -106,7 +106,44 @@ private:
   CMenuItem ReplaceAllMenuItem;
   TSearcherProperties SearcherProperties;
   InputGroupBox GotoInputGroupBox;
+
+  void PointersNotifyEvent(int);
+  void UpdateInfoString();
+  void initializePopupMenu();
+  void initialize();
+  void  StringsOptionChangedEvent();
+  //        TMemoryStream* MemoryStream;
+  //! Length of editable string
+  unsigned int d_stringLen;
+  //! Number of editable strings
+  unsigned int d_numberOfString;
+
+  //! Number of bytes being currently represented
+  unsigned int d_viewedLen;
+  //! Position on the beginning of  stream window being represented
+  int d_streamPos;
+  bool IsProcessKeyDown;
+  //! Stream being edited
+  boost::shared_ptr<std::iostream> d_stream;
+  std::string FKeyPressed;
+  std::string FCurrectEditSelection;
+  void  LoadFromStream();
+  int  ConvertHexPosToGlobal(int value);
+
+  void ShiftIfWrongHexSelStart();
+  int  ConvertGlobalToHexPos(int value);
+  int FindInStream(char* buf, int len);
+  void  DoProgress(int pos);
+  void  GetVariablesAtPos(int);
+  //        TMemoryStream*  GetFindStream();
+  //TMemoryStream*  GetReplaceStream();
+  //        TList*  GetFindPointers();
+
 public:
+
+  TStreamEdit(CWnd* pParent = NULL);
+  virtual ~TStreamEdit();
+
   void  SearchMenuItemClick();
   void  LoadFromStreamMenuitemClick();
 
@@ -145,52 +182,24 @@ public:
   void  ContinueSearchMenuItemClick();
   void  SlowSearchMenuItemClick();
   void  ReplaceAllMenuItemClick();
-private:
-  void PointersNotifyEvent(int);
-  void UpdateInfoString(void);
-  void initializePopupMenu();
-  void initialize(void);
-  void  StringsOptionChangedEvent();
-  //        TMemoryStream* MemoryStream;
-  int StringLen;
-  int NumberOfString;
 
-  int ViewedLen;
-  int FCurrentPos;
-  bool IsProcessKeyDown;
-  boost::shared_ptr<std::iostream> Fstream;
-  std::string FKeyPressed;
-  std::string FCurrectEditSelection;
-  void  LoadFromStream(void);
-  int  ConvertHexPosToGlobal(int value);
-
-  void ShiftIfWrongHexSelStart();
-  int  ConvertGlobalToHexPos(int value);
-  int FindInStream(char* buf, int len);
-  void  DoProgress(int pos);
-  void  GetVariablesAtPos(int);
-  //        TMemoryStream*  GetFindStream();
-  //TMemoryStream*  GetReplaceStream();
-  //        TList*  GetFindPointers();
-
-public:		// User declarations
-  TStreamEdit(CWnd* pParent = NULL);
-  virtual ~TStreamEdit(void);
   void  ShiftHexSelStart(int Shift);
   long  ConvertGlobalToStringPos(long value);
   long  ConvertStringPosToGlobal(long value);
   void  ShiftStringSelStart(int value);
 
-  void  ShiftIfWrongStringSelStart(void);
+  void  ShiftIfWrongStringSelStart();
   bool  Search(bool IsNewSearch);
-  boost::shared_ptr<TSearcher>  GetSearcher(void);
-  bool  SlowSearch(void);
+  bool  SlowSearch();
 
-  int getCurrentPos() const { return FCurrentPos;}
-  void setCurrentPos(int i_value);
-
-  boost::shared_ptr<std::iostream>  getStream(){ return Fstream;}
+  boost::shared_ptr<TSearcher>  GetSearcher();
+  boost::shared_ptr<std::iostream>  getStream(){ return d_stream;}
   void setStream(boost::shared_ptr<std::iostream>);
+
+  
+
+  int getCurrentPos() const { return d_streamPos;}
+  void setCurrentPos(int i_value);
 
   std::string    getKeyPressed() const {return FKeyPressed;}
   void   setKeyPressed(const std::string& i_value );
