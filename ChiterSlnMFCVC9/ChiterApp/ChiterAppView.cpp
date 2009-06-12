@@ -104,6 +104,11 @@ void CChiterAppView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 	// TODO: add cleanup after printing
 }
 
+void CChiterAppView::setStream(boost::shared_ptr<std::iostream> i_stream)
+{
+  d_streamEdit.setStream(i_stream);
+}
+
 
 // CChiterAppView diagnostics
 
@@ -122,11 +127,6 @@ CChiterAppDoc* CChiterAppView::GetDocument() const // non-debug version is inlin
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CChiterAppDoc)));
 	return (CChiterAppDoc*)m_pDocument;
-}
-
-void CChiterAppView::setStream(boost::shared_ptr<std::iostream> i_stream)
-{
-  d_streamEdit.setStream(i_stream);
 }
 
 #endif //_DEBUG
