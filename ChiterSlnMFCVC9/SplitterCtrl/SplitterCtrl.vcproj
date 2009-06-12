@@ -67,7 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
+				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName)_d.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile=".\SplitterCtrl.def"
 				GenerateDebugInformation="true"
@@ -148,6 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile=".\SplitterCtrl.def"
 				GenerateDebugInformation="true"

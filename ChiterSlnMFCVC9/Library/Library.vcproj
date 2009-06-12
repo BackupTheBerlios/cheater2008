@@ -50,7 +50,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -133,7 +133,7 @@
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -150,7 +150,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName)_d.dll"
+				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\release\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\regex\build\msvc-9.0\release\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\filesystem\build\msvc-9.0\release\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\filesystem\build\msvc-9.0\release\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\system\build\msvc-9.0\release\link-static\threading-multi&quot;;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0\bin.v2\libs\system\build\msvc-9.0\release\threading-multi&quot;"
 				IgnoreDefaultLibraryNames=""
