@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="SplitterCtrl"
 	ProjectGUID="{AA56EB7B-B8DF-4FEA-B6E8-FBD4A8C4E17E}"
 	RootNamespace="SplitterCtrl"
@@ -44,13 +44,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_40&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;SPLITTERCTRL_LIBRARY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
+				WarnAsError="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -126,12 +128,14 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..;&quot;C:\Program Files\boost\boost_1_36_0\boost_1_36_0&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_40&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;SPLITTERCTRL_LIBRARY"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
+				WarnAsError="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
