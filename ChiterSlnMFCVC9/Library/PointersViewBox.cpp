@@ -149,7 +149,7 @@ void  TPointersViewBox::updateSize(void)
 
 namespace
 {
-  void clearMenu(CMenu& io_menu,Container& io_container)
+  void clearMenu(CMenu& io_menu,CommandsContainer& io_container)
   {
     while(io_menu.GetMenuItemCount() >0)
     {

@@ -225,60 +225,58 @@ SaveDialog(FALSE)
 
   NumberOfCopies++;
 }
+
+void TStreamEdit::appendMenuItem(TPopupMenu& menu,
+								 CommandsContainer& commandsContainer,
+								 TStreamEditMethod method,
+								 const std::string& i_caption)
+{
+	menu.AppendMenu(MF_STRING, 
+		commandsContainer.createCommand( 
+		CommandPtr(new Command(boost::bind(method,this)) )), 
+		CString( i_caption.c_str()) );
+}
+
 //---------------------------------------------------------------------------
 void TStreamEdit::initializePopupMenu()
 {
   //-------------------Upper all OK--------------------------------------
   d_popupMenu.CreatePopupMenu();
   //0
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::SlowSearchMenuItemClick,this)) )), 
-    CString( "Slow Search") );
-
+  appendMenuItem(d_popupMenu, d_menuCommands,
+	  &TStreamEdit::SlowSearchMenuItemClick,"Slow Search");
+  
   //1
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::SearchMenuItemClick,this)) )), 
-    CString( "Search") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+	  &TStreamEdit::SearchMenuItemClick,"Search");
 
   //2
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::ContinueSearchMenuItemClick,this)) )), 
-    CString( "Continue Search") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::ContinueSearchMenuItemClick,"Continue Search");
 
   //3
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::LoadFromStreamMenuitemClick,this)) )), 
-    CString( "ReLoad") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+	  &TStreamEdit::LoadFromStreamMenuitemClick,"ReLoad");
 
   //4
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::GotoMenuItemClick,this)) )), 
-    CString( "Goto...") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::GotoMenuItemClick,"Goto...");
 
   //5
   d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-") );
 
   //6
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::CopyMenuItemClick,this)) )), 
-    CString( "Copy") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::CopyMenuItemClick,"Copy");
+
   //7
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
-    CString( "Paste") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::PasteMenuItemClick,"Paste");
 
   //8
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::PasteMenuItemClick,this)) )), 
-    CString( "Paste") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::PasteMenuItemClick,"Paste");
+
 
   //9
   d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-"));
@@ -303,25 +301,19 @@ void TStreamEdit::initializePopupMenu()
   d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)DeleteMenuItem.m_hMenu, CString( "Delete" ) ); //6
 
   //14
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::ClearClipBoardMenuItemClick,this)) )), 
-    CString( "Clear ClipBoard") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::ClearClipBoardMenuItemClick,"Clear ClipBoard");
 
   //15
   d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-"));
 
   //16
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::Color1Click,this)) )), 
-    CString( "Color") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::Color1Click,"Color");
 
   //17
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::Font1Click,this)) )), 
-    CString( "Font") );
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::Font1Click,"Font");
 
   FonCMenuItem.CreatePopupMenu();
   //18
@@ -329,21 +321,14 @@ void TStreamEdit::initializePopupMenu()
 
   //--------------------------------------------------
 
-  FonCMenuItem.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::StringFonCMenuItemClick,this)) )), 
-    CString( "String") );
+  appendMenuItem(FonCMenuItem, d_menuCommands,
+    &TStreamEdit::StringFonCMenuItemClick,"String");
 
+  appendMenuItem(FonCMenuItem, d_menuCommands,
+    &TStreamEdit::HexFonCMenuItemClick,"Hex");
 
-  FonCMenuItem.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::HexFonCMenuItemClick,this)) )), 
-    CString( "Hex") );
-
-  FonCMenuItem.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::PointerFonCMenuItemClick,this)) )), 
-    CString( "Pointer") );
+  appendMenuItem(FonCMenuItem, d_menuCommands,
+    &TStreamEdit::PointerFonCMenuItemClick,"Pointer");
 
   //--------------------------------------------------
 
@@ -352,31 +337,24 @@ void TStreamEdit::initializePopupMenu()
   d_popupMenu.AppendMenu(MF_POPUP, (UINT_PTR)ColorMenuItem.m_hMenu, CString( "Color" ) ); //6
 
 
-  ColorMenuItem.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::StringColorMenuItemClick,this)) )), 
-    CString( "String") );
+  appendMenuItem(ColorMenuItem, d_menuCommands,
+    &TStreamEdit::StringColorMenuItemClick,"String");
 
-  ColorMenuItem.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::HexColorMenuItemClick,this)) )), 
-    CString( "Hex") );
+  appendMenuItem(ColorMenuItem, d_menuCommands,
+    &TStreamEdit::HexColorMenuItemClick,"Hex");
 
-
-  ColorMenuItem.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::PointerColorMenuItemClick,this)) )), 
-    CString( "Pointer") );
+  appendMenuItem(ColorMenuItem, d_menuCommands,
+    &TStreamEdit::PointerColorMenuItemClick,"Pointer");
 
   //--------------------------------------------------
   //20
   d_popupMenu.AppendMenu(MF_SEPARATOR,0,CString("-") );
   //---------------------------------------
   //21
-  d_popupMenu.AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&TStreamEdit::ReplaceAllMenuItemClick,this)) )), 
-    CString( "Replace All") );
+
+  appendMenuItem(d_popupMenu, d_menuCommands,
+    &TStreamEdit::ReplaceAllMenuItemClick,"Replace All");
+
   //------------------------------------------------------
 
 }
@@ -971,7 +949,7 @@ void  TStreamEdit::CopyMenuItemClick()
 }
 namespace
 {
-  void clearMenu(CMenu& io_menu,Container& io_container)
+  void clearMenu(CMenu& io_menu,CommandsContainer& io_container)
   {
     while(io_menu.GetMenuItemCount() >0)
     {
@@ -1576,11 +1554,16 @@ bool  TStreamEdit::Search(bool IsNewSearch)
   EndSearch=CTime::GetCurrentTime();
 
   std::stringstream msg;
-  msg << "Search started at " << 
-    StartSearch.Format("%Y%m%d %H:%M:%S") << " "
-    "finished at " << 
-    EndSearch.Format("%Y%m%d %H:%M:%S")<<" search time "<<(EndSearch-StartSearch).Format("%Y%m%d %H:%M:%S") << 
-    " Found :" << PointersFound << " matches.";
+  msg << "Search started at "; 
+  CString startCString = StartSearch.Format("%Y-%m-%d %H:%M:%S");
+  msg <<  CT2CA(startCString) << " ";
+  msg << "finished at "; 
+  CString endCString = EndSearch.Format("%Y-%m-%d %H:%M:%S");
+  msg << CT2CA(endCString);
+  msg << " search time ";
+  CTimeSpan delta = EndSearch-StartSearch;
+  msg << CT2CA(delta.Format("%H:%M:%S"));
+  msg << " Found :" << PointersFound << " matches.";
   append(InfoEdit, msg.str());
   return    PointersFound>0;
 }

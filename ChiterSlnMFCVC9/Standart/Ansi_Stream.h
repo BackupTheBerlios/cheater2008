@@ -29,14 +29,14 @@ STANDART_EXPORT_FUN(unsigned long)  ConvertStreamToulong(std::istream& io_stream
 //int InsertDilimeters(TStream* src,TStream* dest,TStream* dilim, int step,int flag);
 //int RemoveDilimeters(TStream* src, TStream* dest,TStream* dilim );
 
-template<class Container>
-void WriteTListToStream(const Container& list,std::ostream& io_stream)
+template<class CommandsContainer>
+void WriteTListToStream(const CommandsContainer& list,std::ostream& io_stream)
  {
     WORK_ANSILIB_UNION_FOR_CONVERT work;
     work._ulong=list.size();
   io_stream.write((char*)&work._ulong,sizeof(unsigned long));
-  Container::const_iterator it = list.begin();
-  Container::const_iterator itEnd = list.end();
+  CommandsContainer::const_iterator it = list.begin();
+  CommandsContainer::const_iterator itEnd = list.end();
   for(; it!=itEnd; ++it)
    {
     work._ulong=*it;

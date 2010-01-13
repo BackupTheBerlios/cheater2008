@@ -12,7 +12,8 @@
 #include "StandartFwd.h"
 extern char* EMPTY_STRING;
 extern char* SPACE_STRING;
-STANDART_EXPORT_FUN(wchar_t**) getStringType();
+STANDART_EXPORT_FUN(wchar_t**) getStringTypeW();
+STANDART_EXPORT_FUN(char**) getStringTypeA();
 enum  StringIndex{HEX_NUM=0,DEC_NUM,STRING,HEX_STRING,FLOAT_NUM,DOUBLE_NUM};
 extern const char* PRINT_TABLE;
 /*extern char* HEX_NUM;

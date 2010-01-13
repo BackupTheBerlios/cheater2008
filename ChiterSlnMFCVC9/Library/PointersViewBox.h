@@ -34,7 +34,7 @@ private:
         CListBox *d_pointersBox;
         TPopupMenu PopupMenu;
 
-        Container d_menuCommands;
+        CommandsContainer d_menuCommands;
         //enum { IDD = IDD_MEMORYINFOEDIT };
         CMenuItem CopytoMenuItem;
         CMenuItem PasteFromMenuItem;

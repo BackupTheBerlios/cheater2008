@@ -37,7 +37,7 @@ InputGroupBox::InputGroupBox(CWnd* pParent /*=NULL*/)
     //VERIFY( InitModalIndirect( initDialog(hInstance,MAKEINTRESOURCE(InputGroupBox::IDD)), pParent ) );
 
 	d_savePointerMenuItemState = (MF_DISABLED|MF_STRING);
-	d_convertToMenuItemState = (MF_DISABLED|MF_STRING);
+	d_convertToMenuItemState = (MF_DISABLED|MF_POPUP);
 	d_clearPointersMenuItemState = (MF_DISABLED|MF_STRING);
 }
 
@@ -191,7 +191,7 @@ void InputGroupBox::setType(const StringIndex & i_type)
 	CComboBox* typeCombo = dynamic_cast<CComboBox*>(this->GetDlgItem(IDC_COMBO_TYPE));
 	assert(typeCombo);
 
-	int found = typeCombo->FindString(-1,CString(getStringType()[i_type]) );
+	int found = typeCombo->FindString(-1,CString(getStringTypeA()[i_type]) );
 
 	if( CB_ERR == found)
 	{
@@ -246,47 +246,54 @@ void InputGroupBox::setCaption(const std::string& i_caption)
     pWnd->SetWindowText( CString(i_caption.c_str() ) );
 }
 
+void InputGroupBox::appendMenuItem(UINT flag, TPopupMenu& menu,
+                                 CommandsContainer& commandsContainer,
+                                 InputGroupBoxMethod method,
+                                 const std::string& i_caption)
+{
+  menu.AppendMenu(flag, 
+    commandsContainer.createCommand( 
+    CommandPtr(new Command(boost::bind(method,this)) )), 
+    CString( i_caption.c_str()) );
+}
+
 CMenu*  InputGroupBox::CreatePopupMenu(void)
 {
 	
 	//TODO: Add your source code here
-	CMenu* work=new CMenu();
+	TPopupMenu* work = new TPopupMenu();
 	work->CreatePopupMenu();
 
-  work->AppendMenu(d_savePointerMenuItemState, 
-    d_menuCommands.createCommand( 
-      CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxSavePointerMenuItemOnClick,this)) )), 
-      CString("Save value") );
-  work->AppendMenu(d_clearPointersMenuItemState,  
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxClearPointersMenuItemOnClick,this)) )), 
-      CString("Clear TextBox") );
+  TPopupMenu* subMenu = new TPopupMenu();
+  subMenu->CreatePopupMenu();
 
-  work->AppendMenu(d_convertToMenuItemState, ID_APP_EXIT, CString("Convert to...") );
-  work->AppendMenu(MF_STRING,   
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToHexNumMenuItemOnClick,this)) )), 
-    CString( getStringType()[HEX_NUM] ) );
-  work->AppendMenu(MF_STRING,    
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToDecNumMenuItemOnClick,this)) )), 
-      CString( getStringType()[DEC_NUM] ) );
-  work->AppendMenu(MF_STRING,     
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToStringMenuItemOnClick,this)) )), 
-      CString( getStringType()[STRING]) );
-  work->AppendMenu(MF_STRING,      
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToHexStringMenuItemOnClick,this)) )), 
-     CString( getStringType()[HEX_STRING]) );
-  work->AppendMenu(MF_STRING,      
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToDoubleNumMenuItemOnClick,this)) )), 
-     CString( getStringType()[DOUBLE_NUM]) );
-  work->AppendMenu(MF_STRING, 
-    d_menuCommands.createCommand( 
-    CommandPtr(new Command(boost::bind(&InputGroupBox::InputGroupBoxConvertToFloatNumMenuItemOnClick,this)) )), 
-     CString( getStringType()[FLOAT_NUM]) );
+  appendMenuItem(d_savePointerMenuItemState,*work, d_menuCommands,
+    &InputGroupBox::InputGroupBoxSavePointerMenuItemOnClick,"Save value");
+
+  appendMenuItem(d_clearPointersMenuItemState,*work, d_menuCommands,
+    &InputGroupBox::InputGroupBoxClearPointersMenuItemOnClick,"Clear TextBox");
+
+  work->AppendMenu(MF_POPUP, (UINT_PTR)subMenu->m_hMenu, CString( "Convert to.." ) );
+
+  appendMenuItem(MF_STRING,*subMenu, d_menuCommands,
+    &InputGroupBox::InputGroupBoxConvertToHexNumMenuItemOnClick,getStringTypeA()[HEX_NUM]);
+
+  appendMenuItem(MF_STRING,*subMenu, d_menuCommands,
+    &InputGroupBox::InputGroupBoxConvertToDecNumMenuItemOnClick,getStringTypeA()[DEC_NUM]);
+
+  appendMenuItem(MF_STRING,*subMenu, d_menuCommands,
+    &InputGroupBox::InputGroupBoxConvertToStringMenuItemOnClick,getStringTypeA()[STRING]);
+
+  appendMenuItem(MF_STRING,*subMenu, d_menuCommands,
+    &InputGroupBox::InputGroupBoxConvertToHexStringMenuItemOnClick,getStringTypeA()[HEX_STRING]);
+
+
+  appendMenuItem(MF_STRING,*subMenu, d_menuCommands,
+    &InputGroupBox::InputGroupBoxConvertToDoubleNumMenuItemOnClick,getStringTypeA()[DOUBLE_NUM]);
+
+  appendMenuItem(MF_STRING,*subMenu, d_menuCommands,
+    &InputGroupBox::InputGroupBoxConvertToFloatNumMenuItemOnClick,getStringTypeA()[FLOAT_NUM]);
+
   return work;
 }
 
@@ -331,12 +338,12 @@ void InputGroupBox::initialize()
   assert(typeCombo);
   assert(textCombo);
 
-  typeCombo->AddString(LPCTSTR( getStringType()[HEX_NUM]) );
-  typeCombo->AddString(LPCTSTR( getStringType()[DEC_NUM]) );
-  typeCombo->AddString(LPCTSTR( getStringType()[STRING]) ) ;
-  typeCombo->AddString(LPCTSTR( getStringType()[HEX_STRING]) );
-  typeCombo->AddString(LPCTSTR( getStringType()[FLOAT_NUM]) );
-  typeCombo->AddString(LPCTSTR( getStringType()[DOUBLE_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringTypeW()[HEX_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringTypeW()[DEC_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringTypeW()[STRING]) ) ;
+  typeCombo->AddString(LPCTSTR( getStringTypeW()[HEX_STRING]) );
+  typeCombo->AddString(LPCTSTR( getStringTypeW()[FLOAT_NUM]) );
+  typeCombo->AddString(LPCTSTR( getStringTypeW()[DOUBLE_NUM]) );
 
 }
 
@@ -379,7 +386,7 @@ void  InputGroupBox::InputGroupBoxPopupMenuAppear()
 {
 	//TODO: Add your source code here
 	d_savePointerMenuItemState=IsEmpty() ? (MF_DISABLED|MF_STRING) : (MF_ENABLED|MF_STRING);
-	d_convertToMenuItemState=IsEmpty() ? (MF_DISABLED|MF_STRING) : (MF_ENABLED|MF_STRING);
+	d_convertToMenuItemState=IsEmpty() ? (MF_DISABLED|MF_POPUP) : (MF_ENABLED|MF_POPUP);
 	d_clearPointersMenuItemState=(getStrings().empty()) ? (MF_DISABLED|MF_STRING) : (MF_ENABLED|MF_STRING);
 }
 

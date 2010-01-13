@@ -20,7 +20,7 @@ class AUGUST2002_EXPORT TSearcherProperties : public CMyBaseForm
   DECLARE_DYNAMIC(TSearcherProperties)
 
 private:
-  Container d_controlCommands;
+  CommandsContainer d_controlCommands;
   //        TInputGroupBox* Find;
   //        TInputGroupBox* Replace;
   SplitterCtrl_NS::SplitterCtrl* d_splitterWnd;

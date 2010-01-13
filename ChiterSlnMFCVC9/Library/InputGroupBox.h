@@ -7,8 +7,13 @@
 #include "Library/resource.h"
 #include "Library/MyBaseForm.h"
 #include "Library/Command.h"
+#include "Library/AuxiliaryTypedefs.h"
 #include "afxwin.h"
 // InputGroupBox dialog
+
+//forward declaration
+class AUGUST2002_EXPORT InputGroupBox;
+typedef void (InputGroupBox::*InputGroupBoxMethod) ( void );
 
 class AUGUST2002_EXPORT InputGroupBox : public CMyBaseForm
 {
@@ -40,14 +45,19 @@ public:
 
 
 private:
-  Container d_menuCommands;
+  CommandsContainer d_menuCommands;
   CStatic d_staticFrame;
   CStatic d_valueStaticText;
   CStatic d_typeStaticText;
   DWORD d_savePointerMenuItemState;
   DWORD d_convertToMenuItemState;
   DWORD d_clearPointersMenuItemState;
-	CMenu*  CreatePopupMenu(void);
+  void appendMenuItem(UINT flag, TPopupMenu& menu,
+    CommandsContainer& commandsContainer,
+    InputGroupBoxMethod method,
+    const std::string& i_caption);
+
+  CMenu*  CreatePopupMenu(void);
   void initialize();
   CComboBox d_valueBox;
   CComboBox d_typeBox;

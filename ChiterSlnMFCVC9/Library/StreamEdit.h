@@ -28,15 +28,16 @@
 //class TForm1;
 extern char* WhatFind;
 
-
-
+//forward declaration
+class AUGUST2002_EXPORT TStreamEdit;
+typedef void (TStreamEdit::*TStreamEditMethod) ( void );
 
 //---------------------------------------------------------------------------
 class AUGUST2002_EXPORT TStreamEdit : public CMyBaseForm
 {
   DECLARE_DYNAMIC(TStreamEdit)
 private:
-  Container d_menuCommands;
+  CommandsContainer d_menuCommands;
   SplitterCtrl_NS::SplitterCtrl d_splitterWnd;
   SplitterCtrl_NS::SplitterCtrl d_splitterWndTop;
   SplitterCtrl_NS::SplitterCtrl d_splitterWndTopLeft;
@@ -106,6 +107,12 @@ private:
   CMenuItem ReplaceAllMenuItem;
   TSearcherProperties SearcherProperties;
   InputGroupBox GotoInputGroupBox;
+
+
+  void appendMenuItem(TPopupMenu& menu,
+	  CommandsContainer& commandsContainer,
+	  TStreamEditMethod method,
+	  const std::string& i_caption);
 
   void PointersNotifyEvent(int);
   void UpdateInfoString();

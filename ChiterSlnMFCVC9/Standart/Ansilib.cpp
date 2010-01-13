@@ -4,11 +4,17 @@
 #include <sstream>
 #include <iomanip>
 #include "Ansilib.h"
-wchar_t* StringType[]={L"hex num",L"dec num",L"string",L"hex string",L"float num",L"double num"};
+wchar_t* StringTypeW[]={L"hex num",L"dec num",L"string",L"hex string",L"float num",L"double num"};
+char* StringTypeA[]={"hex num","dec num","string","hex string","float num","double num"};
 
-wchar_t** getStringType()
+wchar_t** getStringTypeW()
 {
-	return StringType;
+	return StringTypeW;
+}
+
+char** getStringTypeA()
+{
+  return StringTypeA;
 }
 
 /* char* HEX_NUM="hex num" ;

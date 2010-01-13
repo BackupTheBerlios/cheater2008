@@ -8,10 +8,10 @@
 typedef boost::function<void (void)> Command;
 typedef boost::shared_ptr<Command> CommandPtr;
 
-class AUGUST2002_EXPORT Container
+class AUGUST2002_EXPORT CommandsContainer
 {
 public:
-  Container();
+  CommandsContainer();
   UINT createCommand(CommandPtr);
   bool hasCommand(UINT idx) const;
   const Command& getCommand(UINT) const; //throw

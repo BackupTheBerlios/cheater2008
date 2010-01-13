@@ -7,13 +7,13 @@
 #include <boost/bind.hpp>
 
 
-  Container::Container():
+  CommandsContainer::CommandsContainer():
   d_maxUsed (0x1000)
   {
     
   }
 
-  UINT Container::createCommand(CommandPtr cmd)
+  UINT CommandsContainer::createCommand(CommandPtr cmd)
   {
     UINT idx = 0;
     if(!d_freeIDs.empty())
@@ -48,14 +48,14 @@
     return idx;
   }
 
-  bool Container::hasCommand(UINT idx) const
+  bool CommandsContainer::hasCommand(UINT idx) const
   {
     std::map<UINT,CommandPtr>::const_iterator it = d_map.find(idx);
 
     return (d_map.find(idx) != d_map.end() );
   }
 
-  const Command& Container::getCommand(UINT idx) const
+  const Command& CommandsContainer::getCommand(UINT idx) const
   {
     std::map<UINT,CommandPtr>::const_iterator it = d_map.find(idx);
 
@@ -69,7 +69,7 @@
     return *(it->second);
   }
 
-  void Container::removeCommand(UINT idx)
+  void CommandsContainer::removeCommand(UINT idx)
   {
     std::map<UINT,CommandPtr>::iterator it = d_map.find(idx);
     if(it==d_map.end())
@@ -92,7 +92,7 @@
 
   void test()
   {
-    Container container;
+    CommandsContainer container;
     boost::bind(dymmy,1)();
     container.createCommand( CommandPtr( new Command(boost::bind(dymmy,1)) ) );
   }
