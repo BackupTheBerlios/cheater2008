@@ -76,6 +76,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
 
+  // store menu handles
 	return TRUE;
 }
 

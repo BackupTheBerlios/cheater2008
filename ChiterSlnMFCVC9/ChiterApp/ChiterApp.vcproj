@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ChiterApp"
 	ProjectGUID="{031D6FA0-1E7C-467D-9F35-C34DAB3FB196}"
 	RootNamespace="ChiterApp"
@@ -73,6 +73,7 @@
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -157,6 +158,7 @@
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

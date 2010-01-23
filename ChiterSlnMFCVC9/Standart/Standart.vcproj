@@ -45,6 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;STANDART_LIBRARY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -69,10 +70,13 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Standart.def"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).pdb"
 				SubSystem="2"
+				ImportLibrary="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -127,6 +131,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories=".."
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;STANDART_LIBRARY"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -150,12 +155,15 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Standart.def"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				ImportLibrary="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -195,6 +203,10 @@
 			</File>
 			<File
 				RelativePath=".\Ansilib.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dbg.cpp"
 				>
 			</File>
 			<File
@@ -241,6 +253,10 @@
 			</File>
 			<File
 				RelativePath=".\Ansilib.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dbg.h"
 				>
 			</File>
 			<File

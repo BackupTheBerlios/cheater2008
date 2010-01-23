@@ -6,6 +6,7 @@
 #include <sstream>
 #include <boost/bind.hpp>
 
+#include "Standart/dbg.h"
 
   CommandsContainer::CommandsContainer():
   d_maxUsed (0x1000)
@@ -44,7 +45,8 @@
     }
 
     d_map[idx] = cmd;
-
+    
+    DPRINTF( "Created New Command Index " << idx );
     return idx;
   }
 

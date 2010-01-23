@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Library/AuxiliaryTypedefs.h"
+
 class CMainFrame : public CMDIFrameWnd
 {
 	DECLARE_DYNAMIC(CMainFrame)
@@ -31,7 +33,6 @@ public:
 protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;
 	CToolBar    m_wndToolBar;
-
 // Generated message map functions
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Library"
 	ProjectGUID="{554DB0A1-6DCF-4B0C-84B5-147760659EF1}"
 	RootNamespace="Library"
@@ -69,11 +69,13 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;;$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Library.def"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).pdb"
 				SubSystem="2"
+				ImportLibrary="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -152,13 +154,15 @@
 				Name="VCLinkerTool"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;;$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Library.def"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				ImportLibrary="$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib/$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

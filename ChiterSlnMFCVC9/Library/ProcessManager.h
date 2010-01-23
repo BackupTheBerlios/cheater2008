@@ -6,6 +6,8 @@
 #include <sstream>
 #include <fstream>
 #include "AuxiliaryTypedefs.h"
+#include "Library/august2002Fwd.h"
+
 class ProcessStreamBuf: public std::streambuf
 {
     public:
@@ -46,7 +48,7 @@ class ProcessStreamBuf: public std::streambuf
         virtual int overflow ( int c = EOF );
 };
 //---------------------------------------------------------------------------
-class TProcessManager:public std::iostream
+class AUGUST2002_EXPORT TProcessManager: public std::iostream
 {
 private:
 

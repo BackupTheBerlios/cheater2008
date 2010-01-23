@@ -31,6 +31,7 @@ CChiterAppDoc::~CChiterAppDoc()
 {
 }
 
+
 BOOL CChiterAppDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Library/AuxiliaryTypedefs.h"
 
 class CChiterAppDoc : public CDocument
 {
@@ -29,8 +30,6 @@ public:
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
-
-protected:
 
 // Generated message map functions
 protected:

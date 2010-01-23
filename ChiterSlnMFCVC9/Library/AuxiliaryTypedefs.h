@@ -13,6 +13,8 @@ typedef CProgressCtrl TProgressBar;
 
 typedef CSplitterWnd TGroupBox;
 
+typedef CMenu TMenu;
+
 typedef CMenu TPopupMenu;
 
 typedef CMenu CMenuItem;
