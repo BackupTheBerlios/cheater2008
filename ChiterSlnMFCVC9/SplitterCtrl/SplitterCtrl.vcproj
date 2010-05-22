@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_40&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_42&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;SPLITTERCTRL_LIBRARY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -131,7 +131,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_40&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_42&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;SPLITTERCTRL_LIBRARY"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
