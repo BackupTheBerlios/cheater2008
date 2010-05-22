@@ -1,5 +1,6 @@
 #ifndef LIBRARY_MessageReporterBase_h
 #define LIBRARY_MessageReporterBase_h
+
 #include <string>
 class MessageReporterBase
 {
@@ -11,7 +12,8 @@ public:
     TYPE_EXCEPTION,
 
   };
-  virtual void showMessage(const std::string& i_msg,TYPE type) const  = 0;
+  virtual void showMessage(const std::string& i_title,const std::string& i_msg,TYPE type) const  = 0;
+  void showMessage(const std::string& i_msg,TYPE type) const;
 
   MessageReporterBase(void);
   virtual ~MessageReporterBase(void);

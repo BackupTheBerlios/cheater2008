@@ -41,6 +41,9 @@ class ProcessStreamBuf: public std::streambuf
         virtual int sync ( );
         virtual std::streamsize showmanyc ( );
         virtual std::streamsize xsgetn ( char * s, std::streamsize n );
+        /*Fucking MS */
+        virtual std::streamsize _Xsgetn_s(char * s,size_t /*size of s buffer - dummy, it should be enough*/, std::streamsize _Count);
+        /*Fucking MS */
         virtual int underflow ( );
         virtual int uflow ( );
         virtual int pbackfail ( int c = EOF );

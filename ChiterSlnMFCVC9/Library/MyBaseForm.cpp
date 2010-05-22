@@ -2,8 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "Library.h"
+
 #include "MyBaseForm.h"
+#include "ExceptionReporter.h"
 
 extern HINSTANCE hInstance;
 // CMyBaseForm dialog
@@ -93,6 +94,38 @@ HGLOBAL CMyBaseForm::initDialog( HINSTANCE hinst, LPCTSTR lpszTemplateName )
 }
 
 #endif
+
+BOOL CMyBaseForm::OnCmdMsgNoCppException( UINT nID, int nCode, void* pExtra,
+                                     AFX_CMDHANDLERINFO* pHandlerInfo)
+{
+  BOOL ret = TRUE;
+  try
+  {
+    ret = CBase::OnCmdMsg(nID, nCode,pExtra,pHandlerInfo);
+  }
+  catch (...)
+  {
+    processExceptions(__FUNCTION__);
+  }
+  return ret;
+}
+
+BOOL CMyBaseForm::OnCmdMsg(UINT nID, int nCode, void* pExtra,
+                       AFX_CMDHANDLERINFO* pHandlerInfo)
+{
+  BOOL ret = TRUE;
+  LPEXCEPTION_POINTERS ep = 0;
+  __try
+  {
+    ret = OnCmdMsgNoCppException(nID,nCode,pExtra,pHandlerInfo);
+  }
+  __except(ep ? EXCEPTION_EXECUTE_HANDLER
+    : reportWinExcp(ep = GetExceptionInformation()))
+  {
+
+  }
+  return ret;
+}
 
 
 // CMyBaseForm message handlers
