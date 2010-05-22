@@ -1,7 +1,7 @@
 ﻿//---------------------------------------------------------------------------
 
-#ifndef FunctionsH
-#define FunctionsH
+#ifndef STANDART_FunctionsH
+#define STANDART_FunctionsH
 #include <iostream>
 #include <vector>
 #include "StandartFwd.h"

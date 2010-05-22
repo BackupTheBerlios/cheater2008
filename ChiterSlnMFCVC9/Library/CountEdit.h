@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 
-#ifndef CountEditH
-#define CountEditH
+#ifndef Library_CountEditH
+#define Library_CountEditH
 //---------------------------------------------------------------------------
 #include "Standart/Ansilib.h"
 #include "august2002Fwd.h"

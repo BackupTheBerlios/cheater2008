@@ -44,8 +44,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_40&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;AUGUST2002_LIBRARY"
+				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_42&quot;"
+				PreprocessorDefinitions="OS_WIN32;_WINDOWS;_DEBUG;_USRDLL;AUGUST2002_LIBRARY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -67,9 +67,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Dbghelp.lib"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;;$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_42\lib&quot;;$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Library.def"
 				GenerateDebugInformation="true"
@@ -130,8 +131,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_40&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;AUGUST2002_LIBRARY"
+				AdditionalIncludeDirectories="..;&quot;C:\Program Files (x86)\boost\boost_1_42&quot;"
+				PreprocessorDefinitions="OS_WIN32;_WINDOWS;NDEBUG;_USRDLL;AUGUST2002_LIBRARY"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -152,9 +153,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Dbghelp.lib"
 				OutputFile="$(SolutionDir)/Output.vc9/$(ConfigurationName)/bin/$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40\lib&quot;;$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_42\lib&quot;;$(SolutionDir)/Output.vc9/$(ConfigurationName)/lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\Library.def"
 				GenerateDebugInformation="true"
@@ -205,15 +207,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ExceptionReporter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\InputGroupBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Library.cpp"
+				RelativePath=".\Library.def"
 				>
 			</File>
 			<File
-				RelativePath=".\Library.def"
+				RelativePath=".\LibraryDll.cpp"
 				>
 			</File>
 			<File
@@ -283,11 +289,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\InputGroupBox.h"
+				RelativePath=".\ExceptionReporter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Library.h"
+				RelativePath=".\InputGroupBox.h"
 				>
 			</File>
 			<File

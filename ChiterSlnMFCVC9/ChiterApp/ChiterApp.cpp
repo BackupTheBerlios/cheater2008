@@ -9,6 +9,7 @@
 #include "ChiterAppDoc.h"
 #include "ChiterAppView.h"
 #include "Library/ProcessChoiceFrame.h"
+#include "Library/ExceptionReporter.h"
 #include "Standart/dbg.h"
 
 #include <boost/bind.hpp>
@@ -371,20 +372,46 @@ void CChiterAppApp::OnProcessView()
 }
 
 
-BOOL CChiterAppApp::OnCmdMsg(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo)
+BOOL CChiterAppApp::OnCmdMsgNoCppException( UINT nID, int nCode, void* pExtra,
+                                     AFX_CMDHANDLERINFO* pHandlerInfo)
 {
+  BOOL ret = TRUE;
+  try
+  {
+    if (nCode== CN_COMMAND)
+    { // pop-up menu sent CN_COMMAND
 
-  if (nCode== CN_COMMAND)
-  { // pop-up menu sent CN_COMMAND
-
-    // execute command
-    if(d_menuCommands.hasCommand(nID))
-      d_menuCommands.getCommand(nID)();
-    return TRUE;
+      // execute command
+      if(d_menuCommands.hasCommand(nID))
+        d_menuCommands.getCommand(nID)();
+      return TRUE;
+    }
+    // If the object(s) in the extended command route don't handle
+    // the command, then let the base class OnCmdMsg handle it.
+    ret = CWinApp::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
   }
-  // If the object(s) in the extended command route don't handle
-  // the command, then let the base class OnCmdMsg handle it.
-  return CWinApp::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
+  catch (...)
+  {
+    processExceptions(__FUNCTION__);
+  }
+  return ret;
+}
+
+BOOL CChiterAppApp::OnCmdMsg(UINT nID, int nCode, void* pExtra,
+                       AFX_CMDHANDLERINFO* pHandlerInfo)
+{
+  BOOL ret = TRUE;
+  LPEXCEPTION_POINTERS ep = 0;
+  __try
+  {
+    ret = OnCmdMsgNoCppException(nID,nCode,pExtra,pHandlerInfo);
+  }
+  __except(ep ? EXCEPTION_EXECUTE_HANDLER
+    : reportWinExcp(ep = GetExceptionInformation()))
+  {
+
+  }
+  return ret;
 }
 
 // CChiterAppApp message handlers

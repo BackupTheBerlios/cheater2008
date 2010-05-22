@@ -1,7 +1,7 @@
 ﻿//---------------------------------------------------------------------------
 
-#ifndef DBG_H
-#define DBG_H
+#ifndef STANDADRT_DBG_H
+#define STANDADRT_DBG_H
 #include <sstream>
 #include <string>
 #include "Standart/StandartFwd.h"

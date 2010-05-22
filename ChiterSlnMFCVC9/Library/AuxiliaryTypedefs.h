@@ -1,5 +1,5 @@
-#ifndef AuxiliaryTypedefs_h
-#define  AuxiliaryTypedefs_h
+#ifndef Library_AuxiliaryTypedefs_h
+#define Library_AuxiliaryTypedefs_h
 
 enum TShiftState
 {

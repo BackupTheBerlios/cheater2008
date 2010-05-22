@@ -45,6 +45,7 @@ private:
 
   void OnProcessNew();
   void initializeMainMenu(); 
+  BOOL OnCmdMsgNoCppException(UINT nID, int nCode, void* pExtra,AFX_CMDHANDLERINFO* pHandlerInfo);
 public:
 	virtual BOOL InitInstance();
 

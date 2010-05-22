@@ -1,5 +1,5 @@
-#ifndef august2002Fwd_h
-#define august2002Fwd_h
+#ifndef Library_august2002Fwd_h
+#define Library_august2002Fwd_h
 
 #ifdef AUGUST2002_LIBRARY
 #define AUGUST2002_EXPORT   __declspec( dllexport )

@@ -7,7 +7,7 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
-#include "Library.h"
+
 #include "Standart/Ansi_Stream.h"
 #include "InputGroupBox.h"
 
